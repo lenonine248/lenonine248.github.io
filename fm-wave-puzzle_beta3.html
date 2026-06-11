@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FM WAVE PUZZLE</title>
+<style>
+:root{
+  --panel:#211d19;
+  --panel2:#2b2620;
+  --bezel:#0d0b09;
+  --scope-bg:#070d0a;
+  --trace:#3ee6c0;
+  --target:#f5a93e;
+  --pink:#ff5c8a;
+  --text:#ece4d6;
+  --dim:#998f7f;
+  --lcd:#ffb84d;
+  --lcd-bg:#1a120a;
+  --line:#3a342c;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  background:#15120f;
+  background-image:radial-gradient(ellipse at 50% -10%, #2a241d 0%, #15120f 60%);
+  color:var(--text);
+  font-family:"SF Mono","Cascadia Mono","Consolas","Menlo",monospace;
+  min-height:100vh;
+  display:flex;justify-content:center;
+  padding:16px 12px 48px;
+}
+.unit{width:100%;max-width:720px}
+
+/* ---------- header ---------- */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:2px solid var(--line);
+  padding-bottom:10px;margin-bottom:14px;flex-wrap:wrap;gap:6px;
+}
+.logo{font-size:18px;font-weight:800;letter-spacing:.16em}
+.logo span{color:var(--trace)}
+.logo em{color:var(--pink);font-style:normal}
+.hud{font-size:12px;color:var(--dim);letter-spacing:.1em;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.hud b{color:var(--lcd)}
+.gear{
+  background:none;border:1px solid var(--line);border-radius:6px;color:var(--dim);
+  font-size:14px;padding:4px 9px;cursor:pointer;
+}
+.gear:hover{color:var(--text)}
+
+/* ---------- title screen ---------- */
+.title-screen{text-align:center;padding:34px 12px 10px}
+.title-big{
+  font-size:clamp(34px,8vw,56px);font-weight:800;letter-spacing:.12em;line-height:1.15;
+  margin-bottom:6px;
+}
+.title-big .t1{color:var(--trace);text-shadow:0 0 18px rgba(62,230,192,.45)}
+.title-big .t2{color:var(--target);text-shadow:0 0 18px rgba(245,169,62,.4)}
+.title-sub{color:var(--dim);font-size:13px;letter-spacing:.25em;margin-bottom:28px}
+.title-wave{margin:0 auto 30px;display:block;max-width:520px;width:100%}
+.mode-btns{display:flex;flex-direction:column;gap:12px;max-width:360px;margin:0 auto}
+.title-stats{margin-top:22px;font-size:12px;color:var(--dim);letter-spacing:.1em;line-height:2}
+.title-stats b{color:var(--lcd)}
+
+/* ---------- buttons ---------- */
+button{font-family:inherit;cursor:pointer;border:none;color:var(--text);letter-spacing:.08em}
+.btn{
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border:1px solid var(--line);
+  border-bottom:3px solid var(--bezel);
+  border-radius:8px;
+  padding:13px 20px;font-size:15px;font-weight:700;
+  transition:transform .05s, border-color .15s, box-shadow .2s;
+}
+.btn:active{transform:translateY(2px);border-bottom-width:1px}
+.btn-teal{border-left:4px solid var(--trace)}
+.btn-pink{border-left:4px solid var(--pink)}
+.btn-amber{border-left:4px solid var(--target)}
+.btn-sm{padding:9px 14px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.attention{animation:glowpulse 1s ease-in-out infinite;border-color:var(--trace)}
+@keyframes glowpulse{
+  0%,100%{box-shadow:0 0 0 rgba(62,230,192,0)}
+  50%{box-shadow:0 0 16px rgba(62,230,192,.55)}
+}
+
+/* ---------- scope ---------- */
+.scope-bezel{
+  background:linear-gradient(180deg,#3a332b,#1a1612);
+  border-radius:14px;padding:10px;
+  box-shadow:inset 0 2px 4px rgba(255,255,255,.06), 0 6px 18px rgba(0,0,0,.5);
+}
+.scope-wrap{position:relative;border-radius:8px;overflow:hidden;background:var(--scope-bg)}
+canvas#scope{display:block;width:100%;height:auto}
+.scanlines{
+  position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+}
+.scope-labels{
+  position:absolute;top:8px;left:10px;right:10px;display:flex;justify-content:space-between;
+  font-size:10.5px;letter-spacing:.12em;pointer-events:none;
+}
+.lab-target{color:var(--target);opacity:.85}
+.lab-player{color:var(--trace);opacity:.85}
+
+/* ---------- meter ---------- */
+.meter-row{display:flex;align-items:center;gap:12px;margin:14px 0 4px}
+.meter{flex:1;display:flex;gap:3px;height:18px;position:relative}
+.seg{flex:1;background:#26211b;border-radius:2px;border:1px solid #14110d}
+.seg.on{background:var(--trace);box-shadow:0 0 6px rgba(62,230,192,.5)}
+.seg.on.hot{background:var(--pink);box-shadow:0 0 8px rgba(255,92,138,.6)}
+.meter .thresh{
+  position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--pink);
+  left:96%;opacity:.7;border-radius:1px;
+}
+.readout{
+  font-size:18px;font-weight:800;min-width:86px;text-align:right;
+  background:var(--lcd-bg);color:var(--lcd);border:1px solid var(--line);
+  border-radius:6px;padding:6px 10px;
+  text-shadow:0 0 8px rgba(255,184,77,.5);
+}
+.readout.clear{color:var(--trace);text-shadow:0 0 8px rgba(62,230,192,.6)}
+.meter-note{font-size:11px;color:var(--dim);letter-spacing:.1em;margin-bottom:10px;text-align:right}
+
+.match-banner{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:rgba(62,230,192,.08);
+  border:1px solid var(--trace);border-radius:8px;
+  color:var(--trace);font-size:13.5px;font-weight:700;letter-spacing:.08em;
+  padding:10px 12px;margin-bottom:10px;
+  animation:fadein .3s;
+}
+
+/* ---------- algorithm row ---------- */
+.algo-row{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin:12px 0;padding:10px 14px;
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  font-size:12px;
+}
+.algo-label{color:var(--dim);letter-spacing:.15em;font-size:11px}
+.opbox{border:1.5px solid var(--dim);border-radius:5px;padding:3px 9px;font-weight:700}
+.opbox.car{border-color:var(--trace);color:var(--trace)}
+.opbox.m1{border-color:var(--target);color:var(--target)}
+.opbox.m2{border-color:var(--pink);color:var(--pink)}
+.arrow{color:var(--dim)}
+.algo-stack{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.algo-btns{display:flex;gap:8px;flex-wrap:wrap}
+.algo-btn{
+  background:var(--panel2);border:1px solid var(--line);border-radius:7px;
+  padding:8px 12px;font-size:12px;font-weight:700;color:var(--dim);
+  display:flex;flex-direction:column;gap:2px;align-items:center;min-width:96px;
+}
+.algo-btn small{font-size:10px;font-weight:400;letter-spacing:.05em}
+.algo-btn.active{color:var(--trace);border-color:var(--trace);box-shadow:0 0 10px rgba(62,230,192,.25)}
+.algo-hint{font-size:11px;color:var(--dim);width:100%;margin-top:4px}
+
+/* ---------- operator panels ---------- */
+.ops{display:grid;gap:12px;margin-top:14px}
+.op-panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:14px 16px 16px;
+  border-top:3px solid var(--target);
+}
+.op-panel.op2{border-top-color:var(--pink)}
+.op-title{font-size:12px;letter-spacing:.2em;color:var(--dim);margin-bottom:12px;display:flex;justify-content:space-between}
+.op-title b{color:var(--text)}
+.param{display:grid;grid-template-columns:64px 1fr 74px;align-items:center;gap:12px;margin-bottom:12px}
+.param:last-child{margin-bottom:0}
+.param label{font-size:11.5px;color:var(--dim);letter-spacing:.08em}
+.param .val{
+  background:var(--lcd-bg);color:var(--lcd);border:1px solid var(--line);border-radius:5px;
+  padding:4px 8px;text-align:right;font-weight:700;font-size:14px;
+  text-shadow:0 0 6px rgba(255,184,77,.4);
+}
+.wave-sel{display:flex;gap:6px;flex-wrap:wrap}
+.wave-btn{
+  background:var(--panel2);border:1px solid var(--line);border-radius:6px;
+  padding:6px 10px;font-size:11px;font-weight:700;color:var(--dim);
+  display:flex;align-items:center;gap:6px;
+}
+.wave-btn svg{display:block}
+.wave-btn.active{color:var(--target);border-color:var(--target);box-shadow:0 0 8px rgba(245,169,62,.25)}
+.op-panel.op2 .wave-btn.active{color:var(--pink);border-color:var(--pink);box-shadow:0 0 8px rgba(255,92,138,.25)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:#0f0d0a;border:1px solid #050403}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:26px;height:18px;border-radius:4px;margin-top:-7px;
+  background:linear-gradient(180deg,#564c40,#33291f);
+  border:1px solid #0d0b09;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15), 0 2px 4px rgba(0,0,0,.6);
+}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:#0f0d0a;border:1px solid #050403}
+input[type=range]::-moz-range-thumb{
+  width:26px;height:18px;border-radius:4px;border:1px solid #0d0b09;
+  background:linear-gradient(180deg,#564c40,#33291f);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15), 0 2px 4px rgba(0,0,0,.6);
+}
+
+/* ---------- bottom controls ---------- */
+.sound-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.sound-row .btn{flex:1;min-width:140px}
+.nav-row{display:flex;gap:10px;margin-top:12px;justify-content:space-between;flex-wrap:wrap}
+
+/* ---------- tutorial box ---------- */
+.tut-box{
+  border:1px solid var(--trace);border-left:5px solid var(--trace);
+  background:rgba(62,230,192,.06);
+  border-radius:10px;padding:14px 16px;margin-bottom:14px;
+  font-size:13.5px;line-height:1.9;
+  animation:fadein .3s;
+}
+.tut-step{font-size:11px;color:var(--trace);letter-spacing:.2em;margin-bottom:6px;font-weight:700}
+.tut-box b{color:var(--lcd)}
+.tut-box .btn{margin-top:10px}
+.tut-wait{color:var(--trace);font-weight:700}
+
+/* ---------- tutorial select ---------- */
+.tut-list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.tut-item{
+  display:flex;align-items:center;gap:14px;text-align:left;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border:1px solid var(--line);border-bottom:3px solid var(--bezel);
+  border-radius:10px;padding:14px 18px;width:100%;
+}
+.tut-item:active{transform:translateY(1px)}
+.tut-item .num{
+  font-size:20px;font-weight:800;color:var(--trace);min-width:36px;text-align:center;
+}
+.tut-item .body{flex:1}
+.tut-item .name{font-size:14px;font-weight:700;margin-bottom:2px}
+.tut-item .desc{font-size:11.5px;color:var(--dim);line-height:1.7}
+.tut-item .stat{font-size:11px;letter-spacing:.1em;min-width:48px;text-align:center}
+.tut-item .stat.done{color:var(--trace)}
+.tut-item .stat.todo{color:var(--lcd)}
+.tut-item.locked{opacity:.35;cursor:default}
+.tut-item.locked .num{color:var(--dim)}
+
+/* ---------- stage select ---------- */
+.sel-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.sel-head h2{font-size:16px;letter-spacing:.15em}
+.sel-head .sub{font-size:11.5px;color:var(--dim)}
+.tier-block{margin-bottom:18px}
+.tier-title{
+  font-size:11.5px;color:var(--dim);letter-spacing:.12em;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.tier-title::after{content:"";flex:1;height:1px;background:var(--line)}
+.tier-title b{color:var(--text)}
+.tier-new{
+  font-size:10px;color:var(--pink);border:1px solid var(--pink);border-radius:4px;
+  padding:1px 6px;letter-spacing:.1em;
+}
+.stage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.stage-btn{
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border:1px solid var(--line);border-bottom:2px solid var(--bezel);
+  border-radius:6px;padding:9px 0;font-size:13px;font-weight:700;color:var(--text);
+}
+.stage-btn:active{transform:translateY(1px)}
+.stage-btn.locked{opacity:.28;cursor:default}
+.stage-btn.done{color:var(--trace);border-color:#2a4a42}
+.stage-btn.current{border-color:var(--lcd);color:var(--lcd);box-shadow:0 0 8px rgba(255,184,77,.25)}
+
+/* ---------- info page ---------- */
+.info-page{line-height:2;font-size:14px}
+.info-page h2{
+  font-size:17px;letter-spacing:.12em;color:var(--target);
+  margin:30px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line);
+}
+.info-page h2:first-of-type{margin-top:8px}
+.info-page p{margin-bottom:14px;color:var(--text)}
+.info-page .note{
+  background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--trace);
+  border-radius:8px;padding:12px 16px;font-size:13px;margin:16px 0;color:var(--dim);
+}
+.info-page .note b{color:var(--text)}
+.info-page .formula{
+  text-align:center;background:var(--lcd-bg);color:var(--lcd);
+  border:1px solid var(--line);border-radius:8px;
+  padding:14px;margin:16px 0;font-size:15px;letter-spacing:.05em;
+  text-shadow:0 0 8px rgba(255,184,77,.4);
+}
+.info-page svg{display:block;margin:18px auto;max-width:100%}
+.timeline{margin:14px 0 18px}
+.tl-item{display:grid;grid-template-columns:88px 1fr;gap:14px;margin-bottom:12px}
+.tl-year{color:var(--pink);font-weight:800;text-align:right;letter-spacing:.05em}
+.tl-body{border-left:2px solid var(--line);padding-left:14px;color:var(--text);font-size:13.5px;line-height:1.85}
+.tl-body b{color:var(--lcd)}
+
+/* ---------- overlays / modal ---------- */
+.overlay{
+  position:fixed;inset:0;background:rgba(10,8,6,.82);
+  display:flex;align-items:center;justify-content:center;z-index:50;
+  animation:fadein .25s;padding:16px;
+}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.clear-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  border-top:4px solid var(--trace);
+  padding:36px 40px;text-align:center;max-width:92vw;
+  box-shadow:0 0 60px rgba(62,230,192,.18);
+}
+.clear-word{
+  font-size:42px;font-weight:800;letter-spacing:.22em;color:var(--trace);
+  text-shadow:0 0 22px rgba(62,230,192,.6);margin-bottom:8px;
+  animation:pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.clear-sub{color:var(--dim);font-size:13px;margin-bottom:24px;line-height:1.9}
+.clear-sub b{color:var(--lcd)}
+.clear-card .btn{margin:4px}
+
+.opt-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  border-top:4px solid var(--lcd);
+  padding:26px 28px;width:420px;max-width:92vw;
+}
+.opt-card h3{font-size:15px;letter-spacing:.2em;margin-bottom:20px;color:var(--lcd)}
+.opt-row{display:grid;grid-template-columns:120px 1fr 56px;gap:12px;align-items:center;margin-bottom:18px}
+.opt-row label{font-size:12.5px;color:var(--dim)}
+.opt-row .val{
+  background:var(--lcd-bg);color:var(--lcd);border:1px solid var(--line);border-radius:5px;
+  padding:4px 8px;text-align:right;font-weight:700;font-size:13px;
+}
+.toggle{
+  grid-column:2/4;justify-self:start;
+  background:var(--panel2);border:1px solid var(--line);border-radius:20px;
+  padding:6px 16px;font-size:13px;font-weight:700;color:var(--dim);
+}
+.toggle.on{color:var(--trace);border-color:var(--trace);box-shadow:0 0 8px rgba(62,230,192,.25)}
+.opt-note{font-size:11.5px;color:var(--dim);line-height:1.8;margin-bottom:18px}
+.opt-card .btn{width:100%}
+
+.hidden{display:none !important}
+
+@media (max-width:480px){
+  .param{grid-template-columns:54px 1fr 64px;gap:8px}
+  .clear-card{padding:28px 20px}
+  .clear-word{font-size:32px}
+  .tl-item{grid-template-columns:64px 1fr;gap:10px}
+}
+@media (prefers-reduced-motion: reduce){
+  .clear-word,.btn.attention{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="unit">
+
+  <!-- ============ TITLE SCREEN ============ -->
+  <div id="titleScreen">
+    <div class="title-screen">
+      <div class="title-big"><span class="t1">FM WAVE</span><br><span class="t2">PUZZLE</span></div>
+      <div class="title-sub">— 波形をそろえろ —</div>
+      <svg class="title-wave" viewBox="0 0 520 90" xmlns="http://www.w3.org/2000/svg">
+        <path id="titlePathT" fill="none" stroke="#f5a93e" stroke-width="2" stroke-dasharray="5 5" opacity=".7"/>
+        <path id="titlePathP" fill="none" stroke="#3ee6c0" stroke-width="2.5" opacity=".9"/>
+      </svg>
+      <div class="mode-btns">
+        <button class="btn btn-teal" id="btnStageMode">▶ ステージモード（全100ステージ）</button>
+        <button class="btn btn-pink" id="btnEndlessMode">∞ エンドレスモード</button>
+        <button class="btn btn-amber" id="btnTutMenu">📖 チュートリアル</button>
+        <button class="btn" id="btnInfo">📜 FM音源とは？ — しくみと歴史</button>
+        <button class="btn" id="btnOptionsTitle">⚙ オプション</button>
+      </div>
+      <div class="title-stats" id="titleStats"></div>
+    </div>
+  </div>
+
+  <!-- ============ TUTORIAL SELECT ============ -->
+  <div id="tutSelectScreen" class="hidden">
+    <header>
+      <div class="logo"><span>FM</span> WAVE <em>PUZZLE</em></div>
+      <div class="hud"><button class="gear" id="btnTutSelBack">◀ タイトル</button></div>
+    </header>
+    <div class="sel-head">
+      <h2>TUTORIALS</h2>
+      <span class="sub">新しい要素が登場すると、ここにチュートリアルが増えていきます</span>
+    </div>
+    <div class="tut-list" id="tutList"></div>
+  </div>
+
+  <!-- ============ STAGE SELECT ============ -->
+  <div id="selectScreen" class="hidden">
+    <header>
+      <div class="logo"><span>FM</span> WAVE <em>PUZZLE</em></div>
+      <div class="hud"><button class="gear" id="btnSelBack">◀ タイトル</button></div>
+    </header>
+    <div class="sel-head">
+      <h2>STAGE SELECT</h2>
+      <span class="sub">クリアすると次のステージが開放されます</span>
+    </div>
+    <div id="stageGrid"></div>
+  </div>
+
+  <!-- ============ GAME SCREEN ============ -->
+  <div id="gameScreen" class="hidden">
+    <header>
+      <div class="logo"><span>FM</span> WAVE <em>PUZZLE</em></div>
+      <div class="hud">
+        <span id="hudMode"></span>
+        <span>CLEAR <b id="hudClears">0</b></span>
+        <button class="gear" id="btnOptionsGame" title="オプション">⚙</button>
+      </div>
+    </header>
+
+    <div id="tutBox" class="tut-box hidden"></div>
+
+    <div class="scope-bezel">
+      <div class="scope-wrap">
+        <canvas id="scope" width="1320" height="500"></canvas>
+        <div class="scanlines"></div>
+        <div class="scope-labels">
+          <span class="lab-target">- - - TARGET</span>
+          <span class="lab-player">— YOUR WAVE</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="meter-row">
+      <div class="meter" id="meter"></div>
+      <div class="readout" id="readout">0.0%</div>
+    </div>
+    <div class="meter-note">一致度 96% 以上で波形ロック ▲</div>
+
+    <div id="matchBanner" class="match-banner hidden">
+      ✦ 波形が一致！「♪ 自分の波を聴く」で音を確かめてクリア ✦
+    </div>
+
+    <div class="algo-row" id="algoRow"></div>
+
+    <div class="ops" id="opsContainer"></div>
+
+    <div class="sound-row">
+      <button class="btn btn-amber btn-sm" id="btnPlayTarget">♪ お手本を聴く</button>
+      <button class="btn btn-teal btn-sm" id="btnPlayMine">♪ 自分の波を聴く</button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-sm" id="btnBackFromGame">◀ もどる</button>
+      <button class="btn btn-sm" id="btnRegen">⟳ 別の波形に変える</button>
+    </div>
+  </div>
+
+  <!-- ============ INFO PAGE ============ -->
+  <div id="infoScreen" class="hidden">
+    <header>
+      <div class="logo"><span>FM</span> WAVE <em>PUZZLE</em></div>
+      <div class="hud"><button class="gear" id="btnInfoBack">◀ タイトル</button></div>
+    </header>
+    <div class="info-page">
+
+      <h2>FM音源とは</h2>
+      <p>
+        FM音源（Frequency Modulation synthesis／周波数変調合成）は、<b style="color:var(--trace)">ある波の周波数を、別の波で揺さぶる</b>ことで複雑な音色を生み出す音の合成方式です。
+        音として鳴る波を<b style="color:var(--trace)">キャリア（Carrier）</b>、それを揺さぶる波を<b style="color:var(--target)">モジュレータ（Modulator）</b>と呼びます。
+      </p>
+      <svg viewBox="0 0 520 110" xmlns="http://www.w3.org/2000/svg" aria-label="モジュレータがキャリアを変調する図">
+        <rect x="40" y="35" width="110" height="40" rx="6" fill="none" stroke="#f5a93e" stroke-width="2"/>
+        <text x="95" y="60" text-anchor="middle" fill="#f5a93e" font-size="14" font-family="monospace" font-weight="bold">MODULATOR</text>
+        <line x1="150" y1="55" x2="215" y2="55" stroke="#998f7f" stroke-width="2"/>
+        <polygon points="215,55 205,50 205,60" fill="#998f7f"/>
+        <text x="182" y="45" text-anchor="middle" fill="#998f7f" font-size="11" font-family="monospace">周波数を揺らす</text>
+        <rect x="220" y="35" width="100" height="40" rx="6" fill="none" stroke="#3ee6c0" stroke-width="2"/>
+        <text x="270" y="60" text-anchor="middle" fill="#3ee6c0" font-size="14" font-family="monospace" font-weight="bold">CARRIER</text>
+        <line x1="320" y1="55" x2="385" y2="55" stroke="#998f7f" stroke-width="2"/>
+        <polygon points="385,55 375,50 375,60" fill="#998f7f"/>
+        <text x="430" y="60" fill="#ece4d6" font-size="14" font-family="monospace">♪ 出力</text>
+      </svg>
+      <p>
+        サイレンの「ウ〜〜」のように音の高さをゆっくり揺らすとビブラートになりますが、
+        この揺れを<b>音の高さとして聞こえるほど高速（数十〜数千Hz）</b>にすると、
+        揺れはもはや「音程の変化」ではなく<b>音色の変化</b>として聞こえます。
+        元のサイン波にはなかった倍音（サイドバンド）が一気に生まれ、
+        たった2つのサイン波から、きらびやかなベルや金属音、エレピのような複雑な音が作れるのです。
+      </p>
+      <div class="formula">y(t) = A · sin( 2πf<sub>c</sub>t + I · sin(2πf<sub>m</sub>t) )</div>
+      <p>
+        f<sub>c</sub> はキャリア周波数、f<sub>m</sub> はモジュレータ周波数、I は<b style="color:var(--lcd)">モジュレーション・インデックス</b>（揺さぶりの深さ）です。
+        生まれる倍音は f<sub>c</sub> ± n·f<sub>m</sub> の位置に並び、その強さの配分はベッセル関数という数学関数で決まります。
+        さらにモジュレータをサイン波以外（三角波・矩形波・のこぎり波）にしたり、モジュレータ同士を重ねたり連結したりすると、生まれる倍音の構成はどんどん複雑になっていきます。
+      </p>
+      <div class="note">
+        <b>このゲームとの対応：</b>RATIO スライダーは f<sub>m</sub>/f<sub>c</sub> の比率、INDEX スライダーは I そのものです。
+        比率が整数だと倍音がきれいに整列して楽音らしい音に、半端な比率（×1.5 や ×3.5）だと倍音がずれて
+        ベルやゴングのような金属的な響きになります。INDEX を上げるほど倍音が増えて波形はギザギザに、音は明るく派手になります。
+        WAVE はモジュレータの波形そのもの、ALGORITHM はオペレータのつなぎ方（実機の DX7 にも32種類のアルゴリズムがありました）に対応します。
+      </div>
+
+      <h2>FM音源の歴史</h2>
+      <p>
+        FM音源の物語は、シンセサイザーメーカーではなく<b>大学の音楽研究室</b>から始まりました。
+      </p>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-year">1967</div><div class="tl-body">
+          スタンフォード大学の作曲家・研究者<b>ジョン・チャウニング（John Chowning）</b>が、コンピュータでビブラートの実験中に、変調を極端に速く・深くすると音色そのものが劇的に変化することを発見。FM合成の音楽的な可能性に最初に気づいた瞬間でした。
+        </div></div>
+        <div class="tl-item"><div class="tl-year">1973</div><div class="tl-body">
+          チャウニングが論文「The Synthesis of Complex Audio Spectra by Means of Frequency Modulation」を発表。少ない計算量で豊かな倍音が得られるFM合成の理論が世に出ます。当時のコンピュータ音楽では計算コストの低さが決定的な利点でした。
+        </div></div>
+        <div class="tl-item"><div class="tl-year">1970年代半ば</div><div class="tl-body">
+          スタンフォード大学が特許化し、米国メーカーには響かなかったこの技術を日本の<b>ヤマハ</b>がライセンス。この特許は後に、スタンフォード大学史上有数の収益を生んだライセンスとして知られるようになります。チャウニング自身も《Stria》（1977）などFMを駆使した電子音楽作品を残しました。
+        </div></div>
+        <div class="tl-item"><div class="tl-year">1981</div><div class="tl-body">
+          ヤマハがFM音源搭載の高級エレクトロニックピアノ <b>GS-1</b> を発売。まだ非常に高価でしたが、デジタルFMの実用化が始まります。
+        </div></div>
+        <div class="tl-item"><div class="tl-year">1983</div><div class="tl-body">
+          <b>ヤマハ DX7</b> 登場。6オペレータ・32アルゴリズムのフルデジタルシンセが、従来のアナログ大型機より大幅に安い価格で発売され、空前の大ヒットに。きらめくエレクトリックピアノ、ガラスのようなベル、硬質なベース——DX7の音は1980年代ポップスのサウンドそのものになりました。
+        </div></div>
+        <div class="tl-item"><div class="tl-year">1980〜90年代</div><div class="tl-body">
+          FM音源チップ（ヤマハ <b>OPL/OPN/OPM シリーズ</b>など）がアーケードゲーム基板、PCサウンドカード（AdLib、Sound Blaster）、そして<b>メガドライブ</b>（YM2612）に搭載され、「ゲームミュージックの音」として一時代を築きます。さらに後年は携帯電話の着信メロディ用音源としても広く使われました。
+        </div></div>
+        <div class="tl-item"><div class="tl-year">1995年ごろ</div><div class="tl-body">
+          FM合成の基本特許が期限切れに。各社がFMを自由に使えるようになり、ソフトウェアシンセ（Native Instruments FM7/FM8 など）や無料のDX7互換ソフトが登場します。
+        </div></div>
+        <div class="tl-item"><div class="tl-year">2010年代〜</div><div class="tl-body">
+          KORG volca fm、ヤマハ reface DX や MONTAGE の FM-X、Elektron Digitone など、FM音源のハードが続々と復活。チップチューンやシンセウェイヴの流行も追い風に、「冷たく、きらびやかで、どこか懐かしい」FMの音は現役であり続けています。
+        </div></div>
+      </div>
+      <div class="note">
+        <b>なぜFMは「パズル」になるのか：</b>FM音源は減算方式のシンセと違い、パラメータと出音の関係が直感的に読みにくいことで有名でした。
+        DX7の膨大なパラメータを前に、多くのミュージシャンはプリセットを使うだけだったと言われます。
+        このゲームは、その「比率・インデックス・波形・アルゴリズムが音をどう変えるか」を目と耳で体に覚えさせる練習でもあります。
+        100ステージを終えるころには、波形を見ただけでだいたいのパラメータが読めるようになっているはずです。
+      </div>
+      <div style="text-align:center;margin:26px 0 10px">
+        <button class="btn btn-teal" id="btnInfoBack2">◀ タイトルにもどる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CLEAR OVERLAY ============ -->
+  <div id="clearOverlay" class="overlay hidden">
+    <div class="clear-card">
+      <div class="clear-word" id="clearWord">CLEAR!</div>
+      <div class="clear-sub" id="clearMsg"></div>
+      <button class="btn btn-teal" id="btnNext">次へ ▶</button>
+      <button class="btn" id="btnClearBack">もどる</button>
+    </div>
+  </div>
+
+  <!-- ============ OPTIONS MODAL ============ -->
+  <div id="optOverlay" class="overlay hidden">
+    <div class="opt-card">
+      <h3>⚙ OPTIONS</h3>
+      <div class="opt-row">
+        <label>音量</label>
+        <input type="range" id="optVolume" min="0" max="100" step="1">
+        <div class="val" id="optVolumeVal">70</div>
+      </div>
+      <div class="opt-row">
+        <label>自動再生</label>
+        <button class="toggle" id="optAutoplay">OFF</button>
+      </div>
+      <div class="opt-note">
+        自動再生を ON にすると、スライダーや波形・アルゴリズムを変更するたびに自分の波形が自動で鳴ります。
+        波形が一致した状態での自動再生はクリアとして扱われます。
+      </div>
+      <button class="btn btn-teal btn-sm" id="optClose">閉じる</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+/* ================================================================
+   FM WAVE PUZZLE  v3
+   段階的要素解放:
+     STAGE 1-16   アルゴリズム固定(A) / 正弦波のみ
+     STAGE 17-    モジュレータの波形が選択可能に (TRI/SQR/SAW 順次追加)
+     STAGE 29-    オシレータ2基・並列 (B)
+     STAGE 45-    直列チェイン (C)
+     STAGE 77-    アルゴリズム自体を推理して選択
+   各要素の初登場ステージの直前に割り込みチュートリアル。
+   チュートリアルはステージセレクトには出ず、チュートリアル一覧に増える。
+================================================================ */
+
+const F0 = 220;
+const VIEW_T = 2 / 110;
+const N_SAMPLES = 600;
+const CLEAR_PCT = 96;
+const TOTAL_STAGES = 100;
+
+const rnd = (arr)=>arr[Math.floor(Math.random()*arr.length)];
+const $ = id=>document.getElementById(id);
+
+/* ================= oscillator waveforms ================= */
+const WAVE_FN = {
+  sine:     p=>Math.sin(p),
+  triangle: p=>(2/Math.PI)*Math.asin(Math.sin(p)),
+  square:   p=>(Math.sin(p)>=0?1:-1),
+  saw:      p=>{const x=p/(2*Math.PI); return 2*(x-Math.floor(x+0.5));},
+};
+const WAVE_INFO = {
+  sine:     {label:'SIN', jp:'正弦波'},
+  triangle: {label:'TRI', jp:'三角波'},
+  square:   {label:'SQR', jp:'矩形波'},
+  saw:      {label:'SAW', jp:'のこぎり波'},
+};
+function waveGlyph(w){
+  const paths={
+    sine:'M1 7 Q5 -2 9 7 Q13 16 17 7',
+    triangle:'M1 11 L5 3 L13 11 L17 3',
+    square:'M1 11 L1 3 L9 3 L9 11 L17 11 L17 3',
+    saw:'M1 11 L9 3 L9 11 L17 3',
+  };
+  return `<svg width="18" height="14" viewBox="0 0 18 14"><path d="${paths[w]}" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`;
+}
+
+const W1=['sine'];
+const W2=['sine','triangle'];
+const W3=['sine','triangle','square'];
+const W4=['sine','triangle','square','saw'];
+
+const R_INT  = [1,2,3,4,5,6,7,8];
+const R_HALF = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8];
+
+/* ================= save data ================= */
+const save = {
+  unlocked: 1,
+  clearedMax: 0,
+  totalClears: 0,
+  endlessBest: 0,
+  volume: 70,
+  autoplay: false,
+  tuts: {basic:false, waves:false, parallel:false, serial:false, algo:false},
+};
+async function loadSave(){
+  try{
+    const r = await window.storage.get('fmwp-save');
+    if(r && r.value){
+      const d=JSON.parse(r.value);
+      Object.assign(save, d);
+      save.tuts = Object.assign({basic:false,waves:false,parallel:false,serial:false,algo:false}, d.tuts||{});
+    }
+  }catch(e){/* 初回 or storage 非対応 */}
+}
+async function persist(){
+  try{ await window.storage.set('fmwp-save', JSON.stringify(save)); }catch(e){}
+}
+
+/* ================= 100 stages: tiers ================= */
+/* algoMode: 'fixed' = アルゴリズム表示のみ / 'choice' = プレイヤーが選択 */
+const TIERS = [
+  {from:1,  to:8,   name:"ベーシック",       isNew:"はじまり",
+    spec:(t,n)=>({algoMode:'fixed', algo:'single', waves:W1,
+      ratios:R_INT.slice(0, Math.round(3+t*3)), idxMax:Math.round(3+t*3), idxStep:t<0.5?1:0.5})},
+  {from:9,  to:16,  name:"ハーフレシオ",      isNew:null,
+    spec:(t,n)=>({algoMode:'fixed', algo:'single', waves:W1,
+      ratios:R_HALF.slice(0, Math.round(6+t*6)), idxMax:Math.round(6+t*2), idxStep:0.5})},
+  {from:17, to:28,  name:"ウェーブフォーム",   isNew:"波形選択",
+    spec:(t,n)=>({algoMode:'fixed', algo:'single', waves: t<0.33?W2 : t<0.7?W3 : W4,
+      ratios:R_HALF.slice(0, Math.round(6+t*4)), idxMax:Math.round(5+t*2), idxStep:0.5})},
+  {from:29, to:44,  name:"デュアル並列",      isNew:"オシレータ×2",
+    spec:(t,n)=>({algoMode:'fixed', algo:'parallel', waves: t<0.4?W1 : t<0.75?W2 : W3,
+      ratios:(t<0.5?R_INT:R_HALF).slice(0, Math.round(4+t*4)), idxMax:Math.round(4+t*2), idxStep:t<0.3?1:0.5})},
+  {from:45, to:60,  name:"直列チェイン",      isNew:"直列接続",
+    spec:(t,n)=>({algoMode:'fixed', algo:'serial', waves: t<0.4?W1 : t<0.75?W2 : W3,
+      ratios:(t<0.5?R_INT:R_HALF).slice(0, Math.round(4+t*4)), idxMax:Math.round(3+t*2), idxStep:t<0.3?1:0.5})},
+  {from:61, to:76,  name:"コンビネーション",   isNew:null,
+    spec:(t,n)=>({algoMode:'fixed', algo:(n%2===0?'serial':'parallel'), waves: t<0.5?W3:W4,
+      ratios:R_HALF.slice(0, Math.round(8+t*6)), idxMax:Math.round(5+t*2), idxStep:t<0.6?0.5:0.25})},
+  {from:77, to:92,  name:"アルゴリズム推理",   isNew:"アルゴリズム選択",
+    spec:(t,n)=>({algoMode:'choice', algoPool:['single','parallel','serial'], waves: t<0.5?W2:W3,
+      ratios:R_HALF.slice(0, Math.round(8+t*4)), idxMax:Math.round(5+t*2), idxStep:0.5})},
+  {from:93, to:100, name:"マスター",          isNew:null,
+    spec:(t,n)=>({algoMode:'choice', algoPool:['single','parallel','serial'], waves:W4,
+      ratios:R_HALF, idxMax:Math.round(8+t*2), idxStep:0.25})},
+];
+function stageSpec(n){
+  const tier=TIERS.find(tr=>n>=tr.from&&n<=tr.to);
+  const t=tier.to===tier.from?1:(n-tier.from)/(tier.to-tier.from);
+  const s=tier.spec(t,n);
+  s.tierName=tier.name;
+  return s;
+}
+
+/* ================= endless difficulty ================= */
+function endlessSpec(n){
+  if(n<3)  return {algoMode:'fixed',algo:'single',waves:W1,ratios:R_INT.slice(0,4),idxMax:4,idxStep:1};
+  if(n<6)  return {algoMode:'fixed',algo:'single',waves:W1,ratios:R_HALF.slice(0,8),idxMax:6,idxStep:0.5};
+  if(n<9)  return {algoMode:'fixed',algo:'single',waves:W3,ratios:R_HALF.slice(0,8),idxMax:6,idxStep:0.5};
+  if(n<13) return {algoMode:'fixed',algo:'parallel',waves:W1,ratios:R_INT.slice(0,5),idxMax:5,idxStep:0.5};
+  if(n<17) return {algoMode:'fixed',algo:'serial',waves:W1,ratios:R_INT.slice(0,5),idxMax:4,idxStep:0.5};
+  if(n<22) return {algoMode:'fixed',algo:rnd(['parallel','serial']),waves:W3,ratios:R_HALF.slice(0,10),idxMax:6,idxStep:0.5};
+  if(n<28) return {algoMode:'choice',algoPool:['single','parallel','serial'],waves:W3,ratios:R_HALF.slice(0,10),idxMax:7,idxStep:0.5};
+  return {algoMode:'choice',algoPool:['single','parallel','serial'],waves:W4,ratios:R_HALF,
+          idxMax:Math.min(10,8+Math.floor((n-28)/5)), idxStep:n<36?0.5:0.25};
+}
+
+/* ================= tutorials ================= */
+/* unlockStage: このステージを始める直前に割り込み再生される */
+const TUTORIALS=[
+  {id:'basic', unlockStage:1, name:'① 基本操作',
+   desc:'RATIO と INDEX で波形を合わせる、ゲームの基本の流れ',
+   spec:{algoMode:'fixed',algo:'single',waves:W1,ratios:[1,2,3],idxMax:4,idxStep:1},
+   target:{algo:'single',mods:[{wave:'sine',r:2,I:3},{wave:'sine',r:1,I:0}]},
+   steps:[
+     {text:`ようこそ！ これは <b>FM音源</b> で音と波形を作るパズルです。<br>
+       上の画面には <b style="color:var(--target)">点線＝お手本の波形</b> と
+       <b style="color:var(--trace)">実線＝あなたの波形</b> が表示されています。<br>
+       これをぴったり重ねるのが目標です。`, btn:'次へ ▶'},
+     {text:`まずは <b>RATIO</b>（レシオ）。モジュレータがキャリアの何倍の速さで揺らすかの比率です。<br>
+       比率が変わると波の「うねりの細かさ」が変わります。<br>
+       <span class="tut-wait">▼ RATIO スライダーを動かしてみよう</span>`, wait:'ratio'},
+     {text:`いい感じ！ 次は <b>INDEX</b>（インデックス）。揺さぶりの<b>深さ</b>です。<br>
+       0 だとただのサイン波。上げるほど波がギザギザになり、音は明るく派手になります。<br>
+       <span class="tut-wait">▼ INDEX スライダーを動かしてみよう</span>`, wait:'index'},
+     {text:`波形は「音の形」そのもの。耳でも確かめられます。<br>
+       <span class="tut-wait">▼「♪ お手本を聴く」か「♪ 自分の波を聴く」を押してみよう</span>`, wait:'listen'},
+     {text:`それでは本番。お手本に重ねてみましょう。<br>
+       ヒント：この問題の答えは <b>RATIO ×2 / INDEX 3.0</b> です。<br>
+       <span class="tut-wait">▼ スライダーを合わせて一致度 96% を超えよう</span>`, wait:'matched'},
+     {text:`波形が一致！ でもまだクリアではありません。<br>
+       最後に<b>自分で作った音を鳴らして</b>確認できたらクリアです。<br>
+       <span class="tut-wait">▼ 光っている「♪ 自分の波を聴く」を押そう</span>`, wait:'clear'},
+   ]},
+  {id:'waves', unlockStage:17, name:'② 波形の種類',
+   desc:'モジュレータの波形を SIN 以外（TRI/SQR/SAW）に切り替える',
+   spec:{algoMode:'fixed',algo:'single',waves:W3,ratios:[1,2,3],idxMax:4,idxStep:1},
+   target:{algo:'single',mods:[{wave:'square',r:2,I:2},{wave:'sine',r:1,I:0}]},
+   steps:[
+     {text:`ここからは<b>新要素：波形の種類</b>が登場します。<br>
+       これまでモジュレータは正弦波(SIN)だけでしたが、<b>三角波(TRI)・矩形波(SQR)</b>などに切り替えられるようになります。
+       揺さぶる波の形が変われば、出てくる波形もガラッと変わります。`, btn:'次へ ▶'},
+     {text:`MODULATOR パネルに <b>WAVE</b> ボタンが増えています。<br>
+       切り替えるたびにスコープの波形がどう変わるか観察してみましょう。<br>
+       <span class="tut-wait">▼ WAVE ボタンを押して波形を切り替えてみよう</span>`, wait:'wave'},
+     {text:`カクカクした矩形波で揺らすと波形に段差が、のこぎり波だと非対称なうねりが生まれます。<br>
+       ではこのお手本を再現してみましょう。<br>
+       ヒント：答えは <b>WAVE: SQR / RATIO ×2 / INDEX 2.0</b> です。<br>
+       <span class="tut-wait">▼ 一致度 96% を超えよう</span>`, wait:'matched'},
+     {text:`一致！ あとはもう分かりますね。<br>
+       <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
+   ]},
+  {id:'parallel', unlockStage:29, name:'③ オシレータ×2（並列）',
+   desc:'2基のモジュレータが同時にキャリアを揺らす ALGORITHM B',
+   spec:{algoMode:'fixed',algo:'parallel',waves:W1,ratios:[1,2,3],idxMax:3,idxStep:1},
+   target:{algo:'parallel',mods:[{wave:'sine',r:2,I:2},{wave:'sine',r:3,I:1}]},
+   steps:[
+     {text:`<b>新要素：オシレータが2基</b>になりました！<br>
+       ALGORITHM B では <b style="color:var(--target)">M1</b> と <b style="color:var(--pink)">M2</b> の2つのモジュレータが
+       <b>並列</b>でキャリアを揺らします。2つの揺れが足し算されるイメージです。`, btn:'次へ ▶'},
+     {text:`コツ：まず <b>M2 の INDEX を 0</b> のままにして M1 だけで大まかな形を作り、
+       あとから M2 で細かいうねりを足すと合わせやすいです。<br>
+       ヒント：答えは <b>M1: ×2 / 2.0、M2: ×3 / 1.0</b>（どちらも SIN）。<br>
+       <span class="tut-wait">▼ 2基を調整して一致度 96% を超えよう</span>`, wait:'matched'},
+     {text:`お見事！ 2オシレータを攻略しました。<br>
+       <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
+   ]},
+  {id:'serial', unlockStage:45, name:'④ 直列チェイン',
+   desc:'M2がM1を揺らし、M1がキャリアを揺らす ALGORITHM C',
+   spec:{algoMode:'fixed',algo:'serial',waves:W1,ratios:[1,2,3],idxMax:3,idxStep:1},
+   target:{algo:'serial',mods:[{wave:'sine',r:2,I:2},{wave:'sine',r:3,I:1}]},
+   steps:[
+     {text:`<b>新要素：直列接続</b>です。<br>
+       ALGORITHM C では <b style="color:var(--pink)">M2</b> がまず <b style="color:var(--target)">M1</b> を揺らし、
+       その「すでに揺れている M1」がキャリアを揺らします。<br>
+       並列が「足し算」なら、直列は「入れ子」。より複雑でうねうねした波形が生まれます。`, btn:'次へ ▶'},
+     {text:`コツ：まず <b>M2 の INDEX を 0</b> にして M1 だけ（＝ただのFM）で土台を作り、
+       M2 の INDEX を少しずつ上げて「揺れの揺れ」を加えていきましょう。<br>
+       ヒント：答えは <b>M1: ×2 / 2.0、M2: ×3 / 1.0</b>。<br>
+       <span class="tut-wait">▼ 一致度 96% を超えよう</span>`, wait:'matched'},
+     {text:`完璧！ 直列チェインを攻略しました。<br>
+       <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
+   ]},
+  {id:'algo', unlockStage:77, name:'⑤ アルゴリズム選択',
+   desc:'お手本の接続方式を波形から推理して A/B/C を選ぶ',
+   spec:{algoMode:'choice',algoPool:['single','parallel','serial'],waves:W1,ratios:[1,2,3],idxMax:3,idxStep:1},
+   target:{algo:'serial',mods:[{wave:'sine',r:2,I:2},{wave:'sine',r:3,I:1}]},
+   steps:[
+     {text:`最後の<b>新要素：アルゴリズム選択</b>です。<br>
+       ここからは、お手本がどの接続方式（A/B/C）で作られたかが<b>隠されます</b>。
+       波形のうねり方から推理して、自分でアルゴリズムを選びましょう。`, btn:'次へ ▶'},
+     {text:`ALGORITHM 欄がボタンになっています。<br>
+       <b>A</b>=モジュレータ1基、<b>B</b>=2基並列、<b>C</b>=直列チェイン。<br>
+       <span class="tut-wait">▼ アルゴリズムボタンを押して切り替えてみよう</span>`, wait:'algo'},
+     {text:`見分けるヒント：単純な周期の繰り返しなら <b>A</b>、
+       2種類のうねりが重なって見えるなら <b>B</b>、
+       うねり自体が波打っているなら <b>C</b> が怪しいです。<br>
+       この問題の答えは <b>ALGORITHM C / M1: ×2 / 2.0、M2: ×3 / 1.0</b>。<br>
+       <span class="tut-wait">▼ 正しいアルゴリズムを選んで一致度 96% を超えよう</span>`, wait:'matched'},
+     {text:`これで全要素マスターです！<br>
+       <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
+   ]},
+];
+
+/* ================= game state ================= */
+let mode=null;            // 'stage' | 'endless' | 'tutorial'
+let stageIdx=0;           // 0-based
+let endlessCount=0;
+let spec=null, target=null, player=null, targetSamples=null;
+let lastPct=0, cleared=false;
+let curTut=null, tutStep=0, pendingStage=null;
+
+function resolveSpec(raw){
+  return {
+    algoMode: raw.algoMode,
+    algo: raw.algo||null,
+    algoPool: raw.algoPool||null,
+    ratios: raw.ratios,
+    idxMax: raw.idxMax,
+    idxStep: raw.idxStep,
+    waves: raw.waves||W1,
+    tierName: raw.tierName||'',
+  };
+}
+function idxChoices(s){
+  const a=[];
+  for(let v=s.idxStep;v<=s.idxMax+1e-9;v+=s.idxStep)a.push(Math.round(v*4)/4);
+  return a;
+}
+function genTarget(s){
+  const algo = s.algoMode==='choice' ? rnd(s.algoPool) : s.algo;
+  const nMods = algo==='single'?1:2;
+  const ch=idxChoices(s);
+  const mods=[];
+  for(let i=0;i<2;i++){
+    mods.push(i<nMods
+      ? {wave:rnd(s.waves), r:rnd(s.ratios), I:rnd(ch)}
+      : {wave:'sine', r:s.ratios[0], I:0});
+  }
+  return {algo, mods};
+}
+function initialPlayer(s){
+  const algo = s.algoMode==='choice' ? 'single' : s.algo;
+  return {algo, mods:[
+    {wave:'sine', r:s.ratios[0], I:0},
+    {wave:'sine', r:s.ratios[0], I:0},
+  ]};
+}
+
+/* ================= waveform math ================= */
+function calcWave(p,t,f){
+  const w=2*Math.PI*f, m=p.mods;
+  const o1=WAVE_FN[m[0].wave], o2=WAVE_FN[m[1].wave];
+  if(p.algo==='single')
+    return Math.sin(w*t + m[0].I*o1(w*m[0].r*t));
+  if(p.algo==='parallel')
+    return Math.sin(w*t + m[0].I*o1(w*m[0].r*t) + m[1].I*o2(w*m[1].r*t));
+  /* serial: M2 -> M1 -> C */
+  return Math.sin(w*t + m[0].I*o1(w*m[0].r*t + m[1].I*o2(w*m[1].r*t)));
+}
+function sampleWave(p){
+  const out=new Float32Array(N_SAMPLES);
+  for(let i=0;i<N_SAMPLES;i++)out[i]=calcWave(p,(i/N_SAMPLES)*VIEW_T,F0);
+  return out;
+}
+function matchScore(a,b){
+  let s=0;
+  for(let i=0;i<N_SAMPLES;i++){const d=a[i]-b[i];s+=d*d;}
+  return Math.max(0,Math.min(100,100*(1-Math.sqrt(s/N_SAMPLES)/0.9)));
+}
+
+/* ================= audio ================= */
+let actx=null,masterGain=null,curSrc=null;
+function audio(){
+  if(!actx){
+    actx=new (window.AudioContext||window.webkitAudioContext)();
+    masterGain=actx.createGain();
+    masterGain.connect(actx.destination);
+    applyVolume();
+  }
+  if(actx.state==='suspended')actx.resume();
+  return actx;
+}
+function applyVolume(){
+  if(masterGain)masterGain.gain.value=Math.pow(save.volume/100,2);
+}
+function stopSound(){if(curSrc){try{curSrc.stop();}catch(e){}curSrc=null;}}
+function buildBuffer(p,f,dur){
+  const ctx=audio(),sr=ctx.sampleRate,len=Math.floor(sr*dur);
+  const buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
+  const fi=Math.floor(sr*0.015),fo=Math.floor(sr*0.12);
+  for(let i=0;i<len;i++){
+    let g=1;
+    if(i<fi)g=i/fi;else if(i>len-fo)g=(len-i)/fo;
+    d[i]=calcWave(p,i/sr,f)*0.25*g;
+  }
+  return buf;
+}
+function playWave(p,f=F0,dur=1.2){
+  stopSound();
+  const ctx=audio(),src=ctx.createBufferSource();
+  src.buffer=buildBuffer(p,f,dur);
+  src.connect(masterGain);src.start();curSrc=src;
+}
+function playClearJingle(p){
+  stopSound();
+  const ctx=audio();
+  [F0,F0*1.25,F0*1.5].forEach((f,i)=>{
+    const src=ctx.createBufferSource();
+    src.buffer=buildBuffer(p,f,0.3);
+    src.connect(masterGain);
+    src.start(ctx.currentTime+i*0.16);
+  });
+}
+
+/* ================= drawing ================= */
+const canvas=$('scope'),cx=canvas.getContext('2d');
+function drawScope(){
+  const W=canvas.width,H=canvas.height,mid=H/2,amp=H*0.40;
+  cx.clearRect(0,0,W,H);
+  cx.strokeStyle='rgba(120,200,170,0.10)';cx.lineWidth=1;cx.beginPath();
+  for(let i=1;i<8;i++){const x=W*i/8;cx.moveTo(x,0);cx.lineTo(x,H);}
+  for(let i=1;i<4;i++){const y=H*i/4;cx.moveTo(0,y);cx.lineTo(W,y);}
+  cx.stroke();
+  cx.strokeStyle='rgba(120,200,170,0.22)';
+  cx.beginPath();cx.moveTo(0,mid);cx.lineTo(W,mid);cx.stroke();
+
+  const pts=660,isClear=cleared;
+  cx.save();
+  cx.setLineDash([8,7]);cx.lineWidth=2.5;
+  cx.strokeStyle=isClear?'rgba(255,255,255,0.55)':'rgba(245,169,62,0.85)';
+  cx.shadowColor='rgba(245,169,62,0.5)';cx.shadowBlur=isClear?0:8;
+  cx.beginPath();
+  for(let i=0;i<=pts;i++){
+    const y=mid-calcWave(target,(i/pts)*VIEW_T,F0)*amp;
+    i===0?cx.moveTo(0,y):cx.lineTo(W*i/pts,y);
+  }
+  cx.stroke();cx.restore();
+
+  cx.save();
+  cx.lineWidth=3;
+  cx.strokeStyle=isClear?'#7dffe0':'#3ee6c0';
+  cx.shadowColor=isClear?'rgba(125,255,224,0.9)':'rgba(62,230,192,0.6)';
+  cx.shadowBlur=isClear?18:10;
+  cx.beginPath();
+  for(let i=0;i<=pts;i++){
+    const y=mid-calcWave(player,(i/pts)*VIEW_T,F0)*amp;
+    i===0?cx.moveTo(0,y):cx.lineTo(W*i/pts,y);
+  }
+  cx.stroke();cx.restore();
+}
+
+/* ================= meter ================= */
+const meterEl=$('meter'),readoutEl=$('readout'),SEGS=24;
+(function(){
+  for(let i=0;i<SEGS;i++){const s=document.createElement('div');s.className='seg';meterEl.appendChild(s);}
+  const th=document.createElement('div');th.className='thresh';meterEl.appendChild(th);
+})();
+function updateMeter(pct){
+  const on=Math.round(pct/100*SEGS);
+  meterEl.querySelectorAll('.seg').forEach((s,i)=>{
+    s.classList.toggle('on',i<on);
+    s.classList.toggle('hot',i<on&&(i+1)/SEGS*100>=CLEAR_PCT);
+  });
+  readoutEl.textContent=pct.toFixed(1)+'%';
+  readoutEl.classList.toggle('clear',pct>=CLEAR_PCT);
+}
+
+/* ================= algorithm row ================= */
+function renderAlgo(){
+  const el=$('algoRow');
+  if(spec.algoMode==='choice'){
+    const defs=[
+      {key:'single',  label:'A', sub:'M1 → C'},
+      {key:'parallel',label:'B', sub:'M1+M2 ⇉ C'},
+      {key:'serial',  label:'C', sub:'M2 → M1 → C'},
+    ];
+    el.innerHTML=`<span class="algo-label">ALGORITHM ?</span>
+      <div class="algo-btns">${defs.map(d=>
+        `<button class="algo-btn${player.algo===d.key?' active':''}" data-algo="${d.key}">
+           ${d.label}<small>${d.sub}</small></button>`).join('')}</div>
+      <span class="algo-hint">お手本のアルゴリズムは非公開——波形のうねり方から推理しよう</span>`;
+    el.querySelectorAll('.algo-btn').forEach(b=>{
+      b.addEventListener('click',()=>{
+        if(cleared)return;
+        if(player.algo===b.dataset.algo)return;
+        player.algo=b.dataset.algo;
+        renderAlgo();renderOps();refresh();
+        tutorialEvent('algo');
+        if(save.autoplay)playMine();
+      });
+    });
+    return;
+  }
+  const name={single:'ALGORITHM A',parallel:'ALGORITHM B',serial:'ALGORITHM C'}[spec.algo];
+  let html=`<span class="algo-label">${name}</span>`;
+  if(spec.algo==='single'){
+    html+=`<span class="opbox m1">M1</span><span class="arrow">→</span><span class="opbox car">C</span><span class="arrow">→ ♪</span>
+           <span class="algo-label" style="margin-left:auto">M1 がキャリア C を揺らす</span>`;
+  }else if(spec.algo==='parallel'){
+    html+=`<span class="algo-stack"><span class="opbox m1">M1</span><span class="opbox m2">M2</span></span>
+           <span class="arrow">⇉</span><span class="opbox car">C</span><span class="arrow">→ ♪</span>
+           <span class="algo-label" style="margin-left:auto">M1 と M2 が並列で C を揺らす</span>`;
+  }else{
+    html+=`<span class="opbox m2">M2</span><span class="arrow">→</span><span class="opbox m1">M1</span>
+           <span class="arrow">→</span><span class="opbox car">C</span><span class="arrow">→ ♪</span>
+           <span class="algo-label" style="margin-left:auto">M2 が M1 を、M1 が C を揺らす</span>`;
+  }
+  el.innerHTML=html;
+}
+
+/* ================= operator panels ================= */
+function fmtIdx(v){return spec.idxStep<0.5?v.toFixed(2):v.toFixed(1);}
+function renderOps(){
+  const cont=$('opsContainer');cont.innerHTML='';
+  const nMods=player.algo==='single'?1:2;
+  for(let i=0;i<nMods;i++){
+    const m=player.mods[i];
+    const panel=document.createElement('div');
+    panel.className='op-panel'+(i===1?' op2':'');
+    const role=player.algo==='serial'?(i===0?'（C を揺らす）':'（M1 を揺らす）'):'（C を揺らす）';
+    const waveRow = spec.waves.length>1 ? `
+      <div class="param">
+        <label>WAVE</label>
+        <div class="wave-sel">${spec.waves.map(w=>
+          `<button class="wave-btn${m.wave===w?' active':''}" data-mod="${i}" data-wave="${w}" title="${WAVE_INFO[w].jp}">
+             ${waveGlyph(w)}${WAVE_INFO[w].label}</button>`).join('')}</div>
+        <div class="val" id="valW${i}">${WAVE_INFO[m.wave].label}</div>
+      </div>` : '';
+    panel.innerHTML=`
+      <div class="op-title"><b>MODULATOR ${i+1}</b><span>${role}</span></div>
+      ${waveRow}
+      <div class="param">
+        <label>RATIO</label>
+        <input type="range" min="0" max="${spec.ratios.length-1}" step="1"
+               value="${Math.max(0,spec.ratios.indexOf(m.r))}" data-mod="${i}" data-kind="r">
+        <div class="val" id="valR${i}">×${m.r}</div>
+      </div>
+      <div class="param">
+        <label>INDEX</label>
+        <input type="range" min="0" max="${spec.idxMax}" step="${spec.idxStep}"
+               value="${m.I}" data-mod="${i}" data-kind="I">
+        <div class="val" id="valI${i}">${fmtIdx(m.I)}</div>
+      </div>`;
+    cont.appendChild(panel);
+  }
+  cont.querySelectorAll('input[type=range]').forEach(sl=>{
+    sl.addEventListener('input',onSliderInput);
+    sl.addEventListener('change',onSliderRelease);
+  });
+  cont.querySelectorAll('.wave-btn').forEach(b=>{
+    b.addEventListener('click',()=>onWaveSelect(+b.dataset.mod,b.dataset.wave));
+  });
+}
+function onSliderInput(e){
+  if(cleared)return;
+  const i=+e.target.dataset.mod,kind=e.target.dataset.kind;
+  if(kind==='r'){
+    player.mods[i].r=spec.ratios[+e.target.value];
+    $('valR'+i).textContent='×'+player.mods[i].r;
+    tutorialEvent('ratio');
+  }else{
+    player.mods[i].I=+e.target.value;
+    $('valI'+i).textContent=fmtIdx(player.mods[i].I);
+    tutorialEvent('index');
+  }
+  refresh();
+}
+function onSliderRelease(){
+  if(cleared)return;
+  if(save.autoplay)playMine();
+}
+function onWaveSelect(i,w){
+  if(cleared)return;
+  if(player.mods[i].wave===w)return;
+  player.mods[i].wave=w;
+  const cont=$('opsContainer');
+  cont.querySelectorAll(`.wave-btn[data-mod="${i}"]`).forEach(b=>{
+    b.classList.toggle('active',b.dataset.wave===w);
+  });
+  const v=$('valW'+i);if(v)v.textContent=WAVE_INFO[w].label;
+  tutorialEvent('wave');
+  refresh();
+  if(save.autoplay)playMine();
+}
+
+/* ================= game flow ================= */
+function refresh(){
+  drawScope();
+  lastPct=matchScore(targetSamples,sampleWave(player));
+  updateMeter(lastPct);
+  const matched=!cleared&&lastPct>=CLEAR_PCT;
+  $('matchBanner').classList.toggle('hidden',!matched);
+  $('btnPlayMine').classList.toggle('attention',matched);
+  if(matched)tutorialEvent('matched');
+}
+
+function beginPuzzle(rawSpec, fixedTarget){
+  cleared=false;
+  $('matchBanner').classList.add('hidden');
+  $('btnPlayMine').classList.remove('attention');
+  spec=resolveSpec(rawSpec);
+  target=fixedTarget
+    ? {algo:fixedTarget.algo, mods:fixedTarget.mods.map(m=>({...m}))}
+    : genTarget(spec);
+  player=initialPlayer(spec);
+  targetSamples=sampleWave(target);
+  renderAlgo();renderOps();updateHud();refresh();
+}
+
+/* ステージ開始（必要なら割り込みチュートリアル） */
+function startStage(n){ /* n: 1-based */
+  const tut=TUTORIALS.find(t=>t.unlockStage===n && !save.tuts[t.id]);
+  if(tut){runTutorial(tut,n);return;}
+  mode='stage';stageIdx=n-1;curTut=null;
+  $('tutBox').classList.add('hidden');
+  show('game');
+  beginPuzzle(stageSpec(n));
+}
+function startEndless(){
+  mode='endless';endlessCount=0;curTut=null;
+  $('tutBox').classList.add('hidden');
+  show('game');
+  beginPuzzle(endlessSpec(0));
+}
+function runTutorial(tut,pending){
+  mode='tutorial';curTut=tut;tutStep=0;pendingStage=pending||null;
+  show('game');
+  beginPuzzle(tut.spec,tut.target);
+  renderTutorial();
+}
+
+function updateHud(){
+  let label;
+  if(mode==='stage'){
+    label=`STAGE <b>${stageIdx+1}</b>/100 <span style="opacity:.7">[${spec.tierName}]</span>`;
+  }else if(mode==='endless'){
+    label=`ENDLESS Lv.<b>${endlessCount+1}</b>（BEST <b>${save.endlessBest}</b>）`;
+  }else{
+    label=`TUTORIAL <span style="opacity:.7">${curTut?curTut.name:''}</span>`;
+  }
+  $('hudMode').innerHTML=label;
+  $('hudClears').textContent=save.totalClears;
+}
+
+function playMine(){
+  if(!cleared&&lastPct>=CLEAR_PCT){doClear();return;}
+  playWave(player);
+  tutorialEvent('listen');
+}
+
+function doClear(){
+  cleared=true;
+  if(mode==='stage'){
+    save.totalClears++;
+    if(stageIdx+1>save.clearedMax)save.clearedMax=stageIdx+1;
+    if(stageIdx+2>save.unlocked)save.unlocked=Math.min(TOTAL_STAGES,stageIdx+2);
+  }else if(mode==='endless'){
+    save.totalClears++;
+    if(endlessCount+1>save.endlessBest)save.endlessBest=endlessCount+1;
+  }else if(mode==='tutorial'&&curTut){
+    save.tuts[curTut.id]=true;
+  }
+  persist();
+  updateHud();
+  $('matchBanner').classList.add('hidden');
+  $('btnPlayMine').classList.remove('attention');
+  drawScope();
+
+  playWave(player,F0,0.8);
+  setTimeout(()=>playClearJingle(player),750);
+
+  const msg=$('clearMsg'),btnNext=$('btnNext'),word=$('clearWord');
+  word.textContent='CLEAR!';
+  if(mode==='stage'){
+    if(stageIdx>=TOTAL_STAGES-1){
+      word.textContent='ALL CLEAR!';
+      msg.innerHTML=`全 <b>100</b> ステージ制覇！<br>あなたの耳と目は本物の <b>FM シンセ職人</b> です。`;
+      btnNext.textContent='エンドレスに挑戦 ▶';btnNext.dataset.action='toEndless';
+    }else{
+      msg.innerHTML=`STAGE ${stageIdx+1} クリア！<br>累計クリア数: <b>${save.totalClears}</b>`;
+      btnNext.textContent='次のステージへ ▶';btnNext.dataset.action='nextStage';
+    }
+  }else if(mode==='endless'){
+    msg.innerHTML=`Lv.${endlessCount+1} クリア！<br>連続クリア: <b>${endlessCount+1}</b>　ベスト: <b>${save.endlessBest}</b>`;
+    btnNext.textContent='次の波形へ ▶';btnNext.dataset.action='nextEndless';
+  }else{
+    word.textContent='COMPLETE!';
+    if(pendingStage){
+      msg.innerHTML=`チュートリアル「${curTut.name}」完了！<br>新要素を引っさげて STAGE ${pendingStage} へ。`;
+      btnNext.textContent=`STAGE ${pendingStage} へ ▶`;btnNext.dataset.action='tutToPending';
+    }else{
+      msg.innerHTML=`チュートリアル「${curTut.name}」完了！`;
+      btnNext.textContent='チュートリアル一覧へ ▶';btnNext.dataset.action='tutToList';
+    }
+  }
+  setTimeout(()=>$('clearOverlay').classList.remove('hidden'),1500);
+}
+
+/* ================= tutorial steps engine ================= */
+function renderTutorial(){
+  const box=$('tutBox');
+  if(mode!=='tutorial'||!curTut){box.classList.add('hidden');return;}
+  const st=curTut.steps[tutStep];
+  if(!st){box.classList.add('hidden');return;}
+  box.classList.remove('hidden');
+  box.innerHTML=`<div class="tut-step">TUTORIAL ${tutStep+1}/${curTut.steps.length} — ${curTut.name}</div>${st.text}`+
+    (st.btn?`<br><button class="btn btn-teal btn-sm" id="tutNext">${st.btn}</button>`:'');
+  const b=$('tutNext');
+  if(b)b.addEventListener('click',()=>{tutStep++;renderTutorial();});
+}
+function tutorialEvent(ev){
+  if(mode!=='tutorial'||!curTut)return;
+  const st=curTut.steps[tutStep];
+  if(st&&st.wait===ev){tutStep++;renderTutorial();}
+}
+
+/* ================= tutorial select screen ================= */
+function renderTutSelect(){
+  const list=$('tutList');list.innerHTML='';
+  TUTORIALS.forEach((t,i)=>{
+    const unlocked = t.unlockStage<=save.unlocked;
+    const item=document.createElement('button');
+    item.className='tut-item'+(unlocked?'':' locked');
+    const stat = !unlocked ? '🔒'
+      : save.tuts[t.id] ? '<span class="stat done">済</span>'
+      : '<span class="stat todo">未</span>';
+    item.innerHTML=`
+      <span class="num">${unlocked?'▶':'?'}</span>
+      <span class="body">
+        <span class="name">${unlocked?t.name:'？？？'}</span><br>
+        <span class="desc">${unlocked?t.desc:`STAGE ${t.unlockStage} に到達すると開放`}</span>
+      </span>
+      <span class="stat">${stat}</span>`;
+    if(unlocked){
+      item.addEventListener('click',()=>runTutorial(t,null));
+    }else{
+      item.disabled=true;
+    }
+    list.appendChild(item);
+  });
+}
+
+/* ================= stage select ================= */
+function renderStageSelect(){
+  const grid=$('stageGrid');grid.innerHTML='';
+  TIERS.forEach(tier=>{
+    const block=document.createElement('div');block.className='tier-block';
+    const newTag=tier.isNew?`<span class="tier-new">NEW: ${tier.isNew}</span>`:'';
+    block.innerHTML=`<div class="tier-title"><b>${tier.from}–${tier.to}</b> ${tier.name} ${newTag}</div>`;
+    const g=document.createElement('div');g.className='stage-grid';
+    for(let n=tier.from;n<=tier.to;n++){
+      const b=document.createElement('button');
+      b.className='stage-btn';b.textContent=n;
+      if(n<=save.clearedMax)b.classList.add('done');
+      if(n===save.unlocked&&n>save.clearedMax)b.classList.add('current');
+      if(n>save.unlocked){b.classList.add('locked');b.disabled=true;}
+      else b.addEventListener('click',()=>startStage(n));
+      g.appendChild(b);
+    }
+    block.appendChild(g);grid.appendChild(block);
+  });
+}
+
+/* ================= options ================= */
+function renderOptions(){
+  $('optVolume').value=save.volume;
+  $('optVolumeVal').textContent=save.volume;
+  const t=$('optAutoplay');
+  t.textContent=save.autoplay?'ON':'OFF';
+  t.classList.toggle('on',save.autoplay);
+}
+$('optVolume').addEventListener('input',e=>{
+  save.volume=+e.target.value;
+  $('optVolumeVal').textContent=save.volume;
+  applyVolume();
+});
+$('optVolume').addEventListener('change',()=>{
+  try{playWave({algo:'single',mods:[{wave:'sine',r:2,I:2},{wave:'sine',r:1,I:0}]},F0,0.25);}catch(e){}
+  persist();
+});
+$('optAutoplay').addEventListener('click',()=>{
+  save.autoplay=!save.autoplay;renderOptions();persist();
+});
+$('optClose').addEventListener('click',()=>$('optOverlay').classList.add('hidden'));
+$('btnOptionsTitle').addEventListener('click',()=>{renderOptions();$('optOverlay').classList.remove('hidden');});
+$('btnOptionsGame').addEventListener('click',()=>{renderOptions();$('optOverlay').classList.remove('hidden');});
+
+/* ================= title wave animation ================= */
+(function(){
+  const pT=$('titlePathT'),pP=$('titlePathP');
+  if(!pT)return;
+  let ph=0;
+  function frame(){
+    const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let dT='',dP='';
+    for(let i=0;i<=260;i++){
+      const x=i/260*520,t=i/260*4*Math.PI;
+      const yT=45-32*Math.sin(t+2.0*Math.sin(2*t));
+      const yP=45-32*Math.sin(t+ph+2.0*Math.sin(2*(t+ph*0.3)));
+      dT+=(i===0?'M':'L')+x.toFixed(1)+' '+yT.toFixed(1);
+      dP+=(i===0?'M':'L')+x.toFixed(1)+' '+yP.toFixed(1);
+    }
+    pT.setAttribute('d',dT);pP.setAttribute('d',dP);
+    if(!reduce){ph+=0.018;requestAnimationFrame(frame);}
+  }
+  frame();
+})();
+
+/* ================= screens ================= */
+function show(screen){
+  ['titleScreen','tutSelectScreen','selectScreen','gameScreen','infoScreen'].forEach(id=>$(id).classList.add('hidden'));
+  $({title:'titleScreen',tutsel:'tutSelectScreen',select:'selectScreen',game:'gameScreen',info:'infoScreen'}[screen])
+    .classList.remove('hidden');
+  if(screen!=='game')$('tutBox').classList.add('hidden');
+  if(screen==='title')renderTitleStats();
+  if(screen==='select')renderStageSelect();
+  if(screen==='tutsel')renderTutSelect();
+  window.scrollTo(0,0);
+}
+function renderTitleStats(){
+  const tutDone=Object.values(save.tuts).filter(Boolean).length;
+  $('titleStats').innerHTML=
+    `進行状況: ステージ <b>${save.clearedMax}</b>/100　|　チュートリアル <b>${tutDone}</b>/${TUTORIALS.length}<br>`+
+    `エンドレスベスト <b>${save.endlessBest}</b>　|　累計クリア <b>${save.totalClears}</b>`;
+}
+
+/* ================= UI wiring ================= */
+$('btnStageMode').addEventListener('click',()=>show('select'));
+$('btnSelBack').addEventListener('click',()=>show('title'));
+$('btnTutMenu').addEventListener('click',()=>show('tutsel'));
+$('btnTutSelBack').addEventListener('click',()=>show('title'));
+$('btnEndlessMode').addEventListener('click',startEndless);
+$('btnInfo').addEventListener('click',()=>show('info'));
+$('btnInfoBack').addEventListener('click',()=>show('title'));
+$('btnInfoBack2').addEventListener('click',()=>show('title'));
+
+$('btnPlayTarget').addEventListener('click',()=>{playWave(target);tutorialEvent('listen');});
+$('btnPlayMine').addEventListener('click',playMine);
+$('btnBackFromGame').addEventListener('click',()=>{
+  stopSound();
+  if(mode==='stage')show('select');
+  else if(mode==='tutorial')show(pendingStage?'select':'tutsel');
+  else show('title');
+});
+$('btnRegen').addEventListener('click',()=>{
+  if(mode==='tutorial')return;
+  stopSound();
+  if(mode==='stage')beginPuzzle(stageSpec(stageIdx+1));
+  else beginPuzzle(endlessSpec(endlessCount));
+});
+
+$('btnNext').addEventListener('click',e=>{
+  $('clearOverlay').classList.add('hidden');stopSound();
+  const a=e.target.dataset.action;
+  if(a==='nextStage')startStage(stageIdx+2);
+  else if(a==='nextEndless'){endlessCount++;mode='endless';beginPuzzle(endlessSpec(endlessCount));}
+  else if(a==='toEndless')startEndless();
+  else if(a==='tutToPending'){const n=pendingStage;pendingStage=null;startStage(n);}
+  else if(a==='tutToList')show('tutsel');
+});
+$('btnClearBack').addEventListener('click',()=>{
+  $('clearOverlay').classList.add('hidden');stopSound();
+  if(mode==='stage')show('select');
+  else if(mode==='tutorial')show(pendingStage?'select':'tutsel');
+  else show('title');
+  pendingStage=null;
+});
+
+/* ================= boot ================= */
+loadSave().then(()=>{
+  renderTitleStats();
+  renderOptions();
+  applyVolume();
+});
+renderTitleStats();
+</script>
+</body>
+</html>

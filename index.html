@@ -629,16 +629,16 @@ const save = {
 };
 async function loadSave(){
   try{
-    const r = await window.storage.get('fmwp-save');
-    if(r && r.value){
-      const d=JSON.parse(r.value);
+    const r = localStorage.getItem('fmwp-save');
+    if(r){
+      const d=JSON.parse(r);
       Object.assign(save, d);
       save.tuts = Object.assign({basic:false,waves:false,parallel:false,serial:false,algo:false}, d.tuts||{});
     }
   }catch(e){/* 初回 or storage 非対応 */}
 }
 async function persist(){
-  try{ await window.storage.set('fmwp-save', JSON.stringify(save)); }catch(e){}
+  try{ localStorage.setItem('fmwp-save', JSON.stringify(save)); }catch(e){}
 }
 
 /* ================= 100 stages: tiers ================= */

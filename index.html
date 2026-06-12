@@ -61,6 +61,34 @@ header{
 .mode-btns{display:flex;flex-direction:column;gap:12px;max-width:360px;margin:0 auto}
 .title-stats{margin-top:22px;font-size:12px;color:var(--dim);letter-spacing:.1em;line-height:2}
 .title-stats b{color:var(--lcd)}
+.ver-label{
+  position:fixed;left:14px;bottom:12px;z-index:20;
+  font-size:11px;color:var(--dim);letter-spacing:.12em;
+  cursor:pointer;user-select:none;
+  border:1px solid var(--line);border-radius:6px;
+  background:rgba(33,29,25,.85);
+  padding:5px 10px;
+}
+.ver-label:hover{color:var(--text);border-color:var(--dim)}
+.ver-label b{color:var(--lcd)}
+
+/* ---------- changelog ---------- */
+.cl-block{margin-bottom:22px}
+.cl-ver{
+  display:flex;align-items:baseline;gap:10px;margin-bottom:8px;
+  font-size:15px;font-weight:800;letter-spacing:.12em;color:var(--trace);
+}
+.cl-ver .tag{
+  font-size:10px;font-weight:700;color:var(--pink);
+  border:1px solid var(--pink);border-radius:4px;padding:1px 6px;letter-spacing:.1em;
+}
+.cl-ver::after{content:"";flex:1;height:1px;background:var(--line)}
+.cl-items{
+  border-left:2px solid var(--line);padding-left:14px;margin-left:4px;
+  font-size:13px;line-height:1.95;color:var(--text);
+}
+.cl-items li{list-style:none;padding-left:14px;position:relative;margin-bottom:4px}
+.cl-items li::before{content:"▸";position:absolute;left:0;color:var(--target)}
 
 /* ---------- buttons ---------- */
 button{font-family:inherit;cursor:pointer;border:none;color:var(--text);letter-spacing:.08em}
@@ -91,6 +119,14 @@ button{font-family:inherit;cursor:pointer;border:none;color:var(--text);letter-s
   border-radius:14px;padding:10px;
   box-shadow:inset 0 2px 4px rgba(255,255,255,.06), 0 6px 18px rgba(0,0,0,.5);
 }
+#stickyWrap.sticky{
+  position:sticky;top:0;z-index:30;
+  background:#15120f;
+  padding:8px 0 6px;
+  margin:0 -4px;padding-left:4px;padding-right:4px;
+  box-shadow:0 12px 18px -8px rgba(0,0,0,.7);
+}
+#stickyWrap.sticky .meter-note{margin-bottom:0}
 .scope-wrap{position:relative;border-radius:8px;overflow:hidden;background:var(--scope-bg)}
 canvas#scope{display:block;width:100%;height:auto}
 .scanlines{
@@ -158,13 +194,15 @@ canvas#scope{display:block;width:100%;height:auto}
 .opbox.car{border-color:var(--trace);color:var(--trace)}
 .opbox.m1{border-color:var(--target);color:var(--target)}
 .opbox.m2{border-color:var(--pink);color:var(--pink)}
+.opbox.m3{border-color:#9d7bff;color:#9d7bff}
+.opbox.m3{border-color:#b58cff;color:#b58cff}
 .arrow{color:var(--dim)}
 .algo-stack{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
 .algo-btns{display:flex;gap:8px;flex-wrap:wrap}
 .algo-btn{
   background:var(--panel2);border:1px solid var(--line);border-radius:7px;
-  padding:8px 12px;font-size:12px;font-weight:700;color:var(--dim);
-  display:flex;flex-direction:column;gap:2px;align-items:center;min-width:96px;
+  padding:8px 10px;font-size:12px;font-weight:700;color:var(--dim);
+  display:flex;flex-direction:column;gap:2px;align-items:center;min-width:84px;
 }
 .algo-btn small{font-size:10px;font-weight:400;letter-spacing:.05em}
 .algo-btn.active{color:var(--trace);border-color:var(--trace);box-shadow:0 0 10px rgba(62,230,192,.25)}
@@ -186,6 +224,17 @@ canvas#scope{display:block;width:100%;height:auto}
   border-top:3px solid var(--target);
 }
 .op-panel.op2{border-top-color:var(--pink)}
+.op-panel.op3{border-top-color:#9d7bff}
+.op-panel.locked{opacity:.62}
+.op-panel.locked input[type=range]{filter:grayscale(.6)}
+.op-panel.op3{border-top-color:#b58cff}
+.op-panel.locked{opacity:.78}
+.op-panel.locked input[type=range]{opacity:.35}
+.lock-badge{
+  color:var(--lcd);font-size:10px;border:1px solid var(--line);border-radius:4px;
+  padding:2px 7px;letter-spacing:.08em;
+}
+.wave-btn:disabled{opacity:.35;cursor:default}
 .op-title{font-size:12px;letter-spacing:.2em;color:var(--dim);margin-bottom:12px;display:flex;justify-content:space-between}
 .op-title b{color:var(--text)}
 .param{display:grid;grid-template-columns:64px 1fr 74px;align-items:center;gap:12px;margin-bottom:12px}
@@ -205,6 +254,8 @@ canvas#scope{display:block;width:100%;height:auto}
 .wave-btn svg{display:block}
 .wave-btn.active{color:var(--target);border-color:var(--target);box-shadow:0 0 8px rgba(245,169,62,.25)}
 .op-panel.op2 .wave-btn.active{color:var(--pink);border-color:var(--pink);box-shadow:0 0 8px rgba(255,92,138,.25)}
+.op-panel.op3 .wave-btn.active{color:#9d7bff;border-color:#9d7bff;box-shadow:0 0 8px rgba(157,123,255,.25)}
+.op-panel.op3 .wave-btn.active{color:#b58cff;border-color:#b58cff;box-shadow:0 0 8px rgba(181,140,255,.25)}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent}
 input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:#0f0d0a;border:1px solid #050403}
 input[type=range]::-webkit-slider-thumb{
@@ -254,6 +305,14 @@ input[type=range]::-moz-range-thumb{
   font-family:inherit;font-size:13px;
 }
 .free-btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.envtime-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.envtime-row label{font-size:11.5px;color:var(--dim);letter-spacing:.08em}
+.envtime-row input[type=range]{flex:1;min-width:120px}
+.envtime-row .val{
+  background:var(--lcd-bg);color:var(--lcd);border:1px solid var(--line);border-radius:5px;
+  padding:4px 8px;font-weight:700;font-size:12px;min-width:54px;text-align:right;
+  text-shadow:0 0 6px rgba(255,184,77,.4);
+}
 .free-msg{font-size:11.5px;margin-top:8px;line-height:1.7}
 .free-msg.ok{color:var(--trace)}
 .free-msg.err{color:#ff9a9a}
@@ -448,7 +507,7 @@ input[type=range]::-moz-range-thumb{
         <path id="titlePathP" fill="none" stroke="#3ee6c0" stroke-width="2.5" opacity=".9"/>
       </svg>
       <div class="mode-btns">
-        <button class="btn btn-teal" id="btnStageMode">▶ ステージモード（全140ステージ）</button>
+        <button class="btn btn-teal" id="btnStageMode">▶ ステージモード（全200ステージ）</button>
         <button class="btn btn-pink" id="btnEndlessMode">∞ エンドレスモード</button>
         <button class="btn btn-amber" id="btnFreeMode">🎛 フリーモード — 音作り＆演奏</button>
         <button class="btn" id="btnTutMenu">📖 チュートリアル</button>
@@ -457,6 +516,7 @@ input[type=range]::-moz-range-thumb{
       </div>
       <div class="title-stats" id="titleStats"></div>
     </div>
+    <div class="ver-label" id="verLabel" title="更新履歴を見る"></div>
   </div>
 
   <!-- ============ TUTORIAL SELECT ============ -->
@@ -498,7 +558,8 @@ input[type=range]::-moz-range-thumb{
 
     <div id="tutBox" class="tut-box hidden"></div>
 
-    <div class="scope-bezel">
+    <div id="stickyWrap">
+    <div class="scope-bezel" id="scopeBezel">
       <div class="scope-wrap">
         <canvas id="scope" width="1320" height="500"></canvas>
         <div class="scanlines"></div>
@@ -521,6 +582,7 @@ input[type=range]::-moz-range-thumb{
       <div class="readout" id="readout">0.0%</div>
     </div>
     <div class="meter-note" id="meterNote">一致度 96% 以上で波形ロック ▲</div>
+    </div>
 
     <div id="matchBanner" class="match-banner hidden">
       ✦ 波形が一致！「♪ 自分の波を聴く」で音を確かめてクリア ✦
@@ -540,6 +602,19 @@ input[type=range]::-moz-range-thumb{
     <!-- ===== FREE MODE PANELS ===== -->
     <div id="freePanel" class="hidden">
       <div class="free-sec">
+        <div class="free-title" style="margin-bottom:10px">ENV TIME — 時間変化の再生設定</div>
+        <div class="envtime-row">
+          <button class="toggle on" id="btnEnvLoop">ループ ON</button>
+          <label>ループ時間</label>
+          <input type="range" id="envTimeSlider" min="0.5" max="4" step="0.1" value="2">
+          <div class="val" id="envTimeVal">2.0s</div>
+        </div>
+        <div class="free-hint">
+          ループ OFF にすると、時間変化は1回だけ進んで最後の状態で止まります（鍵盤の音もループせず1回分だけ鳴ります）。
+          SPEED を変えても、ここで指定したループ時間そのものは変わりません。
+        </div>
+      </div>
+      <div class="free-sec">
         <div class="free-head">
           <div class="free-title">KEYBOARD — 押している間だけ鳴ります</div>
           <div class="oct-ctrl">
@@ -549,7 +624,7 @@ input[type=range]::-moz-range-thumb{
           </div>
         </div>
         <div class="kbd" id="kbd"></div>
-        <div class="free-hint">PCキーボード: A W S E D F T G Y H U J K O L P ; （A = ド、押している間だけ発音）</div>
+        <div class="free-hint">PCキーボード: A W S E D F T G Y H U J K O L P ; （A = ド、押している間だけ発音）／ ← → キーでオクターブ切替</div>
       </div>
       <div class="free-sec">
         <div class="free-title" style="margin-bottom:10px">CHORD PLAYER — コード式入力</div>
@@ -564,7 +639,7 @@ input[type=range]::-moz-range-thumb{
       </div>
       <div class="free-sec">
         <div class="free-title" style="margin-bottom:10px">PATCH I/O — 作った音色をテキストで保存・共有</div>
-        <textarea id="patchText" rows="2" placeholder="例: FM1:C|sqr,2.5,3.40,dec,2|sin,3,1.20,-,1"></textarea>
+        <textarea id="patchText" rows="2" placeholder="例: FM1:F|sqr,2.5,3.40,dec,2|sin,3,1.20,-,1|tri,1,0.80,-,1"></textarea>
         <div class="free-btns">
           <button class="btn btn-amber btn-sm" id="btnPatchExport">⬆ 書き出し</button>
           <button class="btn btn-teal btn-sm" id="btnPatchImport">⬇ 読み込み</button>
@@ -572,7 +647,7 @@ input[type=range]::-moz-range-thumb{
         </div>
         <div class="free-msg" id="patchMsg"></div>
         <div class="free-hint">
-          書式: FM1:アルゴリズム(A/B/C)|波形,RATIO,INDEX,ENV,速度|…　波形=sin/tri/sqr/saw、ENV=-/dec/rise/lfo、速度=0.5/1/2/4
+          書式: FM1:アルゴリズム(A〜G)|波形,RATIO,INDEX,ENV,速度|…（最大3基）　波形=sin/tri/sqr/saw、ENV=-/dec/rise/lfo、速度=0.5/1/2/4
         </div>
       </div>
     </div>
@@ -665,11 +740,27 @@ input[type=range]::-moz-range-thumb{
         <b>なぜFMは「パズル」になるのか：</b>FM音源は減算方式のシンセと違い、パラメータと出音の関係が直感的に読みにくいことで有名でした。
         DX7の膨大なパラメータを前に、多くのミュージシャンはプリセットを使うだけだったと言われます。
         このゲームは、その「比率・インデックス・波形・アルゴリズム・時間変化が音をどう変えるか」を目と耳で体に覚えさせる練習でもあります。
-        140ステージを終えるころには、波形を見ただけでだいたいのパラメータが読めるようになっているはずです。
+        200ステージを終えるころには、波形を見ただけでだいたいのパラメータが読めるようになっているはずです。
       </div>
       <div style="text-align:center;margin:26px 0 10px">
         <button class="btn btn-teal" id="btnInfoBack2">◀ タイトルにもどる</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ============ CHANGELOG ============ -->
+  <div id="changelogScreen" class="hidden">
+    <header>
+      <div class="logo"><span>FM</span> WAVE <em>PUZZLE</em></div>
+      <div class="hud"><button class="gear" id="btnClBack">◀ タイトル</button></div>
+    </header>
+    <div class="sel-head">
+      <h2>CHANGELOG — 更新履歴</h2>
+      <span class="sub" id="clCurrent"></span>
+    </div>
+    <div id="clList"></div>
+    <div style="text-align:center;margin:26px 0 10px">
+      <button class="btn btn-teal" id="btnClBack2">◀ タイトルにもどる</button>
     </div>
   </div>
 
@@ -693,6 +784,14 @@ input[type=range]::-moz-range-thumb{
         <div class="val" id="optVolumeVal">70</div>
       </div>
       <div class="opt-row">
+        <label>メニューBGM・効果音</label>
+        <button class="toggle" id="optBgm">ON</button>
+      </div>
+      <div class="opt-note">
+        タイトルやステージセレクトなどのメニュー画面でBGMとボタン効果音を再生します。
+        ゲーム中の波形操作画面は、集中できるよう常に無音のままです。
+      </div>
+      <div class="opt-row">
         <label>自動再生</label>
         <button class="toggle" id="optAutoplay">OFF</button>
       </div>
@@ -706,6 +805,13 @@ input[type=range]::-moz-range-thumb{
       </div>
       <div class="opt-note">
         ON にすると、現在のアルゴリズムとパラメータに対応した数式がリアルタイムで表示されます。
+      </div>
+      <div class="opt-row">
+        <label>波形ウィンドウを上部に固定</label>
+        <button class="toggle" id="optSticky">OFF</button>
+      </div>
+      <div class="opt-note">
+        ON にすると、画面をスクロールしても波形ウィンドウ・時間スライダー・一致度メーターが画面上部に追従して表示され続けます。
       </div>
       <hr class="opt-sep">
       <button class="btn btn-sm danger" id="optReset">進捗をリセット</button>
@@ -733,11 +839,53 @@ input[type=range]::-moz-range-thumb{
    - セーブは localStorage
 ================================================================ */
 
+/* ================= version & changelog =================
+   バージョンを更新するときは VERSION を進め、CHANGELOG の
+   先頭に新しいエントリを追加すること(新しい順に表示される) */
+const VERSION = 'Beta6';
+const CHANGELOG = [
+  {v:'Beta6', items:[
+    'ステージを全200ステージに拡張(141〜200): オシレータ最大4基(モジュレータ×3)編を追加',
+    'アルゴリズムを7種類に拡張: D(3基並列)/E(3連直列)/F(直列2＋並列1)/G(Y字)を追加',
+    'チュートリアル⑨「形の見分け方」を追加: 紛らわしい接続(DとY字など)の識別ポイントを学んでから自力で再現する',
+    '推理ステージを2択→3〜4択→全7択と段階的に拡大',
+    '3基×時間変化/変化速度では、動くモジュレータ数を1〜2基に制限して難易度を調整',
+    'チュートリアル「⑧オシレータ×3」「⑨形の見分け方」を追加し、新アルゴリズム D/E/F/G の解説を拡充(計9本)',
+    'フリーモードで全7アルゴリズムが使用可能に。パッチ書式をA〜G・最大3基に拡張(旧A/B/C形式も読み込み可)',
+    'エンドレスモードの高レベル帯に3基アルゴリズムが登場。並列チュートリアルで「波形ウィンドウを上部に固定」を紹介',
+    '「波形ウィンドウを上部に固定」で、時間スライダーと一致度メーターも一緒に追従するように改善',
+    'タイトル・ステージセレクト・解説ページなどのメニュー画面に、FM音源で合成したBGMとボタン効果音を追加(ゲーム中の波形操作画面は従来どおり無音)。オプションでON/OFF可能',
+  ]},
+  {v:'Beta5', items:[
+    'ステージを全140ステージに拡張し、最高難度の新要素「ENV変化速度(SPEED)」を追加(ティア121〜140、チュートリアル⑦)',
+    'フリーモードの鍵盤を「押している間だけ鳴る」サステイン方式に変更(リリース付き)',
+    'フリーモードにオクターブ切替を追加(OCT−/＋ボタン、キーボードの ← → キーでも変更可能)',
+    'スコープ下に ⏱ 時間スライダーを追加: ONにすると時間変化を手動でコマ送り観察できる',
+    'フリーモードに ENV TIME 設定を追加: 時間変化のループON/OFF、ループ時間(0.5〜4.0秒)を指定可能。SPEEDを変えてもループ時間は変わらない',
+    'オプションに「波形ウィンドウを上部に固定」を追加(スクロールしてもスコープが画面上部に追従)',
+    'チュートリアルを改善: 操作の効果が必ず波形に現れるよう、各ステップで必要なINDEX/ENVを自動セット',
+    'パッチ書式にENV速度フィールドを追加(旧形式も読み込み可)',
+    '更新履歴ページを追加(タイトル左下のバージョン表示から閲覧)',
+  ]},
+  {v:'Beta4', items:[
+    'ステージを全120ステージに拡張し、要素の登場をティア制で細分化(0.5刻みINDEX → ハーフレシオ → 三角波/矩形波/のこぎり波 → 並列 → 直列 → 0.25刻み → アルゴリズム推理)',
+    '高難度の新要素「時間変化エンベロープ(ENV)」を追加: INDEXが時間とともに変化し波形が動く(CONST/DEC/RISE/LFO)',
+    'フリーモードを追加: 全要素を解放した自由な音作り、パッチのテキスト書き出し/読み込み、鍵盤演奏、コード式入力(C Am7 F G7 …)',
+    'オプションに「アルゴリズムの式を表示」を追加(現在のパラメータを数式でリアルタイム表示)',
+    'オプションに「進捗をリセット」を追加(誤操作防止の2段階確認つき)',
+    'ターゲット波形が、そのステージの目玉要素を高確率で含むように生成を調整',
+    '基本チュートリアルに「⟳ 別の波形に変える」機能の説明を追加',
+  ]},
+  {v:'Beta3', items:[
+    'ゲームを公開',
+  ]},
+];
+
 const F0 = 220;
 const VIEW_T = 2 / 110;
 const N_SAMPLES = 600;
 const CLEAR_PCT = 96;
-const TOTAL_STAGES = 140;
+const TOTAL_STAGES = 200;
 const ENV_LOOP_MS = 2000;                 /* 時間変化の1ループ(描画/判定の基準=2秒) */
 const ENV_PHASES = [0.06,0.25,0.45,0.65,0.88]; /* 一致度判定に使う時刻 */
 
@@ -790,10 +938,13 @@ function envGlyph(e){
   };
   return `<svg width="18" height="14" viewBox="0 0 18 14"><path d="${paths[e]}" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`;
 }
-/* エンベロープ値: 速度 s で位相を巻く */
+/* エンベロープ値: 速度 s で位相を巻く
+   ループON: 位相は周回 / ループOFF(フリーモード): 1回進んで最終値で停止。
+   SPEED は位相の進む速さだけを変え、ループ時間そのものは変えない */
 function envVal(env,u,s){
   if(!env||env==='const')return 1;
-  return ENV_FN[env](frac(u*(s||1)));
+  const p = envLoopOn ? frac(u*(s||1)) : Math.min(u*(s||1),1);
+  return ENV_FN[env](p);
 }
 
 const W1=['sine'];
@@ -809,8 +960,43 @@ const S3=[1,2,4];
 const R_INT  = [1,2,3,4,5,6,7,8];
 const R_HALF = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8];
 
+/* ================= algorithms (7種) =================
+   single  A: M1→C
+   parallel B: M1+M2 ⇉ C
+   serial  C: M2→M1→C
+   par3    D: M1+M2+M3 ⇉ C
+   ser3    E: M3→M2→M1→C
+   mix21   F: (M2→M1)+M3 ⇉ C
+   ycross  G: (M2+M3)→M1→C                              */
+const ALGO_NMODS={single:1,parallel:2,serial:2,par3:3,ser3:3,mix21:3,ycross:3};
+const ALGO_DEF=[
+  {key:'single',  label:'A', sub:'M1 → C'},
+  {key:'parallel',label:'B', sub:'M1+M2 ⇉ C'},
+  {key:'serial',  label:'C', sub:'M2→M1→C'},
+  {key:'par3',    label:'D', sub:'M1+M2+M3 ⇉ C'},
+  {key:'ser3',    label:'E', sub:'M3→M2→M1→C'},
+  {key:'mix21',   label:'F', sub:'(M2→M1)+M3 ⇉ C'},
+  {key:'ycross',  label:'G', sub:'(M2+M3)→M1→C'},
+];
+const ALGO_ROLE={
+  single:  ['（C を揺らす）'],
+  parallel:['（C を揺らす）','（C を揺らす）'],
+  serial:  ['（C を揺らす）','（M1 を揺らす）'],
+  par3:    ['（C を揺らす）','（C を揺らす）','（C を揺らす）'],
+  ser3:    ['（C を揺らす）','（M1 を揺らす）','（M2 を揺らす）'],
+  mix21:   ['（C を揺らす）','（M1 を揺らす）','（C を揺らす）'],
+  ycross:  ['（C を揺らす）','（M1 を揺らす）','（M1 を揺らす）'],
+};
+const A3=['par3','ser3','mix21','ycross'];
+const ALL_ALGOS=['single','parallel','serial','par3','ser3','mix21','ycross'];
+/* 2択推理(およびチュートリアル⑨)用の紛らわしいペア(ステージ番号で巡回) */
+const PAIRS=[
+  ['par3','ycross'],['ser3','mix21'],['par3','mix21'],
+  ['ser3','ycross'],['mix21','ycross'],['par3','ser3'],
+];
+
 /* ================= save data (localStorage) ================= */
-const DEFAULT_TUTS = {basic:false, waves:false, parallel:false, serial:false, algo:false, env:false, speed:false};
+const DEFAULT_TUTS = {basic:false, waves:false, parallel:false, serial:false, algo:false, env:false, speed:false, osc3:false, shapes:false};
 const save = {
   unlocked: 1,
   clearedMax: 0,
@@ -819,6 +1005,8 @@ const save = {
   volume: 70,
   autoplay: false,
   showFormula: false,
+  stickyScope: false,
+  bgm: true,
   tuts: {...DEFAULT_TUTS},
 };
 function loadSave(){
@@ -830,6 +1018,9 @@ function loadSave(){
       save.tuts = Object.assign({...DEFAULT_TUTS}, d.tuts||{});
     }
   }catch(e){/* 初回 or storage 非対応 */}
+  /* ステージ数が変わった版からの引き継ぎに備えてクランプ */
+  save.unlocked=Math.min(Math.max(1,save.unlocked),TOTAL_STAGES);
+  save.clearedMax=Math.min(Math.max(0,save.clearedMax),TOTAL_STAGES);
 }
 function persist(){
   try{ localStorage.setItem('fmwp-save', JSON.stringify(save)); }catch(e){}
@@ -910,10 +1101,44 @@ const TIERS = [
     spec:(t,n)=>({algoMode:'fixed',algo:(n%2===0?'serial':'parallel'),waves:W3,envs:E4,envSpeeds:S3,
       ratios:R_HALF.slice(0,10), idxMax:Math.round(5+t*2), idxStep:0.5,
       bias:{env:'any',speed:true}})},
-  {from:135,to:140, name:"アルティメット",      isNew:"最終試練",
+  {from:135,to:140, name:"アルティメット",      isNew:"3オシレータ総決算",
     spec:(t,n)=>({algoMode:'choice',algoPool:['single','parallel','serial'],waves:W4,envs:E4,envSpeeds:S3,
       ratios:R_HALF, idxMax:Math.round(8+t*2), idxStep:0.25,
       bias:{env:'any',speed:true}})},
+  /* ===== 4オシレータ編 (141〜230) =====
+     負荷を緩やかにする仕掛け:
+     - locks: 指定モジュレータをお手本の値で固定(部分操作)
+     - drill: 全パラメータ固定で接続の形だけを当てる
+     - algoPool: 2択 → 3〜4択 → 全7択と段階的に拡大
+     - maxEnvMods: ENVを持てるモジュレータ数を制限         */
+  {from:141,to:148, name:"トリプル並列",        isNew:"オシレータ×3",
+    spec:(t,n)=>({algoMode:'fixed',algo:'par3',waves:t<0.5?W1:W2,envs:E1,
+      ratios:(t<0.5?R_INT:R_HALF).slice(0,Math.round(4+t*3)), idxMax:Math.round(3+t*2), idxStep:t<0.4?1:0.5})},
+  {from:149,to:156, name:"2択推理",            isNew:"複合形 E/F/G＆2択推理",
+    spec:(t,n)=>({algoMode:'choice',algoPool:PAIRS[n%PAIRS.length],waves:W1,envs:E1,
+      ratios:R_INT.slice(0,Math.round(4+t*2)), idxMax:Math.round(3+t*1), idxStep:t<0.5?1:0.5})},
+  {from:157,to:164, name:"3基×波形",           isNew:"3基×波形ミックス",
+    spec:(t,n)=>({algoMode:'fixed',algo:A3[n%4],waves:t<0.5?W3:W4,envs:E1,
+      ratios:R_HALF.slice(0,Math.round(8+t*2)), idxMax:Math.round(4+t*1), idxStep:0.5,
+      bias:{wave:'nonsine'}})},
+  {from:165,to:172, name:"多択推理",           isNew:"3〜4択推理",
+    spec:(t,n)=>({algoMode:'choice',algoPool:t<0.5?A3.slice(0,3):A3,waves:W2,envs:E1,
+      ratios:R_HALF.slice(0,Math.round(6+t*4)), idxMax:Math.round(4+t*1), idxStep:0.5})},
+  {from:173,to:180, name:"推理×総合",          isNew:"全7アルゴリズム",
+    spec:(t,n)=>({algoMode:'choice',algoPool:ALL_ALGOS,waves:t<0.5?W2:W3,envs:E1,
+      ratios:R_HALF.slice(0,Math.round(8+t*4)), idxMax:Math.round(4+t*2), idxStep:0.5})},
+  {from:181,to:188, name:"3基×時間変化",        isNew:"3基×時間変化",
+    spec:(t,n)=>({algoMode:'fixed',algo:A3[n%4],waves:W2,envs:E4,
+      ratios:R_HALF.slice(0,8), idxMax:Math.round(4+t*1), idxStep:0.5,
+      maxEnvMods:t<0.5?1:2, bias:{env:'any'}})},
+  {from:189,to:194, name:"3基×変化速度",        isNew:"3基×変化速度",
+    spec:(t,n)=>({algoMode:'fixed',algo:A3[n%4],waves:W2,envs:E4,envSpeeds:S3,
+      ratios:R_HALF.slice(0,8), idxMax:Math.round(4+t*1), idxStep:0.5,
+      maxEnvMods:1, bias:{env:'any',speed:true}})},
+  {from:195,to:200, name:"ファイナルマスター",   isNew:"最終試練",
+    spec:(t,n)=>({algoMode:'choice',algoPool:ALL_ALGOS,waves:W4,envs:E4,envSpeeds:S3,
+      ratios:R_HALF, idxMax:Math.round(6+t*2), idxStep:0.25,
+      maxEnvMods:2, bias:{env:'any',speed:true}})},
 ];
 function stageSpec(n){
   const tier=TIERS.find(tr=>n>=tr.from&&n<=tr.to);
@@ -934,8 +1159,12 @@ function endlessSpec(n){
   if(n<28) return {algoMode:'choice',algoPool:['single','parallel','serial'],waves:W3,envs:E1,ratios:R_HALF.slice(0,10),idxMax:7,idxStep:0.5};
   if(n<34) return {algoMode:'fixed',algo:rnd(['single','parallel']),waves:W3,envs:E4,ratios:R_HALF.slice(0,10),idxMax:7,idxStep:0.5,bias:{env:'any'}};
   if(n<40) return {algoMode:'choice',algoPool:['single','parallel','serial'],waves:W4,envs:E4,ratios:R_HALF,idxMax:8,idxStep:0.5,bias:{env:'any'}};
-  return {algoMode:'choice',algoPool:['single','parallel','serial'],waves:W4,envs:E4,envSpeeds:S3,ratios:R_HALF,
-          idxMax:Math.min(10,8+Math.floor((n-40)/5)), idxStep:n<48?0.5:0.25, bias:{env:'any',speed:true}};
+  if(n<44) return {algoMode:'choice',algoPool:['single','parallel','serial'],waves:W4,envs:E4,envSpeeds:S3,ratios:R_HALF,
+          idxMax:8, idxStep:0.5, bias:{env:'any',speed:true}};
+  if(n<50) return {algoMode:'fixed',algo:rnd(['par3','ser3']),waves:W2,envs:E1,ratios:R_INT.slice(0,5),idxMax:4,idxStep:0.5};
+  if(n<56) return {algoMode:'fixed',algo:rnd(A3),waves:W3,envs:E4,ratios:R_HALF.slice(0,10),idxMax:5,idxStep:0.5,maxEnvMods:1,bias:{env:'any'}};
+  return {algoMode:'choice',algoPool:ALL_ALGOS,waves:W4,envs:E4,envSpeeds:S3,ratios:R_HALF,
+          idxMax:Math.min(10,7+Math.floor((n-56)/5)), idxStep:n<64?0.5:0.25, maxEnvMods:2, bias:{env:'any',speed:true}};
 }
 
 /* ================= tutorials ================= */
@@ -1003,6 +1232,10 @@ const TUTORIALS=[
        この状態で <b>M2 の INDEX</b> を上げると、波形に「別のうねり」が重なっていくのが見えるはずです。<br>
        <span class="tut-wait">▼ M2 の INDEX を上げてみよう</span>`, wait:'index',
        ensure:[{m:0,I:2}]},
+     {text:`ここでひとつ便利な設定の紹介。パネルが2枚になって画面が縦に長くなってきましたね。<br>
+       <b>⚙ オプション</b>の<b>「波形ウィンドウを上部に固定」</b>を ON にすると、
+       下のスライダーを操作するためにスクロールしても、波形・時間スライダー・一致度メーターが
+       画面上部に追従して見え続けます。お好みでいつでも切り替えられます。`, btn:'次へ ▶'},
      {text:`コツ：まず <b>M2 の INDEX を 0</b> に戻して M1 だけで大まかな形を作り、
        あとから M2 で細かいうねりを足すと合わせやすいです。<br>
        ヒント：答えは <b>M1: ×2 / 2.0、M2: ×3 / 1.0</b>（どちらも SIN）。<br>
@@ -1089,7 +1322,59 @@ const TUTORIALS=[
      {text:`動きの「形」が同じでも「速さ」が違うと一致しません。じっくり観察して合わせましょう。<br>
        ヒント：答えは <b>RATIO ×2 / INDEX 3.0 / ENV: LFO / SPEED ×2</b>。<br>
        <span class="tut-wait">▼ 速度まで一致させて 96% を超えよう</span>`, wait:'matched'},
-     {text:`テンポまで完璧に捕まえました！ これですべての要素をマスターです。<br>
+     {text:`テンポまで完璧に捕まえました！ 時間変化を完全マスターです。<br>
+       <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
+   ]},
+  {id:'osc3', unlockStage:141, name:'⑧ オシレータ×3',
+   desc:'新アルゴリズムD/E/F/Gの全体像と、3基のモジュレータを自力で操る練習',
+   spec:{algoMode:'fixed',algo:'par3',waves:W1,envs:E1,ratios:[1,2,3],idxMax:3,idxStep:1},
+   target:{algo:'par3',mods:[{wave:'sine',r:2,I:2,env:'const',s:1},{wave:'sine',r:3,I:1,env:'const',s:1},{wave:'sine',r:1,I:2,env:'const',s:1}]},
+   steps:[
+     {text:`ついに<b>モジュレータが3基</b>（キャリア込みでオシレータ4基）になりました！<br>
+       3基になると、つなぎ方＝アルゴリズムも一気に増えます。新しく登場するのは次の4種類：<br>
+       <b style="color:var(--lcd)">D（3基並列）</b>…M1・M2・M3が全員でキャリアを揺らす「足し算」の形<br>
+       <b style="color:var(--lcd)">E（3連直列）</b>…M3→M2→M1→C と数珠つなぎ。「揺れの揺れの揺れ」が生まれる最深の入れ子<br>
+       <b style="color:var(--lcd)">F（直列2＋並列1）</b>…直列チェイン(M2→M1)と単独のM3が並走するハイブリッド<br>
+       <b style="color:var(--lcd)">G（Y字）</b>…M2とM3が<b>同じM1</b>を一緒に揺らし、そのM1がCを揺らす合流形`, btn:'次へ ▶'},
+     {text:`まずは一番素直な <b>D（3基並列）</b> から。並列は何基いても「揺れの足し算」なので、
+       B（2基並列）で身につけた攻略がそのまま通用します。鉄則は<b>1基ずつ</b>——
+       M2・M3 の INDEX を 0 のままにして、M1 だけで波形の土台を作るところから。<br>
+       <span class="tut-wait">▼ まず M1 の INDEX を上げて、土台のうねりを作ってみよう</span>`, wait:'index'},
+     {text:`そこへ M2、M3 と順にうねりを重ねていきます。1基足すたびに、
+       お手本のどの「成分」が埋まったかを観察するのがコツ。
+       ちなみに <b>E（3連直列）</b> はこの逆の発想で、C（直列）をもう一段深くした入れ子です。<br>
+       ヒント：この問題の答えは <b>M1: ×2 / 2.0、M2: ×3 / 1.0、M3: ×1 / 2.0</b>。<br>
+       <span class="tut-wait">▼ 3基すべてを合わせて一致度 96% を超えよう</span>`, wait:'matched'},
+     {text:`3基を自力で乗りこなしました！
+       F と G の見分け方は、登場直前のチュートリアル⑨でじっくり扱います。<br>
+       <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
+   ]},
+  {id:'shapes', unlockStage:149, name:'⑨ 形の見分け方',
+   desc:'E/F/Gそれぞれの性質を学び、形の推理とパラメータ合わせを自力でやり切る',
+   spec:{algoMode:'choice',algoPool:['par3','ycross'],waves:W1,envs:E1,ratios:[1,2,3],idxMax:3,idxStep:1},
+   target:{algo:'ycross',mods:[{wave:'sine',r:2,I:2,env:'const',s:1},{wave:'sine',r:3,I:1,env:'const',s:1},{wave:'sine',r:1,I:1,env:'const',s:1}]},
+   steps:[
+     {text:`ここからは、お手本のアルゴリズムを<b>形から推理する</b>ステージが続きます。
+       まずは新しい接続たちの「性格」を整理しましょう。<br>
+       <b style="color:var(--lcd)">E（3連直列）</b>：M3→M2→M1→C の数珠つなぎ。直列Cの強化版で、
+       「うねり自体がうねり、そのうねりがさらにうねる」<b>最も深い入れ子</b>。小さなINDEXでも波形が激しく崩れるのが目印です。`, btn:'次へ ▶'},
+     {text:`<b style="color:var(--lcd)">F（直列2＋並列1）</b>：M2→M1 の直列チェインに、独立した M3 が並走します。
+       「入れ子のうねり」と「素直な細かい振動」が<b>同時に・別々に</b>見えるのが特徴。
+       片方だけ追いかけると C や B と見間違えるので、両方の気配を探しましょう。<br>
+       <b style="color:var(--lcd)">G（Y字）</b>：M2 と M3 が<b>同じ M1 の中で合流</b>してから C を揺らします。
+       2つの揺れが混ざって1本の経路を通るため、全体がひとかたまりで複雑にうねります。`, btn:'次へ ▶'},
+     {text:`特に紛らわしいのが <b>D（3基並列）と G（Y字）</b>。どちらも3基が働きますが——<br>
+       <b>D</b>：3つの揺れがただ「足し算」され、細かい振動が<b>規則正しく重なる</b><br>
+       <b>G</b>：M1の揺れ自体が揺らされるので、<b>うねりがさらにうねる</b>入れ子の質感が出る<br>
+       見比べやすいよう、3基すべてに INDEX を入れておきました。同じパラメータのまま形だけを変えると、質感の違いがはっきり見えます。<br>
+       <span class="tut-wait">▼ D と G を切り替えて、波形の質感の違いを見比べよう</span>`, wait:'algo',
+       ensure:[{m:0,I:2},{m:1,I:1},{m:2,I:1}]},
+     {text:`それでは本番。この問題は <b>D か G の2択</b>です。形を見極めたうえで、
+       パラメータも自分の手で合わせ切りましょう。<br>
+       ヒント：答えは <b>ALGORITHM G / M1: ×2 / 2.0、M2: ×3 / 1.0、M3: ×1 / 1.0</b>。<br>
+       <span class="tut-wait">▼ 形とパラメータを一致させて 96% を超えよう</span>`, wait:'matched'},
+     {text:`形の推理から再現まで、すべて自力でやり切りました！
+       音でも、Dは澄んだ重なり、Gは濁りのある複雑な響きと、性格の違いが聴き取れます。<br>
        <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
    ]},
 ];
@@ -1102,6 +1387,10 @@ let spec=null, target=null, player=null, targetSets=null;
 let lastPct=0, cleared=false;
 let curTut=null, tutStep=0, pendingStage=null;
 let scrubOn=false, scrubU=0;
+let lockedMods=new Set(); /* お手本の値で固定されたモジュレータ番号 */
+/* フリーモードの時間変化再生設定 */
+let envLoopOn=true, envLoopTime=2.0, envAnimStart=0;
+function envLoopSec(){return mode==='free'?envLoopTime:ENV_LOOP_MS/1000;}
 
 function resolveSpec(raw){
   return {
@@ -1115,6 +1404,9 @@ function resolveSpec(raw){
     envs: raw.envs||E1,
     envSpeeds: raw.envSpeeds||S1,
     bias: raw.bias||null,
+    locks: raw.locks||null,
+    drill: !!raw.drill,
+    maxEnvMods: (raw.maxEnvMods===undefined?null:raw.maxEnvMods),
     tierName: raw.tierName||'',
   };
 }
@@ -1130,7 +1422,7 @@ function patchHasEnv(p){ return !!p && p.mods.some(m=>m.env && m.env!=='const');
 function applyBias(tgt,s){
   if(!s.bias) return;
   if(Math.random()>0.8) return;
-  const n = tgt.algo==='single'?1:2;
+  const n = ALGO_NMODS[tgt.algo];
   const mi = Math.floor(Math.random()*n);
   const m = tgt.mods[mi];
   const b = s.bias;
@@ -1169,24 +1461,38 @@ function applyBias(tgt,s){
 }
 function genTarget(s){
   const algo = s.algoMode==='choice' ? rnd(s.algoPool) : s.algo;
-  const nMods = algo==='single'?1:2;
+  const nMods = ALGO_NMODS[algo];
   const ch=idxChoices(s);
   const mods=[];
-  for(let i=0;i<2;i++){
+  for(let i=0;i<3;i++){
     mods.push(i<nMods
       ? {wave:rnd(s.waves), r:rnd(s.ratios), I:rnd(ch), env:rnd(s.envs), s:rnd(s.envSpeeds)}
       : {wave:'sine', r:s.ratios[0], I:0, env:'const', s:1});
   }
   const tgt={algo,mods};
   applyBias(tgt,s);
+  /* ENVを持てるモジュレータ数の制限(3基ティアの負荷調整) */
+  if(s.maxEnvMods!=null){
+    const idx=[];
+    for(let i=0;i<nMods;i++)if(tgt.mods[i].env!=='const')idx.push(i);
+    while(idx.length>s.maxEnvMods){
+      const k=idx.splice(Math.floor(Math.random()*idx.length),1)[0];
+      tgt.mods[k].env='const';tgt.mods[k].s=1;
+    }
+  }
   return tgt;
 }
+function neutralMod(s){
+  return {wave:'sine', r:(s?s.ratios[0]:1), I:0, env:'const', s:1};
+}
+function padMods(ms){
+  const out=ms.map(m=>({s:1,...m}));
+  while(out.length<3)out.push({wave:'sine',r:1,I:0,env:'const',s:1});
+  return out;
+}
 function initialPlayer(s){
-  const algo = s.algoMode==='choice' ? 'single' : s.algo;
-  return {algo, mods:[
-    {wave:'sine', r:s.ratios[0], I:0, env:'const', s:1},
-    {wave:'sine', r:s.ratios[0], I:0, env:'const', s:1},
-  ]};
+  const algo = s.algoMode==='choice' ? s.algoPool[0] : s.algo;
+  return {algo, mods:[neutralMod(s),neutralMod(s),neutralMod(s)]};
 }
 
 /* ================= waveform math ================= */
@@ -1196,11 +1502,26 @@ function calcWave(p,t,f,u){
   const o1=WAVE_FN[m[0].wave], o2=WAVE_FN[m[1].wave];
   const I1=m[0].I*envVal(m[0].env,u,m[0].s);
   const I2=m[1].I*envVal(m[1].env,u,m[1].s);
-  if(p.algo==='single')
-    return Math.sin(w*t + I1*o1(w*m[0].r*t));
-  if(p.algo==='parallel')
-    return Math.sin(w*t + I1*o1(w*m[0].r*t) + I2*o2(w*m[1].r*t));
-  return Math.sin(w*t + I1*o1(w*m[0].r*t + I2*o2(w*m[1].r*t)));
+  switch(p.algo){
+    case 'single':
+      return Math.sin(w*t + I1*o1(w*m[0].r*t));
+    case 'parallel':
+      return Math.sin(w*t + I1*o1(w*m[0].r*t) + I2*o2(w*m[1].r*t));
+    case 'serial':
+      return Math.sin(w*t + I1*o1(w*m[0].r*t + I2*o2(w*m[1].r*t)));
+  }
+  const o3=WAVE_FN[m[2].wave];
+  const I3=m[2].I*envVal(m[2].env,u,m[2].s);
+  switch(p.algo){
+    case 'par3':
+      return Math.sin(w*t + I1*o1(w*m[0].r*t) + I2*o2(w*m[1].r*t) + I3*o3(w*m[2].r*t));
+    case 'ser3':
+      return Math.sin(w*t + I1*o1(w*m[0].r*t + I2*o2(w*m[1].r*t + I3*o3(w*m[2].r*t))));
+    case 'mix21':
+      return Math.sin(w*t + I1*o1(w*m[0].r*t + I2*o2(w*m[1].r*t)) + I3*o3(w*m[2].r*t));
+    default: /* ycross */
+      return Math.sin(w*t + I1*o1(w*m[0].r*t + I2*o2(w*m[1].r*t) + I3*o3(w*m[2].r*t)));
+  }
 }
 function sampleWaveU(p,u){
   const out=new Float32Array(N_SAMPLES);
@@ -1263,9 +1584,10 @@ function buildBuffer(p,f,dur,gain){
 }
 /* 押下中サステイン用のシームレスなループバッファ
    - ENVなし: キャリア4周期ぶん(比率が0.25刻みなのでモジュレータも整数周期で繋がる)
-   - ENVあり: 2秒(=表示ループと同じ)を丸ごとループ。周期数を4の倍数に量子化して
-     位相は連続(エンベロープのリセット感はループの仕様として残る) */
-function buildLoopBuffer(p,f){
+   - ENVあり: ループ時間ぶん(=表示と同じ)を丸ごとループ。周期数を4の倍数に量子化して
+     位相は連続(エンベロープのリセット感はループの仕様として残る)
+   - oneShot=true(ループOFF)のときは末尾に短いフェードを付ける */
+function buildLoopBuffer(p,f,oneShot){
   const ctx=audio(),sr=ctx.sampleRate;
   if(!patchHasEnv(p)){
     const len=Math.max(16,Math.round(sr*4/f));
@@ -1274,18 +1596,23 @@ function buildLoopBuffer(p,f){
     for(let i=0;i<len;i++)d[i]=calcWave(p,i/sr,f2,0);
     return buf;
   }
-  const dur=ENV_LOOP_MS/1000;
+  const dur=envLoopSec();
   const len=Math.round(sr*dur);
   let cycles=4*Math.max(1,Math.round(f*dur/4));
   const f2=cycles/dur;
   const buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
-  for(let i=0;i<len;i++)d[i]=calcWave(p,i/sr,f2,i/len);
+  const fo=Math.floor(sr*0.04);
+  for(let i=0;i<len;i++){
+    let g=1;
+    if(oneShot && i>len-fo)g=(len-i)/fo;
+    d[i]=calcWave(p,i/sr,f2,i/len)*g;
+  }
   return buf;
 }
 function playWave(p,f,dur){
   stopSound();
   f=f||F0;
-  if(dur===undefined)dur=patchHasEnv(p)?2.0:1.2;
+  if(dur===undefined)dur=patchHasEnv(p)?envLoopSec():1.2;
   const ctx=audio(),src=ctx.createBufferSource();
   src.buffer=buildBuffer(p,f,dur);
   src.connect(masterGain);src.start();curSrc=src;
@@ -1311,10 +1638,125 @@ function playVoice(p,f,when,dur,gain){
   if(voices.length>48)voices.splice(0,voices.length-48);
 }
 
+/* ================= menu BGM & SE =================
+   タイトル/セレクト/解説などメニュー画面専用。
+   ゲーム画面(波形操作中)では一切鳴らさない。
+   BGMはFM音源でその場で24秒ループを合成する */
+let userInteracted=false;
+let bgmSrc=null,bgmGainNode=null,bgmBuf=null,seBuf=null;
+function menuAudioAllowed(){
+  return !!save.bgm && userInteracted && $('gameScreen').classList.contains('hidden');
+}
+function renderBgmLoop(ctx){
+  const sr=ctx.sampleRate;
+  const BEAT=0.75;                 /* 80 BPM */
+  const dur=BEAT*4*8;              /* 4拍×8小節 = 24秒ループ */
+  const len=Math.round(sr*dur);
+  const d=new Float32Array(len);
+  const fOf=mi=>440*Math.pow(2,(mi-69)/12);
+  /* FMノートを加算合成(末尾はループ先頭へラップして継ぎ目を消す) */
+  function note(mi,start,ndur,amp,ratio,idx,idec){
+    const f0=fOf(mi),n=Math.round(sr*ndur),s0=Math.round(sr*start);
+    const atk=Math.max(1,Math.round(sr*0.012));
+    const w=2*Math.PI*f0;
+    for(let i=0;i<n;i++){
+      const t=i/sr;
+      const env=i<atk? i/atk : Math.exp(-3*(i-atk)/Math.max(1,n-atk));
+      const I=idx*Math.exp(-idec*t);
+      d[(s0+i)%len]+=Math.sin(w*t+I*Math.sin(w*ratio*t))*amp*env;
+    }
+  }
+  /* Am7 → Fmaj7 → Cmaj7 → G7 を2小節ずつ */
+  const prog=[
+    {bass:45,tones:[57,60,64,67]},  /* Am7  */
+    {bass:41,tones:[53,57,60,64]},  /* Fmaj7 */
+    {bass:48,tones:[52,55,59,64]},  /* Cmaj7 */
+    {bass:43,tones:[55,59,62,65]},  /* G7   */
+  ];
+  const ARP=[0,2,1,3, 2,0,3,1, 0,2,1,3, 2,3,1,2];
+  prog.forEach((ch,ci)=>{
+    const s=ci*BEAT*8;
+    /* パッド(エレピ風の柔らかいFM) */
+    ch.tones.forEach((mi,k)=>note(mi,s+0.02*k,BEAT*7.6,0.026,2,0.7,0.35));
+    /* ベース */
+    note(ch.bass,s,BEAT*3,0.065,1,1.1,1.6);
+    note(ch.bass,s+BEAT*4,BEAT*3,0.06,1,1.1,1.6);
+    note(ch.bass+(ci%2?7:12),s+BEAT*7,BEAT*0.9,0.04,1,1.1,2.5);
+    /* アルペジオ(8分音符、ところどころ休符) */
+    for(let st=0;st<16;st++){
+      if(st===7||st===15)continue;
+      note(ch.tones[ARP[st]]+12,s+st*BEAT/2,0.55,0.03,2,1.6,4.5);
+    }
+    /* たまのきらめき(ベル) */
+    if(ci===1||ci===3)note(ch.tones[3]+24,s+BEAT*6,1.4,0.018,3.5,2.2,3.5);
+  });
+  const buf=ctx.createBuffer(1,len,sr);
+  buf.getChannelData(0).set(d);
+  return buf;
+}
+function startBgm(){
+  if(bgmSrc)return;
+  const ctx=audio();
+  if(!bgmBuf)bgmBuf=renderBgmLoop(ctx);
+  bgmGainNode=ctx.createGain();
+  bgmGainNode.gain.setValueAtTime(0.0001,ctx.currentTime);
+  bgmGainNode.gain.setTargetAtTime(0.5,ctx.currentTime,0.6);
+  bgmSrc=ctx.createBufferSource();
+  bgmSrc.buffer=bgmBuf;bgmSrc.loop=true;
+  bgmSrc.connect(bgmGainNode);bgmGainNode.connect(masterGain);
+  bgmSrc.start();
+}
+function stopBgm(){
+  if(!bgmSrc)return;
+  const ctx=audio(),src=bgmSrc,g=bgmGainNode;
+  bgmSrc=null;bgmGainNode=null;
+  try{
+    g.gain.cancelScheduledValues(ctx.currentTime);
+    g.gain.setValueAtTime(Math.max(0.0001,g.gain.value),ctx.currentTime);
+    g.gain.setTargetAtTime(0.0001,ctx.currentTime,0.15);
+    src.stop(ctx.currentTime+0.7);
+  }catch(e){}
+}
+function updateBgm(){ if(menuAudioAllowed())startBgm(); else stopBgm(); }
+function playSE(){
+  if(!menuAudioAllowed())return;
+  const ctx=audio();
+  if(!seBuf){
+    const sr=ctx.sampleRate,n=Math.round(sr*0.09);
+    seBuf=ctx.createBuffer(1,n,sr);
+    const d=seBuf.getChannelData(0),atk=Math.round(sr*0.002);
+    for(let i=0;i<n;i++){
+      const t=i/sr;
+      const env=(i<atk?i/atk:Math.exp(-26*(t-atk/sr)));
+      const I=2.2*Math.exp(-30*t);
+      d[i]=Math.sin(2*Math.PI*1318*t+I*Math.sin(2*Math.PI*2636*t))*0.3*env;
+    }
+  }
+  const src=ctx.createBufferSource();
+  src.buffer=seBuf;
+  src.playbackRate.value=0.95+Math.random()*0.1;
+  const g=ctx.createGain();g.gain.value=0.6;
+  src.connect(g);g.connect(masterGain);
+  src.start();
+}
+/* 初回操作でオーディオを解禁(ブラウザの自動再生制限対応) */
+document.addEventListener('pointerdown',()=>{
+  if(!userInteracted){userInteracted=true;updateBgm();}
+},true);
+/* メニュー画面のボタン操作にクリックSE */
+document.addEventListener('click',e=>{
+  if(e.target.closest('button')||e.target.closest('.ver-label'))playSE();
+},true);
+
 /* ================= drawing ================= */
 const canvas=$('scope'),cx=canvas.getContext('2d');
 function currentU(){
-  return scrubOn ? scrubU : (performance.now()%ENV_LOOP_MS)/ENV_LOOP_MS;
+  if(scrubOn)return scrubU;
+  const T=envLoopSec()*1000;
+  if(mode==='free' && !envLoopOn){
+    return Math.min((performance.now()-envAnimStart)/T,1);
+  }
+  return (performance.now()%T)/T;
 }
 function drawScope(){
   const W=canvas.width,H=canvas.height,mid=H/2,amp=H*0.40;
@@ -1382,7 +1824,7 @@ function setScrub(on){
 $('btnScrub').addEventListener('click',()=>setScrub(!scrubOn));
 $('scrubSlider').addEventListener('input',e=>{
   scrubU=+e.target.value/1000;
-  $('scrubVal').textContent='t='+(scrubU*ENV_LOOP_MS/1000).toFixed(2)+'s';
+  $('scrubVal').textContent='t='+(scrubU*envLoopSec()).toFixed(2)+'s';
   drawScope();
 });
 
@@ -1403,17 +1845,46 @@ function updateMeter(pct){
 }
 
 /* ================= algorithm row / formula ================= */
+function algoDiagram(a){
+  const box=(c,l)=>`<span class="opbox ${c}">${l}</span>`;
+  const ar=t=>`<span class="arrow">${t}</span>`;
+  switch(a){
+    case 'single':
+      return box('m1','M1')+ar('→')+box('car','C')+ar('→ ♪')+
+        `<span class="algo-label" style="margin-left:auto">M1 がキャリア C を揺らす</span>`;
+    case 'parallel':
+      return `<span class="algo-stack">${box('m1','M1')}${box('m2','M2')}</span>`+ar('⇉')+box('car','C')+ar('→ ♪')+
+        `<span class="algo-label" style="margin-left:auto">M1 と M2 が並列で C を揺らす</span>`;
+    case 'serial':
+      return box('m2','M2')+ar('→')+box('m1','M1')+ar('→')+box('car','C')+ar('→ ♪')+
+        `<span class="algo-label" style="margin-left:auto">M2 が M1 を、M1 が C を揺らす</span>`;
+    case 'par3':
+      return `<span class="algo-stack">${box('m1','M1')}${box('m2','M2')}${box('m3','M3')}</span>`+ar('⇉')+box('car','C')+ar('→ ♪')+
+        `<span class="algo-label" style="margin-left:auto">3基が並列で C を揺らす</span>`;
+    case 'ser3':
+      return box('m3','M3')+ar('→')+box('m2','M2')+ar('→')+box('m1','M1')+ar('→')+box('car','C')+ar('→ ♪')+
+        `<span class="algo-label" style="margin-left:auto">M3→M2→M1→C の3連チェイン</span>`;
+    case 'mix21':
+      return `<span class="algo-stack"><span>${box('m2','M2')}${ar('→')}${box('m1','M1')}</span><span>${box('m3','M3')}</span></span>`+
+        ar('⇉')+box('car','C')+ar('→ ♪')+
+        `<span class="algo-label" style="margin-left:auto">M2→M1 の直列＋M3 の並列</span>`;
+    default: /* ycross */
+      return `<span class="algo-stack">${box('m2','M2')}${box('m3','M3')}</span>`+ar('→')+box('m1','M1')+ar('→')+box('car','C')+ar('→ ♪')+
+        `<span class="algo-label" style="margin-left:auto">M2 と M3 が M1 を揺らし、M1 が C を揺らす</span>`;
+  }
+}
 function renderAlgo(){
   const el=$('algoRow');
   if(spec.algoMode==='choice'){
-    const defs=[
-      {key:'single',  label:'A', sub:'M1 → C'},
-      {key:'parallel',label:'B', sub:'M1+M2 ⇉ C'},
-      {key:'serial',  label:'C', sub:'M2 → M1 → C'},
-    ];
+    const pool=spec.algoPool;
+    const defs=ALGO_DEF.filter(d=>pool.includes(d.key));
     const hint = mode==='free'
       ? '自由にアルゴリズムを切り替えて音を作ろう'
-      : 'お手本のアルゴリズムは非公開——波形のうねり方から推理しよう';
+      : (spec.drill
+        ? 'パラメータはすべてお手本と同じ——接続の「形」だけを当てよう'
+        : (pool.length<=2
+          ? 'お手本はこの2つのどちらか——うねり方から推理しよう'
+          : 'お手本のアルゴリズムは非公開——波形のうねり方から推理しよう'));
     el.innerHTML=`<span class="algo-label">${mode==='free'?'ALGORITHM':'ALGORITHM ?'}</span>
       <div class="algo-btns">${defs.map(d=>
         `<button class="algo-btn${player.algo===d.key?' active':''}" data-algo="${d.key}">
@@ -1424,28 +1895,16 @@ function renderAlgo(){
         if(cleared)return;
         if(player.algo===b.dataset.algo)return;
         player.algo=b.dataset.algo;
-        renderAlgo();renderOps();refresh();
+        renderAlgo();renderOps();
         tutorialEvent('algo');
+        refresh();
         if(save.autoplay&&mode!=='free')playMine();
       });
     });
     return;
   }
-  const name={single:'ALGORITHM A',parallel:'ALGORITHM B',serial:'ALGORITHM C'}[spec.algo];
-  let html=`<span class="algo-label">${name}</span>`;
-  if(spec.algo==='single'){
-    html+=`<span class="opbox m1">M1</span><span class="arrow">→</span><span class="opbox car">C</span><span class="arrow">→ ♪</span>
-           <span class="algo-label" style="margin-left:auto">M1 がキャリア C を揺らす</span>`;
-  }else if(spec.algo==='parallel'){
-    html+=`<span class="algo-stack"><span class="opbox m1">M1</span><span class="opbox m2">M2</span></span>
-           <span class="arrow">⇉</span><span class="opbox car">C</span><span class="arrow">→ ♪</span>
-           <span class="algo-label" style="margin-left:auto">M1 と M2 が並列で C を揺らす</span>`;
-  }else{
-    html+=`<span class="opbox m2">M2</span><span class="arrow">→</span><span class="opbox m1">M1</span>
-           <span class="arrow">→</span><span class="opbox car">C</span><span class="arrow">→ ♪</span>
-           <span class="algo-label" style="margin-left:auto">M2 が M1 を、M1 が C を揺らす</span>`;
-  }
-  el.innerHTML=html;
+  const d=ALGO_DEF.find(x=>x.key===spec.algo);
+  el.innerHTML=`<span class="algo-label">ALGORITHM ${d.label}</span>`+algoDiagram(spec.algo);
 }
 
 function updateFormula(){
@@ -1462,12 +1921,17 @@ function updateFormula(){
     return `${mm.I.toFixed(2)}${e}·${wn[mm.wave]}`;
   };
   let s;
-  if(player.algo==='single')
-    s=`y = sin( ωt + ${coef(m[0])}(${rr(m[0].r)}ωt) )`;
-  else if(player.algo==='parallel')
-    s=`y = sin( ωt + ${coef(m[0])}(${rr(m[0].r)}ωt) + ${coef(m[1])}(${rr(m[1].r)}ωt) )`;
-  else
-    s=`y = sin( ωt + ${coef(m[0])}(${rr(m[0].r)}ωt + ${coef(m[1])}(${rr(m[1].r)}ωt)) )`;
+  const c1=coef(m[0]),c2=coef(m[1]),c3=coef(m[2]);
+  const r1=rr(m[0].r),r2=rr(m[1].r),r3=rr(m[2].r);
+  switch(player.algo){
+    case 'single':   s=`y = sin( ωt + ${c1}(${r1}ωt) )`;break;
+    case 'parallel': s=`y = sin( ωt + ${c1}(${r1}ωt) + ${c2}(${r2}ωt) )`;break;
+    case 'serial':   s=`y = sin( ωt + ${c1}(${r1}ωt + ${c2}(${r2}ωt)) )`;break;
+    case 'par3':     s=`y = sin( ωt + ${c1}(${r1}ωt) + ${c2}(${r2}ωt) + ${c3}(${r3}ωt) )`;break;
+    case 'ser3':     s=`y = sin( ωt + ${c1}(${r1}ωt + ${c2}(${r2}ωt + ${c3}(${r3}ωt))) )`;break;
+    case 'mix21':    s=`y = sin( ωt + ${c1}(${r1}ωt + ${c2}(${r2}ωt)) + ${c3}(${r3}ωt) )`;break;
+    default:         s=`y = sin( ωt + ${c1}(${r1}ωt + ${c2}(${r2}ωt) + ${c3}(${r3}ωt)) )`;
+  }
   el.innerHTML=s;
 }
 
@@ -1477,17 +1941,19 @@ function fmtRatio(r){return '×'+(r%1===0?r:(''+r));}
 function fmtSpeed(s){return '×'+(s%1===0?s:(''+s));}
 function renderOps(){
   const cont=$('opsContainer');cont.innerHTML='';
-  const nMods=player.algo==='single'?1:2;
+  const nMods=ALGO_NMODS[player.algo];
   for(let i=0;i<nMods;i++){
     const m=player.mods[i];
+    const locked=lockedMods.has(i);
+    const dis=locked?' disabled':'';
     const panel=document.createElement('div');
-    panel.className='op-panel'+(i===1?' op2':'');
-    const role=player.algo==='serial'?(i===0?'（C を揺らす）':'（M1 を揺らす）'):'（C を揺らす）';
+    panel.className='op-panel'+(i===1?' op2':'')+(i===2?' op3':'')+(locked?' locked':'');
+    const role=locked?'<span class="lock-badge">🔒 おてほん固定</span>':(ALGO_ROLE[player.algo][i]||'');
     const waveRow = spec.waves.length>1 ? `
       <div class="param">
         <label>WAVE</label>
         <div class="wave-sel">${spec.waves.map(w=>
-          `<button class="wave-btn${m.wave===w?' active':''}" data-mod="${i}" data-wave="${w}" title="${WAVE_INFO[w].jp}">
+          `<button class="wave-btn${m.wave===w?' active':''}"${dis} data-mod="${i}" data-wave="${w}" title="${WAVE_INFO[w].jp}">
              ${waveGlyph(w)}${WAVE_INFO[w].label}</button>`).join('')}</div>
         <div class="val" id="valW${i}">${WAVE_INFO[m.wave].label}</div>
       </div>` : '';
@@ -1495,7 +1961,7 @@ function renderOps(){
       <div class="param">
         <label>ENV</label>
         <div class="wave-sel">${spec.envs.map(e=>
-          `<button class="wave-btn${m.env===e?' active':''}" data-mod="${i}" data-env="${e}" title="${ENV_INFO[e].jp}">
+          `<button class="wave-btn${m.env===e?' active':''}"${dis} data-mod="${i}" data-env="${e}" title="${ENV_INFO[e].jp}">
              ${envGlyph(e)}${ENV_INFO[e].label}</button>`).join('')}</div>
         <div class="val" id="valE${i}">${ENV_INFO[m.env].label}</div>
       </div>` : '';
@@ -1503,7 +1969,7 @@ function renderOps(){
       <div class="param">
         <label>SPEED</label>
         <div class="wave-sel">${spec.envSpeeds.map(sv=>
-          `<button class="wave-btn${(m.s||1)===sv?' active':''}" data-mod="${i}" data-speed="${sv}" title="エンベロープ速度 ${fmtSpeed(sv)}">
+          `<button class="wave-btn${(m.s||1)===sv?' active':''}"${dis} data-mod="${i}" data-speed="${sv}" title="エンベロープ速度 ${fmtSpeed(sv)}">
              ${fmtSpeed(sv)}</button>`).join('')}</div>
         <div class="val" id="valS${i}">${fmtSpeed(m.s||1)}</div>
       </div>` : '';
@@ -1513,13 +1979,13 @@ function renderOps(){
       <div class="param">
         <label>RATIO</label>
         <input type="range" min="0" max="${spec.ratios.length-1}" step="1"
-               value="${Math.max(0,spec.ratios.indexOf(m.r))}" data-mod="${i}" data-kind="r">
+               value="${Math.max(0,spec.ratios.indexOf(m.r))}"${dis} data-mod="${i}" data-kind="r">
         <div class="val" id="valR${i}">${fmtRatio(m.r)}</div>
       </div>
       <div class="param">
         <label>INDEX</label>
         <input type="range" min="0" max="${spec.idxMax}" step="${spec.idxStep}"
-               value="${m.I}" data-mod="${i}" data-kind="I">
+               value="${m.I}"${dis} data-mod="${i}" data-kind="I">
         <div class="val" id="valI${i}">${fmtIdx(m.I)}</div>
       </div>
       ${envRow}
@@ -1543,6 +2009,7 @@ function renderOps(){
 function onSliderInput(e){
   if(cleared)return;
   const i=+e.target.dataset.mod,kind=e.target.dataset.kind;
+  if(lockedMods.has(i))return;
   if(kind==='r'){
     player.mods[i].r=spec.ratios[+e.target.value];
     $('valR'+i).textContent=fmtRatio(player.mods[i].r);
@@ -1559,7 +2026,7 @@ function onSliderRelease(){
   if(save.autoplay&&mode!=='free')playMine();
 }
 function onWaveSelect(i,w){
-  if(cleared)return;
+  if(cleared||lockedMods.has(i))return;
   if(player.mods[i].wave===w)return;
   player.mods[i].wave=w;
   $('opsContainer').querySelectorAll(`.wave-btn[data-mod="${i}"][data-wave]`).forEach(b=>{
@@ -1571,7 +2038,7 @@ function onWaveSelect(i,w){
   if(save.autoplay&&mode!=='free')playMine();
 }
 function onEnvSelect(i,e){
-  if(cleared)return;
+  if(cleared||lockedMods.has(i))return;
   if(player.mods[i].env===e)return;
   player.mods[i].env=e;
   $('opsContainer').querySelectorAll(`.wave-btn[data-mod="${i}"][data-env]`).forEach(b=>{
@@ -1583,7 +2050,7 @@ function onEnvSelect(i,e){
   if(save.autoplay&&mode!=='free')playMine();
 }
 function onSpeedSelect(i,sv){
-  if(cleared)return;
+  if(cleared||lockedMods.has(i))return;
   if((player.mods[i].s||1)===sv)return;
   player.mods[i].s=sv;
   $('opsContainer').querySelectorAll(`.wave-btn[data-mod="${i}"][data-speed]`).forEach(b=>{
@@ -1597,6 +2064,7 @@ function onSpeedSelect(i,sv){
 
 /* ================= game flow ================= */
 function refresh(){
+  if(mode==='free' && !envLoopOn) envAnimStart=performance.now();
   drawScope();
   updateFormula();
   if(mode==='free')return;
@@ -1624,13 +2092,31 @@ function applyModeUI(){
 
 function beginPuzzle(rawSpec, fixedTarget){
   cleared=false;
+  envLoopOn=true; /* パズルの時間変化は常にループ */
   $('matchBanner').classList.add('hidden');
   $('btnPlayMine').classList.remove('attention');
   spec=resolveSpec(rawSpec);
   target=fixedTarget
     ? {algo:fixedTarget.algo, mods:fixedTarget.mods.map(m=>({s:1,...m}))}
     : genTarget(spec);
+  while(target.mods.length<3)
+    target.mods.push({wave:'sine',r:spec.ratios[0],I:0,env:'const',s:1});
   player=initialPlayer(spec);
+  /* 部分ロック: 指定モジュレータをお手本の値で固定して見せる */
+  lockedMods=new Set(spec.locks||[]);
+  if(spec.drill){
+    /* 形当てドリル: 全パラメータをお手本と同じ値で固定し、
+       アルゴリズムだけを(わざと違う形から)選ばせる */
+    const nm=ALGO_NMODS[target.algo];
+    for(let i=0;i<nm;i++)lockedMods.add(i);
+    player.mods=target.mods.map(m=>({...m}));
+    const wrong=(spec.algoPool||[]).filter(a=>a!==target.algo);
+    if(wrong.length)player.algo=rnd(wrong);
+  }else{
+    lockedMods.forEach(i=>{
+      if(target.mods[i])player.mods[i]={...target.mods[i]};
+    });
+  }
   targetSets=makeSampleSets(target);
   renderAlgo();renderOps();updateHud();applyModeUI();refresh();
 }
@@ -1659,16 +2145,20 @@ function runTutorial(tut,pending){
 /* ---- free mode ---- */
 const FREE_RATIOS=(()=>{const a=[];for(let v=0.25;v<=8.0001;v+=0.25)a.push(Math.round(v*4)/4);return a;})();
 const FREE_SPEEDS=[0.5,1,2,4];
-const FREE_SPEC={algoMode:'choice',algoPool:['single','parallel','serial'],
+const FREE_SPEC={algoMode:'choice',algoPool:ALL_ALGOS,
   waves:W4, envs:E4, envSpeeds:FREE_SPEEDS, ratios:FREE_RATIOS, idxMax:10, idxStep:0.05};
 function startFree(){
   mode='free';curTut=null;pendingStage=null;
   $('tutBox').classList.add('hidden');
   cleared=false;
+  lockedMods=new Set();
+  envLoopOn=true;envLoopTime=2.0;envAnimStart=performance.now();
+  syncEnvTimeUI();
   spec=resolveSpec(FREE_SPEC);
   target=null;targetSets=null;
   player={algo:'single',mods:[
     {wave:'sine',r:2,I:2,env:'const',s:1},
+    {wave:'sine',r:1,I:0,env:'const',s:1},
     {wave:'sine',r:1,I:0,env:'const',s:1},
   ]};
   show('game');
@@ -1829,9 +2319,11 @@ const WCODE={sine:'sin',triangle:'tri',square:'sqr',saw:'saw'};
 const WCODE_R={sin:'sine',tri:'triangle',sqr:'square',saw:'saw'};
 const ECODE={const:'-',decay:'dec',rise:'rise',lfo:'lfo'};
 const ECODE_R={'-':'const',dec:'decay',rise:'rise',lfo:'lfo'};
+const ACODE={single:'A',parallel:'B',serial:'C',par3:'D',ser3:'E',mix21:'F',ycross:'G'};
+const ACODE_R={A:'single',B:'parallel',C:'serial',D:'par3',E:'ser3',F:'mix21',G:'ycross'};
 function exportPatch(p){
-  const algo={single:'A',parallel:'B',serial:'C'}[p.algo];
-  const n=p.algo==='single'?1:2;
+  const algo=ACODE[p.algo];
+  const n=ALGO_NMODS[p.algo];
   const ms=[];
   for(let i=0;i<n;i++){
     const m=p.mods[i];
@@ -1846,14 +2338,14 @@ function snapSpeed(x){
 }
 function importPatch(text){
   const t=text.trim();
-  const m=t.match(/^FM1:([ABC])\|(.+)$/i);
+  const m=t.match(/^FM1:([A-G])\|(.+)$/i);
   if(!m)return {err:'書式が不正です。「FM1:」から始まるパッチ文字列を入力してください。'};
-  const algo={A:'single',B:'parallel',C:'serial'}[m[1].toUpperCase()];
+  const algo=ACODE_R[m[1].toUpperCase()];
   const parts=m[2].split('|');
-  const need=algo==='single'?1:2;
+  const need=ALGO_NMODS[algo];
   if(parts.length<need)return {err:`アルゴリズム ${m[1].toUpperCase()} にはモジュレータが ${need} 基必要です。`};
   const mods=[];
-  for(let i=0;i<2;i++){
+  for(let i=0;i<3;i++){
     if(i<parts.length){
       const f=parts[i].split(',').map(s=>s.trim());
       if(f.length<3)return {err:`モジュレータ${i+1}の書式が不正です（波形,RATIO,INDEX[,ENV[,速度]]）。`};
@@ -1946,7 +2438,7 @@ function playChordText(){
   if(bad.length){setFreeMsg('chordMsg','✖ 解釈できないコード: '+bad.join(', '),false);return;}
   stopAllVoices();
   const hasEnv=patchHasEnv(player);
-  const dur=hasEnv?1.6:1.0;
+  const dur=hasEnv?Math.max(0.8,envLoopSec()):1.0;
   chords.forEach((c,i)=>{
     const g=0.22/Math.sqrt(c.freqs.length);
     c.freqs.forEach(f=>playVoice(player,f,i*dur,dur,g));
@@ -1970,15 +2462,20 @@ function midiName(mi){return NOTE_NAMES[mi%12]+(Math.floor(mi/12)-1);}
 function noteOn(mi){
   if(activeNotes.has(mi))return;
   const ctx=audio();
+  const oneShot = patchHasEnv(player) && !envLoopOn;
   const src=ctx.createBufferSource();
-  src.buffer=buildLoopBuffer(player,midiFreq(mi));
-  src.loop=true;
+  src.buffer=buildLoopBuffer(player,midiFreq(mi),oneShot);
+  src.loop=!oneShot;
   const g=ctx.createGain();
   const t=ctx.currentTime;
   g.gain.setValueAtTime(0.0001,t);
   g.gain.linearRampToValueAtTime(0.22,t+0.012);
   src.connect(g);g.connect(masterGain);
   src.start();
+  src.onended=()=>{
+    const v=activeNotes.get(mi);
+    if(v&&v.src===src){activeNotes.delete(mi);setKeyVisual(mi,false);}
+  };
   activeNotes.set(mi,{src,g});
   setKeyVisual(mi,true);
 }
@@ -2046,9 +2543,16 @@ $('btnOctUp').addEventListener('click',()=>{
 });
 document.addEventListener('keydown',e=>{
   if(mode!=='free')return;
-  if(e.repeat)return;
   const tag=(document.activeElement&&document.activeElement.tagName)||'';
   if(tag==='INPUT'||tag==='TEXTAREA')return;
+  if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+    e.preventDefault();
+    if(e.repeat)return;
+    if(e.key==='ArrowLeft'&&freeOct>OCT_MIN){freeOct--;buildKeyboard();}
+    else if(e.key==='ArrowRight'&&freeOct<OCT_MAX){freeOct++;buildKeyboard();}
+    return;
+  }
+  if(e.repeat)return;
   const off=KEY_OFFSETS[e.key.toLowerCase()];
   if(off===undefined)return;
   noteOn(kbdLow()+off);
@@ -2062,6 +2566,29 @@ document.addEventListener('keyup',e=>{
 window.addEventListener('blur',releaseAllNotes);
 $('btnStopAll').addEventListener('click',stopAllVoices);
 
+/* ---- ENV TIME (フリーモードの時間変化再生設定) ---- */
+function syncEnvTimeUI(){
+  const b=$('btnEnvLoop');
+  b.textContent=envLoopOn?'ループ ON':'ループ OFF';
+  b.classList.toggle('on',envLoopOn);
+  $('envTimeSlider').value=envLoopTime;
+  $('envTimeVal').textContent=envLoopTime.toFixed(1)+'s';
+}
+$('btnEnvLoop').addEventListener('click',()=>{
+  envLoopOn=!envLoopOn;
+  envAnimStart=performance.now();
+  releaseAllNotes(); /* 既存の押下中ノートはループ設定が異なるため解放 */
+  syncEnvTimeUI();
+  drawScope();
+});
+$('envTimeSlider').addEventListener('input',e=>{
+  envLoopTime=+e.target.value;
+  envAnimStart=performance.now();
+  $('envTimeVal').textContent=envLoopTime.toFixed(1)+'s';
+  if(scrubOn)$('scrubVal').textContent='t='+(scrubU*envLoopSec()).toFixed(2)+'s';
+  drawScope();
+});
+
 /* ================= options ================= */
 function renderOptions(){
   $('optVolume').value=save.volume;
@@ -2072,7 +2599,16 @@ function renderOptions(){
   const f=$('optFormula');
   f.textContent=save.showFormula?'ON':'OFF';
   f.classList.toggle('on',save.showFormula);
+  const st=$('optSticky');
+  st.textContent=save.stickyScope?'ON':'OFF';
+  st.classList.toggle('on',save.stickyScope);
+  const bg=$('optBgm');
+  bg.textContent=save.bgm?'ON':'OFF';
+  bg.classList.toggle('on',save.bgm);
   resetDisarm();
+}
+function applyStickyScope(){
+  $('stickyWrap').classList.toggle('sticky',!!save.stickyScope);
 }
 $('optVolume').addEventListener('input',e=>{
   save.volume=+e.target.value;
@@ -2089,6 +2625,15 @@ $('optAutoplay').addEventListener('click',()=>{
 $('optFormula').addEventListener('click',()=>{
   save.showFormula=!save.showFormula;renderOptions();persist();
   updateFormula();
+});
+$('optSticky').addEventListener('click',()=>{
+  save.stickyScope=!save.stickyScope;renderOptions();persist();
+  applyStickyScope();
+});
+$('optBgm').addEventListener('click',()=>{
+  save.bgm=!save.bgm;renderOptions();persist();
+  userInteracted=true;
+  updateBgm();
 });
 $('optClose').addEventListener('click',()=>$('optOverlay').classList.add('hidden'));
 $('btnOptionsTitle').addEventListener('click',()=>{renderOptions();$('optOverlay').classList.remove('hidden');});
@@ -2168,14 +2713,31 @@ function showToast(text){
 
 /* ================= screens ================= */
 function show(screen){
-  ['titleScreen','tutSelectScreen','selectScreen','gameScreen','infoScreen'].forEach(id=>$(id).classList.add('hidden'));
-  $({title:'titleScreen',tutsel:'tutSelectScreen',select:'selectScreen',game:'gameScreen',info:'infoScreen'}[screen])
+  ['titleScreen','tutSelectScreen','selectScreen','gameScreen','infoScreen','changelogScreen'].forEach(id=>$(id).classList.add('hidden'));
+  $({title:'titleScreen',tutsel:'tutSelectScreen',select:'selectScreen',game:'gameScreen',info:'infoScreen',changelog:'changelogScreen'}[screen])
     .classList.remove('hidden');
   if(screen!=='game'){$('tutBox').classList.add('hidden');stopAllVoices();}
   if(screen==='title')renderTitleStats();
   if(screen==='select')renderStageSelect();
   if(screen==='tutsel')renderTutSelect();
+  if(screen==='changelog')renderChangelog();
+  updateBgm();
   window.scrollTo(0,0);
+}
+function renderChangelog(){
+  $('clCurrent').textContent='現在のバージョン: '+VERSION;
+  const list=$('clList');list.innerHTML='';
+  let first=true;
+  CHANGELOG.forEach(e=>{
+    if(!e.items.length)return; /* 変更が未記載のバージョンは表示しない */
+    const block=document.createElement('div');
+    block.className='cl-block';
+    block.innerHTML=
+      `<div class="cl-ver">${e.v}${first?'<span class="tag">LATEST</span>':''}</div>`+
+      `<ul class="cl-items">${e.items.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+    list.appendChild(block);
+    first=false;
+  });
 }
 function renderTitleStats(){
   const tutDone=Object.values(save.tuts).filter(Boolean).length;
@@ -2194,6 +2756,10 @@ $('btnFreeMode').addEventListener('click',startFree);
 $('btnInfo').addEventListener('click',()=>show('info'));
 $('btnInfoBack').addEventListener('click',()=>show('title'));
 $('btnInfoBack2').addEventListener('click',()=>show('title'));
+$('verLabel').innerHTML=`<b>${VERSION}</b>　更新履歴 ▸`;
+$('verLabel').addEventListener('click',()=>show('changelog'));
+$('btnClBack').addEventListener('click',()=>show('title'));
+$('btnClBack2').addEventListener('click',()=>show('title'));
 
 $('btnPlayTarget').addEventListener('click',()=>{playWave(target);tutorialEvent('listen');});
 $('btnPlayMine').addEventListener('click',playMine);
@@ -2233,6 +2799,8 @@ buildKeyboard();
 renderTitleStats();
 renderOptions();
 applyVolume();
+applyStickyScope();
+syncEnvTimeUI();
 </script>
 </body>
 </html>

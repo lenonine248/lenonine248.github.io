@@ -182,6 +182,29 @@ canvas#scope{display:block;width:100%;height:auto}
   animation:fadein .3s;
 }
 
+/* ---------- rank badge ---------- */
+.rank-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:6px;font-weight:800;font-size:14px;
+  border:1.5px solid currentColor;
+}
+.rank-S{color:#ffd24a;text-shadow:0 0 8px rgba(255,210,74,.5)}
+.rank-A{color:var(--trace)}
+.rank-B{color:#7db4ff}
+.rank-C{color:var(--dim)}
+.stage-btn .mini-rank{
+  display:block;font-size:9px;font-weight:800;line-height:1;margin-top:3px;
+}
+.clear-rank{
+  display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:14px;
+}
+.clear-rank .rank-big{
+  font-size:54px;font-weight:800;line-height:1;
+}
+.clear-rank .rank-label{font-size:11px;color:var(--dim);letter-spacing:.2em}
+.clear-rank .rank-detail{font-size:11.5px;color:var(--dim);line-height:1.7;margin-top:2px}
+.clear-rank .rank-detail b{color:var(--lcd)}
+
 /* ---------- algorithm row / formula ---------- */
 .algo-row{
   display:flex;align-items:center;gap:10px;flex-wrap:wrap;
@@ -207,6 +230,31 @@ canvas#scope{display:block;width:100%;height:auto}
 .algo-btn small{font-size:10px;font-weight:400;letter-spacing:.05em}
 .algo-btn.active{color:var(--trace);border-color:var(--trace);box-shadow:0 0 10px rgba(62,230,192,.25)}
 .algo-hint{font-size:11px;color:var(--dim);width:100%;margin-top:4px}
+
+/* ---------- help tooltip ---------- */
+.help-dot{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;margin-left:5px;border-radius:50%;
+  background:var(--lcd-bg);color:var(--lcd);border:1px solid var(--line);
+  font-size:10px;font-weight:800;cursor:pointer;vertical-align:middle;
+  flex:none;user-select:none;line-height:1;
+}
+.help-dot:hover{border-color:var(--lcd);box-shadow:0 0 6px rgba(255,184,77,.3)}
+.help-dot.active{background:var(--lcd);color:var(--bg)}
+#helpPop{
+  position:fixed;z-index:120;max-width:300px;
+  background:var(--panel);border:1px solid var(--lcd);border-left:4px solid var(--lcd);
+  border-radius:10px;padding:12px 15px;
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
+  font-size:12.5px;line-height:1.85;color:var(--text);
+  animation:fadein .15s;
+}
+#helpPop .hp-title{font-size:11px;font-weight:800;color:var(--lcd);letter-spacing:.12em;margin-bottom:6px}
+#helpPop b{color:var(--lcd)}
+#helpPop code{
+  background:var(--lcd-bg);color:var(--lcd);border:1px solid var(--line);border-radius:4px;
+  padding:0 5px;font-size:11.5px;
+}
 .formula-live{
   margin:8px 0 0;padding:10px 14px;
   background:var(--lcd-bg);color:var(--lcd);
@@ -382,12 +430,22 @@ input[type=range]::-moz-range-thumb{
   font-size:11.5px;color:var(--dim);letter-spacing:.12em;margin-bottom:8px;
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;
 }
-.tier-title::after{content:"";flex:1;height:1px;background:var(--line)}
+.tier-title .tier-prog{
+  font-size:10px;color:var(--dim);border:1px solid var(--line);border-radius:4px;
+  padding:1px 7px;letter-spacing:.08em;flex:none;
+}
+.tier-title .tier-prog.done{color:var(--trace);border-color:#2a4a42}
+.tier-title .tier-prog.locked{opacity:.5}
+.tier-title::after{content:"";flex:1;height:1px;background:var(--line);order:5}
 .tier-title b{color:var(--text)}
+.tier-title .tier-name{flex:none}
+.tier-title .tier-new-wrap{flex:none}
 .tier-new{
   font-size:10px;color:var(--pink);border:1px solid var(--pink);border-radius:4px;
   padding:1px 6px;letter-spacing:.1em;
 }
+.sel-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sel-tools .btn{flex:none}
 .stage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
 .stage-btn{
   background:linear-gradient(180deg,var(--panel2),var(--panel));
@@ -424,6 +482,64 @@ input[type=range]::-moz-range-thumb{
 .tl-year{color:var(--pink);font-weight:800;text-align:right;letter-spacing:.05em}
 .tl-body{border-left:2px solid var(--line);padding-left:14px;color:var(--text);font-size:13.5px;line-height:1.85}
 .tl-body b{color:var(--lcd)}
+
+/* ---------- preset gallery ---------- */
+.preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:8px}
+.preset-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  border-top:3px solid var(--target);
+  padding:16px 18px;display:flex;flex-direction:column;gap:10px;
+}
+.preset-card .pc-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.preset-card .pc-name{font-size:15px;font-weight:800;color:var(--text);letter-spacing:.04em}
+.preset-card .pc-algo{
+  font-size:10px;color:var(--lcd);border:1px solid var(--line);border-radius:4px;
+  padding:1px 7px;letter-spacing:.06em;white-space:nowrap;
+}
+.preset-card .pc-desc{font-size:12px;color:var(--dim);line-height:1.8}
+.preset-card .pc-spec{
+  font-size:11px;color:var(--lcd);background:var(--lcd-bg);
+  border:1px solid var(--line);border-radius:6px;padding:7px 10px;
+  letter-spacing:.02em;line-height:1.7;overflow-x:auto;white-space:nowrap;
+}
+.preset-card .pc-btns{display:flex;gap:8px;margin-top:2px}
+.preset-card .pc-btns .btn{flex:1}
+.preset-mini{display:block;margin:0 auto}
+.preset-intro{font-size:13px;color:var(--text);line-height:1.95;margin-bottom:8px}
+
+/* ---------- reverse mode ---------- */
+.rev-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.rev-tab{
+  background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+  padding:10px 18px;font-size:13px;font-weight:700;color:var(--dim);
+}
+.rev-tab.active{color:var(--trace);border-color:var(--trace);box-shadow:0 0 10px rgba(62,230,192,.2)}
+.rev-panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:20px 22px;
+}
+.rev-panel h3{font-size:14px;letter-spacing:.12em;color:var(--target);margin-bottom:12px}
+.rev-panel p{font-size:13px;color:var(--text);line-height:1.95;margin-bottom:14px}
+.rev-panel .dim{color:var(--dim);font-size:12px}
+.rev-panel input[type=text]{
+  width:100%;background:var(--lcd-bg);color:var(--lcd);
+  border:1px solid var(--line);border-radius:6px;padding:11px 12px;
+  font-family:inherit;font-size:14px;letter-spacing:.02em;
+}
+.rev-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.rev-msg{font-size:12px;margin-top:12px;line-height:1.8}
+.rev-msg.ok{color:var(--trace)}
+.rev-msg.err{color:#ff9a9a}
+.rev-step{
+  display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;
+}
+.rev-step .n{
+  flex:none;width:24px;height:24px;border-radius:50%;
+  background:var(--lcd-bg);color:var(--lcd);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;
+}
+.rev-step .tx{font-size:13px;color:var(--text);line-height:1.8}
+.rev-step .tx b{color:var(--lcd)}
 
 /* ---------- overlays / modal ---------- */
 .overlay{
@@ -509,8 +625,11 @@ input[type=range]::-moz-range-thumb{
       <div class="mode-btns">
         <button class="btn btn-teal" id="btnStageMode">▶ ステージモード（全200ステージ）</button>
         <button class="btn btn-pink" id="btnEndlessMode">∞ エンドレスモード</button>
+        <button class="btn" id="btnDaily">📅 デイリーチャレンジ — 今日の1問</button>
         <button class="btn btn-amber" id="btnFreeMode">🎛 フリーモード — 音作り＆演奏</button>
+        <button class="btn" id="btnReverse">🔍 逆引きモード — 出題コードに挑戦</button>
         <button class="btn" id="btnTutMenu">📖 チュートリアル</button>
+        <button class="btn" id="btnPresets">🎹 プリセット図鑑 — 定番FM音色を聴く</button>
         <button class="btn" id="btnInfo">📜 FM音源とは？ — しくみと歴史</button>
         <button class="btn" id="btnOptionsTitle">⚙ オプション</button>
       </div>
@@ -541,6 +660,9 @@ input[type=range]::-moz-range-thumb{
     <div class="sel-head">
       <h2>STAGE SELECT</h2>
       <span class="sub">クリアすると次のステージが開放されます</span>
+    </div>
+    <div class="sel-tools">
+      <button class="btn btn-teal btn-sm" id="btnJumpFront">▶ 続きから</button>
     </div>
     <div id="stageGrid"></div>
   </div>
@@ -602,6 +724,16 @@ input[type=range]::-moz-range-thumb{
     <!-- ===== FREE MODE PANELS ===== -->
     <div id="freePanel" class="hidden">
       <div class="free-sec">
+        <div class="free-head">
+          <div class="free-title">FREE PATCH — 自由に音作り</div>
+          <button class="btn btn-sm" id="btnFreeReset">↺ 音色をリセット</button>
+        </div>
+        <div class="free-hint">
+          スライダーやボタンで自由に音色を作れます。作った音色はフリーモードを出ても保持され、次に入ったときに復元されます。
+          「↺ 音色をリセット」で初期状態（ALGORITHM A / M1: ×2・2.0）に戻せます。
+        </div>
+      </div>
+      <div class="free-sec">
         <div class="free-title" style="margin-bottom:10px">ENV TIME — 時間変化の再生設定</div>
         <div class="envtime-row">
           <button class="toggle on" id="btnEnvLoop">ループ ON</button>
@@ -628,7 +760,7 @@ input[type=range]::-moz-range-thumb{
       </div>
       <div class="free-sec">
         <div class="free-title" style="margin-bottom:10px">CHORD PLAYER — コード式入力</div>
-        <input type="text" id="chordInput" placeholder="例: C  Am7  F  G7　（スペース区切りで順に演奏）">
+        <input type="text" id="chordInput" maxlength="120" placeholder="例: C  Am7  F  G7　（スペース区切りで順に演奏）">
         <div class="free-btns">
           <button class="btn btn-teal btn-sm" id="btnPlayChords">♪ コードを演奏</button>
         </div>
@@ -639,7 +771,7 @@ input[type=range]::-moz-range-thumb{
       </div>
       <div class="free-sec">
         <div class="free-title" style="margin-bottom:10px">PATCH I/O — 作った音色をテキストで保存・共有</div>
-        <textarea id="patchText" rows="2" placeholder="例: FM1:F|sqr,2.5,3.40,dec,2|sin,3,1.20,-,1|tri,1,0.80,-,1"></textarea>
+        <textarea id="patchText" maxlength="200" rows="2" placeholder="例: FM1:F|sqr,2.5,3.40,dec,2|sin,3,1.20,-,1|tri,1,0.80,-,1"></textarea>
         <div class="free-btns">
           <button class="btn btn-amber btn-sm" id="btnPatchExport">⬆ 書き出し</button>
           <button class="btn btn-teal btn-sm" id="btnPatchImport">⬇ 読み込み</button>
@@ -748,6 +880,73 @@ input[type=range]::-moz-range-thumb{
     </div>
   </div>
 
+  <!-- ============ PRESET GALLERY ============ -->
+  <div id="presetScreen" class="hidden">
+    <header>
+      <div class="logo"><span>FM</span> WAVE <em>PUZZLE</em></div>
+      <div class="hud"><button class="gear" id="btnPresetBack">◀ タイトル</button></div>
+    </header>
+    <div class="sel-head">
+      <h2>PRESET GALLERY — プリセット図鑑</h2>
+      <span class="sub">定番のFM音色を聴いて、フリーモードで開いて改造できます</span>
+    </div>
+    <p class="preset-intro">
+      実機のFMシンセが鳴らしてきた定番の音色を、このゲームの音源で再現したものです。
+      <b style="color:var(--trace)">♪ 試聴</b>で音を確かめ、<b style="color:var(--target)">🎛 フリーモードで開く</b>を押すと、
+      その音色をフリーモードに読み込んで自由にいじったり鍵盤で演奏したりできます。
+      「なぜこの設定でこの音になるのか」を、波形と数式を見ながら体で覚えましょう。
+    </p>
+    <div class="preset-grid" id="presetGrid"></div>
+    <div style="text-align:center;margin:26px 0 10px">
+      <button class="btn btn-teal" id="btnPresetBack2">◀ タイトルにもどる</button>
+    </div>
+  </div>
+
+  <!-- ============ REVERSE MODE ============ -->
+  <div id="reverseScreen" class="hidden">
+    <header>
+      <div class="logo"><span>FM</span> WAVE <em>PUZZLE</em></div>
+      <div class="hud"><button class="gear" id="btnReverseBack">◀ タイトル</button></div>
+    </header>
+    <div class="sel-head">
+      <h2>REVERSE — 逆引きモード</h2>
+      <span class="sub">問題を出す／出された問題に挑戦する</span>
+    </div>
+    <p class="preset-intro">
+      通常のステージはゲームが出題しますが、逆引きモードでは<b style="color:var(--trace)">プレイヤー同士で問題を出し合えます</b>。
+      自分で作った音色を「出題コード」にして友達やSNSで共有し、相手は耳とパラメータだけを頼りにその音を再現します。
+    </p>
+    <div class="rev-tabs">
+      <button class="rev-tab active" id="revTabSolve">📥 出題コードに挑戦</button>
+      <button class="rev-tab" id="revTabMake">📤 問題を作って出題</button>
+    </div>
+
+    <!-- 挑戦タブ -->
+    <div class="rev-panel" id="revSolvePanel">
+      <h3>出題コードに挑戦</h3>
+      <p>受け取った<b style="color:var(--lcd)">出題コード</b>（<span class="dim">FM1:… で始まる文字列</span>）を貼り付けて「挑戦開始」を押すと、
+      その音色が<b>お手本</b>になります。お手本は<b style="color:var(--trace)">音だけ</b>聴けます——波形を見ずに、耳で同じ音を作り出しましょう。</p>
+      <input type="text" id="revCodeInput" maxlength="200" placeholder="例: FM1:C|sin,1,3.00,dec,1|sin,3,2.00,-,1">
+      <div class="rev-btns">
+        <button class="btn btn-teal btn-sm" id="btnRevSolve">▶ 挑戦開始</button>
+        <button class="btn btn-sm" id="btnRevPaste">📋 クリップボードから貼り付け</button>
+      </div>
+      <div class="rev-msg" id="revSolveMsg"></div>
+    </div>
+
+    <!-- 出題タブ -->
+    <div class="rev-panel hidden" id="revMakePanel">
+      <h3>問題を作って出題</h3>
+      <div class="rev-step"><span class="n">1</span><span class="tx"><b>フリーモード</b>で好きな音色を作ります（鍵盤で試したり、プリセット図鑑から改造してもOK）。</span></div>
+      <div class="rev-step"><span class="n">2</span><span class="tx">フリーモード内の <b>PATCH I/O</b> で「⬆ 書き出し」を押し、表示された <b>FM1:…</b> のコードを「📋 コピー」します。</span></div>
+      <div class="rev-step"><span class="n">3</span><span class="tx">そのコードを友達やSNSに貼って出題！ 相手はこの逆引きモードの「挑戦」タブにコードを入れて再現します。</span></div>
+      <p class="dim">※ 出題コードは音色そのものなので、共有された人は同じ音をゲーム上で完全に再現できます。</p>
+      <div class="rev-btns">
+        <button class="btn btn-amber btn-sm" id="btnRevToFree">🎛 フリーモードで音色を作る</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ CHANGELOG ============ -->
   <div id="changelogScreen" class="hidden">
     <header>
@@ -765,11 +964,15 @@ input[type=range]::-moz-range-thumb{
   </div>
 
   <!-- ============ CLEAR OVERLAY ============ -->
+  <div id="helpPop" class="hidden"></div>
+
   <div id="clearOverlay" class="overlay hidden">
     <div class="clear-card">
       <div class="clear-word" id="clearWord">CLEAR!</div>
+      <div class="clear-rank hidden" id="clearRank"></div>
       <div class="clear-sub" id="clearMsg"></div>
       <button class="btn btn-teal" id="btnNext">次へ ▶</button>
+      <button class="btn btn-amber hidden" id="btnClearToFree">🎛 この音色をフリーモードで開く</button>
       <button class="btn" id="btnClearBack">もどる</button>
     </div>
   </div>
@@ -814,6 +1017,17 @@ input[type=range]::-moz-range-thumb{
         ON にすると、画面をスクロールしても波形ウィンドウ・時間スライダー・一致度メーターが画面上部に追従して表示され続けます。
       </div>
       <hr class="opt-sep">
+      <div class="opt-row">
+        <label>🎧 耳トレモード<br><span style="font-size:10px;color:var(--pink);letter-spacing:.1em">上級者向け</span></label>
+        <button class="toggle" id="optEarTrain">OFF</button>
+      </div>
+      <div class="opt-note">
+        ON にすると、ステージとエンドレスで<b style="color:var(--text)">お手本の波形と一致度メーターが隠れ</b>、
+        「♪ お手本を聴く」の<b style="color:var(--text)">音だけ</b >を頼りに再現する上級者向けモードになります。
+        自分の波形は見えます。音が合ったと思ったら「♪ 自分の波を聴く」でクリア判定。
+        FM音源は本来「耳で作る」もの——目を閉じてパラメータと音色の関係を体に刻みましょう。
+      </div>
+      <hr class="opt-sep">
       <button class="btn btn-sm danger" id="optReset">進捗をリセット</button>
       <div class="opt-note" id="optResetNote">
         ステージ進行・クリア数・エンドレス記録・チュートリアル達成状況を消去します（音量などの設定は残ります）。
@@ -842,8 +1056,19 @@ input[type=range]::-moz-range-thumb{
 /* ================= version & changelog =================
    バージョンを更新するときは VERSION を進め、CHANGELOG の
    先頭に新しいエントリを追加すること(新しい順に表示される) */
-const VERSION = 'Beta6';
+const VERSION = 'Beta7';
 const CHANGELOG = [
+  {v:'Beta7', items:[
+    'スコア＆ランク機能を追加: クリア時に操作の少なさ・速さからS/A/B/Cを判定し、ステージごとに最高ランクを記録。ステージセレクトとタイトルに表示',
+    'フリーモードを出てもキーボードが反応し続ける不具合を修正',
+    'フリーモードで作った音色を、モードを出入りしても保持するように変更。音色リセットボタンを追加',
+    'ステージセレクトを改善: ティアごとの進捗(クリア数)表示と、「続きから」で未クリア最前線へジャンプする機能を追加',
+    'オプションに上級者向けの「耳トレモード」を追加: お手本波形と一致度メーターを隠し、音だけを頼りに再現する',
+    'プリセット図鑑を追加: エレピ・ベル・ブラスなど定番FM音色12種を、解説・波形プレビュー付きで試聴でき、フリーモードに読み込んで改造できる',
+    '逆引きモードを追加: 自分で作った音色を出題コードにして共有し、相手は音だけを頼りに再現する(プレイヤー同士の出題遊び)',
+    'デイリーチャレンジを追加: 日付ごとに全プレイヤー共通の1問が出題され、連続達成日数(ストリーク)と日替わりランクを記録する',
+    '各パラメータ(WAVE/RATIO/INDEX/ENV/SPEED/アルゴリズム)に「?」解説ツールチップを追加: なぜその設定でその音になるかをその場で確認できる',
+  ]},
   {v:'Beta6', items:[
     'ステージを全200ステージに拡張(141〜200): オシレータ最大4基(モジュレータ×3)編を追加',
     'アルゴリズムを7種類に拡張: D(3基並列)/E(3連直列)/F(直列2＋並列1)/G(Y字)を追加',
@@ -889,7 +1114,26 @@ const TOTAL_STAGES = 200;
 const ENV_LOOP_MS = 2000;                 /* 時間変化の1ループ(描画/判定の基準=2秒) */
 const ENV_PHASES = [0.06,0.25,0.45,0.65,0.88]; /* 一致度判定に使う時刻 */
 
-const rnd = (arr)=>arr[Math.floor(Math.random()*arr.length)];
+/* 差し替え可能な乱数源(通常はMath.random、デイリー中はシード付きPRNG) */
+let RAND = Math.random;
+function withSeededRand(seed, fn){
+  /* mulberry32: 軽量で再現性のあるPRNG */
+  let a = seed>>>0;
+  const prev = RAND;
+  RAND = function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  try{ return fn(); } finally { RAND = prev; }
+}
+function strSeed(str){
+  let h = 2166136261>>>0;
+  for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h>>>0;
+}
+const rnd = (arr)=>arr[Math.floor(RAND()*arr.length)];
 const $ = id=>document.getElementById(id);
 const frac = x=>x-Math.floor(x);
 
@@ -995,7 +1239,118 @@ const PAIRS=[
   ['ser3','ycross'],['mix21','ycross'],['par3','ser3'],
 ];
 
-/* ================= save data (localStorage) ================= */
+/* ================= preset gallery ================= */
+/* 実機FMの定番音をこのゲームの音源モデルで再現したプリセット */
+const PRESETS=[
+  {name:'エレクトリックピアノ', icon:'🎹',
+   desc:'チャウニングが発見した最初期のFMらしい音。比率1:1＋減衰インデックスで、アタックは煌びやか、減衰で丸くなる——DX7が80年代を席巻した張本人。',
+   patch:{algo:'single',mods:[{wave:'sine',r:1,I:3,env:'decay',s:1}]}},
+  {name:'ベル / チャイム', icon:'🔔',
+   desc:'非整数比(×3.5)が倍音を不協和にずらし、金属的でガラスのような響きに。FMが最も得意とする音色のひとつ。',
+   patch:{algo:'single',mods:[{wave:'sine',r:3.5,I:4,env:'decay',s:1}]}},
+  {name:'チューブラーベル', icon:'🎐',
+   desc:'高い非整数比のベルに、低い整数比の胴鳴りを並列で重ねた、奥行きのある鐘の音。',
+   patch:{algo:'parallel',mods:[{wave:'sine',r:3.5,I:3,env:'decay',s:1},{wave:'sine',r:1,I:2,env:'decay',s:1}]}},
+  {name:'ブラス', icon:'🎺',
+   desc:'インデックスを時間とともに上げる(RISE)ことで、フッと吹き込むような明るくなるアタックを再現。シンセブラスの基本形。',
+   patch:{algo:'single',mods:[{wave:'sine',r:1,I:4,env:'rise',s:1}]}},
+  {name:'ウッドベース', icon:'🎸',
+   desc:'比率1:1の太い基音に、速め(×2)の減衰インデックスで弦をはじく「ボン」というアタックを加えた低音。',
+   patch:{algo:'single',mods:[{wave:'sine',r:1,I:3,env:'decay',s:2}]}},
+  {name:'クラビ', icon:'🎵',
+   desc:'直列接続で「揺れの揺れ」を作り、減衰させることで、歯切れのよい引っかくようなアタックを持つ鍵盤音に。',
+   patch:{algo:'serial',mods:[{wave:'sine',r:1,I:4,env:'decay',s:1},{wave:'sine',r:3,I:2,env:'decay',s:1}]}},
+  {name:'グラスハープ', icon:'🥛',
+   desc:'高い整数比(×4)を一定インデックスで鳴らした、澄んだ純音に近い倍音の音。グラスの縁をなぞる音のよう。',
+   patch:{algo:'single',mods:[{wave:'sine',r:4,I:2,env:'const',s:1}]}},
+  {name:'オルガン', icon:'🎛',
+   desc:'整数比のモジュレータを3基並列で重ね、ドローバーのように倍音を積んだ持続音。一定インデックスで音が動かない。',
+   patch:{algo:'par3',mods:[{wave:'sine',r:2,I:1.5,env:'const',s:1},{wave:'sine',r:4,I:1,env:'const',s:1},{wave:'sine',r:6,I:0.6,env:'const',s:1}]}},
+  {name:'メタルパーカッション', icon:'🥁',
+   desc:'非常に高い非整数比＋大きなインデックスを一瞬で減衰させ、金属を叩いたような無音程に近い打撃音に。',
+   patch:{algo:'single',mods:[{wave:'sine',r:5.5,I:5,env:'decay',s:1}]}},
+  {name:'シンセリード', icon:'🎤',
+   desc:'のこぎり波モジュレータで倍音を稼ぎ、サイン波を並列で足してエッジのある芯を作った、抜けの良いリード。',
+   patch:{algo:'parallel',mods:[{wave:'saw',r:1,I:3,env:'const',s:1},{wave:'sine',r:2,I:2,env:'const',s:1}]}},
+  {name:'うねりパッド', icon:'🌊',
+   desc:'インデックスをLFOで周期的に揺らし、音色がゆっくり明暗するパッド。時間スライダーで動きを観察してみて。',
+   patch:{algo:'parallel',mods:[{wave:'sine',r:1,I:3,env:'lfo',s:1},{wave:'sine',r:2,I:1.5,env:'const',s:1}]}},
+  {name:'シタール風', icon:'🪕',
+   desc:'直列で深く変調し、第2モジュレータを速めに減衰させることで、弦のうなりとビーンという独特の余韻を再現。',
+   patch:{algo:'serial',mods:[{wave:'sine',r:1,I:5,env:'decay',s:1},{wave:'sine',r:4,I:3,env:'decay',s:2}]}},
+];
+
+/* ================= help tooltips ================= */
+/* 各パラメータの「なぜそうなるか」豆知識。FM音源の原理と操作を結びつける */
+const HELP={
+  wave:{t:'WAVE（モジュレータの波形）', b:
+    'キャリアを揺らす波の<b>形</b>です。サイン波は倍音を含まないので加わる倍音が穏やか、'+
+    '三角波・矩形波・のこぎり波は元々多くの倍音を持つため、揺らした瞬間に倍音が一気に増えて'+
+    '<b>明るく複雑な音</b>になります。同じ INDEX でも波形を変えると音色が大きく変わります。'},
+  ratio:{t:'RATIO（周波数比 fm/fc）', b:
+    'モジュレータの周波数がキャリアの何倍かを表します。ここが<b>整数</b>（×1,×2,×3…）だと'+
+    '生まれる倍音がキャリアの倍音列にぴったり乗り、<b>楽器のような澄んだ音</b>に。'+
+    '<b>非整数</b>（×2.5,×3.5…）だと倍音が整数列からずれて、<b>ベルや金属のような不協和な響き</b>になります。'},
+  index:{t:'INDEX（変調指数 I）', b:
+    '揺らしの<b>深さ</b>です。0なら純粋なサイン波。大きくするほど<b>側帯波（サイドバンド）</b>が増え、'+
+    '倍音が広がって音が明るく・厚くなります。FMの「音の派手さ」を決める最重要パラメータで、'+
+    '時間とともに INDEX を下げると、減衰につれて音がだんだん丸くなります。'},
+  env:{t:'ENV（エンベロープ）', b:
+    'INDEX を<b>時間で変化</b>させる仕組みです。<code>DEC</code>は時間とともに減衰（鐘やピアノのように'+
+    'アタックが派手で減衰すると丸くなる）、<code>RISE</code>は徐々に増加（ブラスのフッと吹き込む感じ）、'+
+    '<code>LFO</code>は周期的に上下（音色がうねるパッド）。音色を「動かす」鍵です。'},
+  speed:{t:'SPEED（エンベロープ速度）', b:
+    'ENV の変化の<b>速さ</b>です。<code>×2</code>なら2倍速で減衰・上昇・うねりが進みます。'+
+    'LFO と組み合わせるとビブラートのような速い揺れになり、DEC なら歯切れの良い短い減衰に。'+
+    'ENV が <code>-</code>（一定）のときは効果がありません。'},
+  algo:{t:'ALGORITHM（接続方法）', b:
+    'オシレータの<b>つなぎ方</b>です。<b>並列</b>は複数のモジュレータが別々にキャリアを揺らし、'+
+    '揺れが「足し算」される素直な音。<b>直列</b>は「揺れをさらに揺らす」入れ子構造で、'+
+    '同じ設定でも倍音が爆発的に増えて複雑になります。同じパラメータでも接続が違えば別の音です。'},
+};
+let helpKey=null;
+function helpDot(key){
+  return `<span class="help-dot" data-help="${key}" title="解説">?</span>`;
+}
+function showHelp(dot){
+  const key=dot.dataset.help;
+  const pop=$('helpPop');
+  if(helpKey===key && !pop.classList.contains('hidden')){ hideHelp(); return; }
+  helpKey=key;
+  const h=HELP[key];
+  pop.innerHTML=`<div class="hp-title">💡 ${h.t}</div>${h.b}`;
+  pop.classList.remove('hidden');
+  document.querySelectorAll('.help-dot.active').forEach(d=>d.classList.remove('active'));
+  dot.classList.add('active');
+  /* 位置決め: アイコンの下に出し、画面外にはみ出さないよう調整 */
+  const r=dot.getBoundingClientRect();
+  pop.style.visibility='hidden';
+  requestAnimationFrame(()=>{
+    const pw=pop.offsetWidth, ph=pop.offsetHeight, vw=window.innerWidth, vh=window.innerHeight;
+    let left=r.left, top=r.bottom+8;
+    if(left+pw>vw-10) left=vw-pw-10;
+    if(left<10) left=10;
+    if(top+ph>vh-10) top=r.top-ph-8;       /* 下に入らなければ上に */
+    if(top<10) top=10;
+    pop.style.left=left+'px';
+    pop.style.top=top+'px';
+    pop.style.visibility='visible';
+  });
+}
+function hideHelp(){
+  helpKey=null;
+  $('helpPop').classList.add('hidden');
+  document.querySelectorAll('.help-dot.active').forEach(d=>d.classList.remove('active'));
+}
+/* 外側タップ・スクロールで閉じる */
+document.addEventListener('click',e=>{
+  if(e.target.closest('.help-dot'))return;
+  if(e.target.closest('#helpPop'))return;
+  if(helpKey)hideHelp();
+},true);
+window.addEventListener('scroll',()=>{if(helpKey)hideHelp();},true);
+
+/* ================= help tooltips end ================= */
 const DEFAULT_TUTS = {basic:false, waves:false, parallel:false, serial:false, algo:false, env:false, speed:false, osc3:false, shapes:false};
 const save = {
   unlocked: 1,
@@ -1007,6 +1362,12 @@ const save = {
   showFormula: false,
   stickyScope: false,
   bgm: true,
+  earTrain: false,
+  ranks: {},      /* {stageNumber: 'S'|'A'|'B'|'C'} 各ステージの最高ランク */
+  daily: {},      /* {'YYYY-MM-DD': 'S'|'A'|'B'|'C'} その日の最高ランク */
+  dailyStreak: 0, /* 連続達成日数 */
+  dailyLast: '',  /* 最後に達成した日付(ストリーク判定用) */
+  dailyBestStreak: 0,
   tuts: {...DEFAULT_TUTS},
 };
 function loadSave(){
@@ -1016,6 +1377,11 @@ function loadSave(){
       const d=JSON.parse(r);
       Object.assign(save, d);
       save.tuts = Object.assign({...DEFAULT_TUTS}, d.tuts||{});
+      save.ranks = (d.ranks && typeof d.ranks==='object') ? d.ranks : {};
+      save.daily = (d.daily && typeof d.daily==='object') ? d.daily : {};
+      save.dailyStreak = d.dailyStreak||0;
+      save.dailyLast = d.dailyLast||'';
+      save.dailyBestStreak = d.dailyBestStreak||0;
     }
   }catch(e){/* 初回 or storage 非対応 */}
   /* ステージ数が変わった版からの引き継ぎに備えてクランプ */
@@ -1140,6 +1506,57 @@ const TIERS = [
       ratios:R_HALF, idxMax:Math.round(6+t*2), idxStep:0.25,
       maxEnvMods:2, bias:{env:'any',speed:true}})},
 ];
+/* ================= daily challenge ================= */
+/* 日付を YYYY-MM-DD で取得(ローカル日付) */
+function todayStr(d){
+  d=d||new Date();
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+/* 基準日からの通算日数(難易度の緩やかな底上げと曜日変化に使う) */
+function dayNumber(dateStr){
+  const [y,m,d]=dateStr.split('-').map(Number);
+  const t=Date.UTC(y,m-1,d);
+  return Math.floor(t/86400000);
+}
+/* その日のランダム難易度係数(0〜1)。日付シードで固定 */
+function dailyDifficulty(dateStr){
+  return withSeededRand(strSeed('fmwp-daily-diff-'+dateStr), ()=>RAND());
+}
+/* その日の「○ステージ相当」表示値。5刻み＋±5のブレ(日付シードで固定) */
+function dailyStageEquiv(dateStr){
+  const diff=dailyDifficulty(dateStr);
+  /* 難易度係数を 1〜200 ステージへマッピングし、5刻みに丸める */
+  const base=Math.round((10+diff*190)/5)*5;
+  /* ±5 のブレ(-5/0/+5 のいずれか、これも日付シードで固定) */
+  const jitter=withSeededRand(strSeed('fmwp-daily-jit-'+dateStr), ()=>(Math.floor(RAND()*3)-1)*5);
+  return Math.min(200, Math.max(5, base+jitter));
+}
+/* デイリーのお題spec: 曜日で系統を変え、難易度はその日のランダム係数で決まる */
+function dailySpec(dateStr){
+  const dn=dayNumber(dateStr);
+  const dow=((dn%7)+7)%7;             /* 0..6 の曜日的サイクル(系統の変化) */
+  const diff=dailyDifficulty(dateStr); /* その日のランダム難易度(週進行に依存しない) */
+  /* 曜日ごとに「その日の主役」を変えて変化を出す */
+  const sys=[
+    {algoPool:['single','parallel'],          waves:W3, envs:E1,  sp:S1, bias:{wave:'nonsine'}},
+    {algoPool:['serial','parallel'],          waves:W2, envs:E1,  sp:S1, bias:{ratio:'half'}},
+    {algoPool:['single','parallel','serial'], waves:W4, envs:E4,  sp:S1, bias:{env:'any'}},
+    {algoPool:['par3','ycross'],              waves:W2, envs:E1,  sp:S1, bias:null},
+    {algoPool:['ser3','mix21'],               waves:W3, envs:E4,  sp:S1, bias:{env:'any'}},
+    {algoPool:ALL_ALGOS,                      waves:W4, envs:E4,  sp:S3, bias:{env:'any',speed:true}},
+    {algoPool:A3,                             waves:W3, envs:E4,  sp:S3, bias:{env:'any',speed:true}},
+  ][dow];
+  return {
+    algoMode:'choice', algoPool:sys.algoPool,
+    waves:sys.waves, envs:sys.envs, envSpeeds:sys.sp,
+    ratios: diff<0.5 ? R_HALF.slice(0,12) : R_HALF,
+    idxMax: Math.round(5+diff*3),
+    idxStep: diff<0.5 ? 0.5 : 0.25,
+    maxEnvMods: 2,
+    bias: sys.bias,
+  };
+}
 function stageSpec(n){
   const tier=TIERS.find(tr=>n>=tr.from&&n<=tr.to);
   const t=tier.to===tier.from?1:(n-tier.from)/(tier.to-tier.from);
@@ -1383,14 +1800,31 @@ const TUTORIALS=[
 let mode=null;            // 'stage' | 'endless' | 'tutorial' | 'free'
 let stageIdx=0;
 let endlessCount=0;
+let dailyDate='';  /* 現在挑戦中のデイリーの日付 */
 let spec=null, target=null, player=null, targetSets=null;
 let lastPct=0, cleared=false;
 let curTut=null, tutStep=0, pendingStage=null;
 let scrubOn=false, scrubU=0;
+/* スコア計測 */
+let moveCount=0, puzzleStart=0;
+let presetSrc=null; /* プリセット図鑑の試聴音 */
 let lockedMods=new Set(); /* お手本の値で固定されたモジュレータ番号 */
 /* フリーモードの時間変化再生設定 */
 let envLoopOn=true, envLoopTime=2.0, envAnimStart=0;
 function envLoopSec(){return mode==='free'?envLoopTime:ENV_LOOP_MS/1000;}
+/* フリーモードで作った音色を保持(モードを出ても消えない) */
+function defaultFreePatch(){
+  return {algo:'single',mods:[
+    {wave:'sine',r:2,I:2,env:'const',s:1},
+    {wave:'sine',r:1,I:0,env:'const',s:1},
+    {wave:'sine',r:1,I:0,env:'const',s:1},
+  ]};
+}
+let freePatch=defaultFreePatch();
+function saveFreePatch(){
+  if(mode==='free'&&player)
+    freePatch={algo:player.algo, mods:player.mods.map(m=>({...m}))};
+}
 
 function resolveSpec(raw){
   return {
@@ -1421,9 +1855,9 @@ function patchHasEnv(p){ return !!p && p.mods.some(m=>m.env && m.env!=='const');
 /* ターゲット生成: 高確率(80%)でティアの目玉要素を含める */
 function applyBias(tgt,s){
   if(!s.bias) return;
-  if(Math.random()>0.8) return;
+  if(RAND()>0.8) return;
   const n = ALGO_NMODS[tgt.algo];
-  const mi = Math.floor(Math.random()*n);
+  const mi = Math.floor(RAND()*n);
   const m = tgt.mods[mi];
   const b = s.bias;
   if(b.wave){
@@ -1476,7 +1910,7 @@ function genTarget(s){
     const idx=[];
     for(let i=0;i<nMods;i++)if(tgt.mods[i].env!=='const')idx.push(i);
     while(idx.length>s.maxEnvMods){
-      const k=idx.splice(Math.floor(Math.random()*idx.length),1)[0];
+      const k=idx.splice(Math.floor(RAND()*idx.length),1)[0];
       tgt.mods[k].env='const';tgt.mods[k].s=1;
     }
   }
@@ -1750,6 +2184,13 @@ document.addEventListener('click',e=>{
 
 /* ================= drawing ================= */
 const canvas=$('scope'),cx=canvas.getContext('2d');
+/* 耳トレモード: お手本波形と一致度メーターを隠す(stage/endlessのみ。クリア後は答え合わせで表示)
+   逆引きモードは常に音だけ(波形を見ると音色コードの答えが一目で分かるため) */
+function earTrainActive(){
+  if(cleared)return false;
+  if(mode==='reverse')return true;
+  return save.earTrain && (mode==='stage'||mode==='endless');
+}
 function currentU(){
   if(scrubOn)return scrubU;
   const T=envLoopSec()*1000;
@@ -1771,7 +2212,7 @@ function drawScope(){
 
   const pts=660,isClear=cleared;
 
-  if(target){
+  if(target && !earTrainActive()){
     cx.save();
     cx.setLineDash([8,7]);cx.lineWidth=2.5;
     cx.strokeStyle=isClear?'rgba(255,255,255,0.55)':'rgba(245,169,62,0.85)';
@@ -1885,7 +2326,7 @@ function renderAlgo(){
         : (pool.length<=2
           ? 'お手本はこの2つのどちらか——うねり方から推理しよう'
           : 'お手本のアルゴリズムは非公開——波形のうねり方から推理しよう'));
-    el.innerHTML=`<span class="algo-label">${mode==='free'?'ALGORITHM':'ALGORITHM ?'}</span>
+    el.innerHTML=`<span class="algo-label">${mode==='free'?'ALGORITHM':'ALGORITHM ?'}${helpDot('algo')}</span>
       <div class="algo-btns">${defs.map(d=>
         `<button class="algo-btn${player.algo===d.key?' active':''}" data-algo="${d.key}">
            ${d.label}<small>${d.sub}</small></button>`).join('')}</div>
@@ -1896,15 +2337,22 @@ function renderAlgo(){
         if(player.algo===b.dataset.algo)return;
         player.algo=b.dataset.algo;
         renderAlgo();renderOps();
+        registerMove();
         tutorialEvent('algo');
         refresh();
         if(save.autoplay&&mode!=='free')playMine();
       });
     });
+    el.querySelectorAll('.help-dot').forEach(d=>{
+      d.addEventListener('click',ev=>{ev.stopPropagation();showHelp(d);});
+    });
     return;
   }
   const d=ALGO_DEF.find(x=>x.key===spec.algo);
-  el.innerHTML=`<span class="algo-label">ALGORITHM ${d.label}</span>`+algoDiagram(spec.algo);
+  el.innerHTML=`<span class="algo-label">ALGORITHM ${d.label}${helpDot('algo')}</span>`+algoDiagram(spec.algo);
+  el.querySelectorAll('.help-dot').forEach(dd=>{
+    dd.addEventListener('click',ev=>{ev.stopPropagation();showHelp(dd);});
+  });
 }
 
 function updateFormula(){
@@ -1951,7 +2399,7 @@ function renderOps(){
     const role=locked?'<span class="lock-badge">🔒 おてほん固定</span>':(ALGO_ROLE[player.algo][i]||'');
     const waveRow = spec.waves.length>1 ? `
       <div class="param">
-        <label>WAVE</label>
+        <label>WAVE${helpDot('wave')}</label>
         <div class="wave-sel">${spec.waves.map(w=>
           `<button class="wave-btn${m.wave===w?' active':''}"${dis} data-mod="${i}" data-wave="${w}" title="${WAVE_INFO[w].jp}">
              ${waveGlyph(w)}${WAVE_INFO[w].label}</button>`).join('')}</div>
@@ -1959,7 +2407,7 @@ function renderOps(){
       </div>` : '';
     const envRow = spec.envs.length>1 ? `
       <div class="param">
-        <label>ENV</label>
+        <label>ENV${helpDot('env')}</label>
         <div class="wave-sel">${spec.envs.map(e=>
           `<button class="wave-btn${m.env===e?' active':''}"${dis} data-mod="${i}" data-env="${e}" title="${ENV_INFO[e].jp}">
              ${envGlyph(e)}${ENV_INFO[e].label}</button>`).join('')}</div>
@@ -1967,7 +2415,7 @@ function renderOps(){
       </div>` : '';
     const speedRow = spec.envSpeeds.length>1 ? `
       <div class="param">
-        <label>SPEED</label>
+        <label>SPEED${helpDot('speed')}</label>
         <div class="wave-sel">${spec.envSpeeds.map(sv=>
           `<button class="wave-btn${(m.s||1)===sv?' active':''}"${dis} data-mod="${i}" data-speed="${sv}" title="エンベロープ速度 ${fmtSpeed(sv)}">
              ${fmtSpeed(sv)}</button>`).join('')}</div>
@@ -1977,13 +2425,13 @@ function renderOps(){
       <div class="op-title"><b>MODULATOR ${i+1}</b><span>${role}</span></div>
       ${waveRow}
       <div class="param">
-        <label>RATIO</label>
+        <label>RATIO${helpDot('ratio')}</label>
         <input type="range" min="0" max="${spec.ratios.length-1}" step="1"
                value="${Math.max(0,spec.ratios.indexOf(m.r))}"${dis} data-mod="${i}" data-kind="r">
         <div class="val" id="valR${i}">${fmtRatio(m.r)}</div>
       </div>
       <div class="param">
-        <label>INDEX</label>
+        <label>INDEX${helpDot('index')}</label>
         <input type="range" min="0" max="${spec.idxMax}" step="${spec.idxStep}"
                value="${m.I}"${dis} data-mod="${i}" data-kind="I">
         <div class="val" id="valI${i}">${fmtIdx(m.I)}</div>
@@ -2005,6 +2453,9 @@ function renderOps(){
   cont.querySelectorAll('.wave-btn[data-speed]').forEach(b=>{
     b.addEventListener('click',()=>onSpeedSelect(+b.dataset.mod,parseFloat(b.dataset.speed)));
   });
+  cont.querySelectorAll('.help-dot').forEach(d=>{
+    d.addEventListener('click',ev=>{ev.stopPropagation();showHelp(d);});
+  });
 }
 function onSliderInput(e){
   if(cleared)return;
@@ -2021,8 +2472,10 @@ function onSliderInput(e){
   }
   refresh();
 }
+function registerMove(){ if(mode==='stage'||mode==='endless'||mode==='daily')moveCount++; }
 function onSliderRelease(){
   if(cleared)return;
+  registerMove();
   if(save.autoplay&&mode!=='free')playMine();
 }
 function onWaveSelect(i,w){
@@ -2033,6 +2486,7 @@ function onWaveSelect(i,w){
     b.classList.toggle('active',b.dataset.wave===w);
   });
   const v=$('valW'+i);if(v)v.textContent=WAVE_INFO[w].label;
+  registerMove();
   tutorialEvent('wave');
   refresh();
   if(save.autoplay&&mode!=='free')playMine();
@@ -2045,6 +2499,7 @@ function onEnvSelect(i,e){
     b.classList.toggle('active',b.dataset.env===e);
   });
   const v=$('valE'+i);if(v)v.textContent=ENV_INFO[e].label;
+  registerMove();
   tutorialEvent('env');
   refresh();
   if(save.autoplay&&mode!=='free')playMine();
@@ -2057,6 +2512,7 @@ function onSpeedSelect(i,sv){
     b.classList.toggle('active',parseFloat(b.dataset.speed)===sv);
   });
   const v=$('valS'+i);if(v)v.textContent=fmtSpeed(sv);
+  registerMove();
   tutorialEvent('speed');
   refresh();
   if(save.autoplay&&mode!=='free')playMine();
@@ -2065,26 +2521,35 @@ function onSpeedSelect(i,sv){
 /* ================= game flow ================= */
 function refresh(){
   if(mode==='free' && !envLoopOn) envAnimStart=performance.now();
+  if(mode==='free') saveFreePatch();
   drawScope();
   updateFormula();
   if(mode==='free')return;
   lastPct=matchScoreSets(targetSets,makeSampleSets(player));
-  updateMeter(lastPct);
+  const ear=earTrainActive();
+  updateMeter(ear?0:lastPct);            /* 耳トレ中はメーターを動かさない */
   const matched=!cleared&&lastPct>=CLEAR_PCT;
-  $('matchBanner').classList.toggle('hidden',!matched);
-  $('btnPlayMine').classList.toggle('attention',matched);
+  /* 耳トレ中は「合っている」ことを視覚的に教えない */
+  $('matchBanner').classList.toggle('hidden',!matched||ear);
+  $('btnPlayMine').classList.toggle('attention',matched&&!ear);
   if(matched)tutorialEvent('matched');
 }
 
 function applyModeUI(){
   const free = mode==='free';
-  $('meterRow').classList.toggle('hidden',free);
+  const ear = earTrainActive();
+  const rev = mode==='reverse';
+  $('meterRow').classList.toggle('hidden',free||ear);
   $('meterNote').classList.toggle('hidden',free);
+  $('meterNote').innerHTML = rev
+    ? '🔍 逆引き — 音だけで同じ音色を作り「♪ 自分の波を聴く」'
+    : (ear ? '🎧 耳トレモード — 音だけで合わせて「♪ 自分の波を聴く」'
+           : '一致度 96% 以上で波形ロック ▲');
   $('btnPlayTarget').classList.toggle('hidden',free);
   $('btnStopAll').classList.toggle('hidden',!free);
-  $('btnRegen').classList.toggle('hidden',free||mode==='tutorial');
+  $('btnRegen').classList.toggle('hidden',free||mode==='tutorial'||rev);
   $('freePanel').classList.toggle('hidden',!free);
-  $('labTarget').style.visibility=free?'hidden':'visible';
+  $('labTarget').style.visibility=(free||ear)?'hidden':'visible';
   $('hudClearWrap').classList.toggle('hidden',free);
   if(free)$('matchBanner').classList.add('hidden');
   updateScrubRow();
@@ -2118,6 +2583,7 @@ function beginPuzzle(rawSpec, fixedTarget){
     });
   }
   targetSets=makeSampleSets(target);
+  moveCount=0;puzzleStart=performance.now();
   renderAlgo();renderOps();updateHud();applyModeUI();refresh();
 }
 
@@ -2135,6 +2601,25 @@ function startEndless(){
   show('game');
   beginPuzzle(endlessSpec(0));
 }
+/* ---- daily challenge ---- */
+function startDaily(){
+  dailyDate=todayStr();
+  mode='daily';curTut=null;
+  $('tutBox').classList.add('hidden');
+  show('game');
+  /* 日付をシードに固定問題を生成(全プレイヤー・何度挑戦しても同一) */
+  const target=withSeededRand(strSeed('fmwp-daily-'+dailyDate), ()=>genTarget(resolveSpec(dailySpec(dailyDate))));
+  beginPuzzle(dailySpec(dailyDate), target);
+}
+/* デイリー達成時のストリーク更新 */
+function updateDailyStreak(dateStr){
+  if(save.dailyLast===dateStr) return; /* 同日2回目以降はストリーク据え置き */
+  const prev=todayStr(new Date(dayNumber(dateStr)*86400000 - 86400000 + 43200000));
+  if(save.dailyLast===prev) save.dailyStreak++;
+  else save.dailyStreak=1;
+  save.dailyLast=dateStr;
+  if(save.dailyStreak>save.dailyBestStreak) save.dailyBestStreak=save.dailyStreak;
+}
 function runTutorial(tut,pending){
   mode='tutorial';curTut=tut;tutStep=0;pendingStage=pending||null;
   show('game');
@@ -2147,7 +2632,7 @@ const FREE_RATIOS=(()=>{const a=[];for(let v=0.25;v<=8.0001;v+=0.25)a.push(Math.
 const FREE_SPEEDS=[0.5,1,2,4];
 const FREE_SPEC={algoMode:'choice',algoPool:ALL_ALGOS,
   waves:W4, envs:E4, envSpeeds:FREE_SPEEDS, ratios:FREE_RATIOS, idxMax:10, idxStep:0.05};
-function startFree(){
+function startFree(presetPatch){
   mode='free';curTut=null;pendingStage=null;
   $('tutBox').classList.add('hidden');
   cleared=false;
@@ -2156,13 +2641,23 @@ function startFree(){
   syncEnvTimeUI();
   spec=resolveSpec(FREE_SPEC);
   target=null;targetSets=null;
-  player={algo:'single',mods:[
-    {wave:'sine',r:2,I:2,env:'const',s:1},
-    {wave:'sine',r:1,I:0,env:'const',s:1},
-    {wave:'sine',r:1,I:0,env:'const',s:1},
-  ]};
+  if(presetPatch){
+    freePatch={algo:presetPatch.algo, mods:presetPatch.mods.map(m=>({...m}))};
+  }
+  player={algo:freePatch.algo, mods:freePatch.mods.map(m=>({...m}))};
+  while(player.mods.length<3)player.mods.push({wave:'sine',r:1,I:0,env:'const',s:1});
   show('game');
   renderAlgo();renderOps();updateHud();applyModeUI();refresh();
+}
+
+/* ---- reverse mode: 出題コードに挑戦 ---- */
+function startReverseSolve(patch){
+  mode='reverse';curTut=null;pendingStage=null;
+  $('tutBox').classList.add('hidden');
+  envLoopOn=true;envLoopTime=2.0;envAnimStart=performance.now();
+  show('game');
+  /* お手本=入力パッチ。プレイヤーは全要素を自由操作(初期は素のサイン) */
+  beginPuzzle(FREE_SPEC, patch);
 }
 
 function updateHud(){
@@ -2173,6 +2668,10 @@ function updateHud(){
     label=`ENDLESS Lv.<b>${endlessCount+1}</b>（BEST <b>${save.endlessBest}</b>）`;
   }else if(mode==='free'){
     label=`FREE MODE`;
+  }else if(mode==='reverse'){
+    label=`🔍 REVERSE`;
+  }else if(mode==='daily'){
+    label=`📅 DAILY <span style="opacity:.7">${dailyDate}</span> <span style="opacity:.7">／ 難易度 約${dailyStageEquiv(dailyDate)}ステージ相当</span>`;
   }else{
     label=`TUTORIAL <span style="opacity:.7">${curTut?curTut.name:''}</span>`;
   }
@@ -2186,15 +2685,61 @@ function playMine(){
   tutorialEvent('listen');
 }
 
+/* ================= score / rank ================= */
+const RANK_ORDER={C:0,B:1,A:2,S:3};
+/* ステージ番号ごとの理論最小操作数(目安)。これを基準に操作効率を測る */
+function parScore(){
+  if(!target)return 6;
+  const nm=ALGO_NMODS[target.algo];
+  let par=nm*2;                              /* 1基あたり RATIO+INDEX */
+  if(spec.waves.length>1)par+=nm;            /* 波形選択 */
+  if(spec.envs.length>1)par+=nm;             /* ENV選択 */
+  if(spec.envSpeeds.length>1)par+=nm;        /* SPEED選択 */
+  if(spec.algoMode==='choice')par+=2;        /* アルゴリズム推理 */
+  return Math.max(4,par);
+}
+/* 操作効率・速さからランクを決める */
+function computeRank(){
+  const par=parScore();
+  const sec=(performance.now()-puzzleStart)/1000;
+  let pts=100;
+  const over=Math.max(0,moveCount-par);
+  pts-=Math.min(40, over*3);                          /* 余分な操作で減点 */
+  const timePar=par*4+8;                              /* 操作数に応じた想定時間 */
+  pts-=Math.min(25, Math.max(0,(sec-timePar))*0.4);   /* 遅すぎると軽く減点 */
+  if(pts>=90)return 'S';
+  if(pts>=70)return 'A';
+  if(pts>=48)return 'B';
+  return 'C';
+}
+function rankBadge(r){return `<span class="rank-badge rank-${r}">${r}</span>`;}
+function recordRank(n,r){
+  const prev=save.ranks[n];
+  if(!prev||RANK_ORDER[r]>RANK_ORDER[prev]){save.ranks[n]=r;return true;}
+  return false;
+}
+
 function doClear(){
   cleared=true;
+  const rank=(mode==='stage'||mode==='endless'||mode==='daily')?computeRank():null;
+  let rankUp=false;
+  let dailyFirst=false, dailyStreakNow=0;
   if(mode==='stage'){
     save.totalClears++;
     if(stageIdx+1>save.clearedMax)save.clearedMax=stageIdx+1;
     if(stageIdx+2>save.unlocked)save.unlocked=Math.min(TOTAL_STAGES,stageIdx+2);
+    rankUp=recordRank(stageIdx+1,rank);
   }else if(mode==='endless'){
     save.totalClears++;
     if(endlessCount+1>save.endlessBest)save.endlessBest=endlessCount+1;
+  }else if(mode==='daily'){
+    save.totalClears++;
+    dailyFirst = !save.daily[dailyDate];
+    /* その日の最高ランクを記録 */
+    const prev=save.daily[dailyDate];
+    if(!prev||RANK_ORDER[rank]>RANK_ORDER[prev]){save.daily[dailyDate]=rank;rankUp=true;}
+    updateDailyStreak(dailyDate);
+    dailyStreakNow=save.dailyStreak;
   }else if(mode==='tutorial'&&curTut){
     save.tuts[curTut.id]=true;
   }
@@ -2202,7 +2747,22 @@ function doClear(){
   updateHud();
   $('matchBanner').classList.add('hidden');
   $('btnPlayMine').classList.remove('attention');
+  if(save.earTrain||mode==='reverse')applyModeUI();   /* 耳トレ/逆引き: クリア後はお手本・メーターを答え合わせ表示 */
+  if(save.earTrain||mode==='reverse')updateMeter(lastPct);
   drawScope();
+
+  /* ランク表示 */
+  const rankEl=$('clearRank');
+  if(rank){
+    const rankWord={S:'PERFECT!',A:'GREAT!',B:'CLEAR',C:'COMPLETE'}[rank];
+    const detail = `操作 <b>${moveCount}</b> 回でクリア`;
+    rankEl.innerHTML=`<div class="rank-big rank-${rank}">${rank}</div>`+
+      `<div class="rank-label">${rankWord}</div>`+
+      `<div class="rank-detail">${detail}${rankUp?'<br>★ 自己ベスト更新！':''}</div>`;
+    rankEl.classList.remove('hidden');
+  }else{
+    rankEl.classList.add('hidden');
+  }
 
   const hasEnv=patchHasEnv(player)||patchHasEnv(target);
   playWave(player,F0,hasEnv?2.0:0.8);
@@ -2211,6 +2771,7 @@ function doClear(){
 
   const msg=$('clearMsg'),btnNext=$('btnNext'),word=$('clearWord');
   word.textContent='CLEAR!';
+  $('btnClearToFree').classList.add('hidden');
   if(mode==='stage'){
     if(stageIdx>=TOTAL_STAGES-1){
       word.textContent='ALL CLEAR!';
@@ -2223,6 +2784,18 @@ function doClear(){
   }else if(mode==='endless'){
     msg.innerHTML=`Lv.${endlessCount+1} クリア！<br>連続クリア: <b>${endlessCount+1}</b>　ベスト: <b>${save.endlessBest}</b>`;
     btnNext.textContent='次の波形へ ▶';btnNext.dataset.action='nextEndless';
+  }else if(mode==='daily'){
+    word.textContent='DAILY!';
+    msg.innerHTML=`${dailyDate} のデイリーチャレンジ達成！`+
+      `<br>難易度: <b>約${dailyStageEquiv(dailyDate)}ステージ相当</b>`+
+      `<br>🔥 連続達成 <b>${dailyStreakNow}</b> 日（自己ベスト <b>${save.dailyBestStreak}</b> 日）`+
+      (dailyFirst?'':'<br><span style="opacity:.7;font-size:11px">※ 本日2回目以降。最高ランクを更新できます</span>');
+    btnNext.textContent='もう一度挑戦 ▶';btnNext.dataset.action='dailyAgain';
+  }else if(mode==='reverse'){
+    word.textContent='SOLVED!';
+    msg.innerHTML=`出題コードの音色を再現しました！<br>波形を表示したので、お手本（点線）と見比べてみましょう。<br>この音色をフリーモードに持ち込んで、さらにいじることもできます。`;
+    btnNext.textContent='別のコードに挑戦 ▶';btnNext.dataset.action='reverseAgain';
+    $('btnClearToFree').classList.remove('hidden');
   }else{
     word.textContent='COMPLETE!';
     if(pendingStage){
@@ -2296,14 +2869,33 @@ function renderTutSelect(){
 /* ================= stage select ================= */
 function renderStageSelect(){
   const grid=$('stageGrid');grid.innerHTML='';
-  TIERS.forEach(tier=>{
-    const block=document.createElement('div');block.className='tier-block';
-    const newTag=tier.isNew?`<span class="tier-new">NEW: ${tier.isNew}</span>`:'';
-    block.innerHTML=`<div class="tier-title"><b>${tier.from}–${tier.to}</b> ${tier.name} ${newTag}</div>`;
+  TIERS.forEach((tier,ti)=>{
+    const block=document.createElement('div');
+    block.className='tier-block';
+    const newTag=tier.isNew?`<span class="tier-new-wrap"><span class="tier-new">NEW: ${tier.isNew}</span></span>`:'';
+    /* ティアの進捗(クリア数 / 総数)と状態 */
+    const total=tier.to-tier.from+1;
+    let cleared=0;
+    for(let n=tier.from;n<=tier.to;n++)if(n<=save.clearedMax)cleared++;
+    const locked = tier.from>save.unlocked;
+    let progClass='', progText;
+    if(locked){progClass='locked';progText='🔒 未開放';}
+    else if(cleared>=total){progClass='done';progText=`✓ ${cleared}/${total}`;}
+    else progText=`${cleared}/${total}`;
+    const titleEl=document.createElement('div');
+    titleEl.className='tier-title';
+    titleEl.innerHTML=
+      `<b>${tier.from}–${tier.to}</b>`+
+      `<span class="tier-name">${tier.name}</span>`+
+      newTag+
+      `<span class="tier-prog ${progClass}">${progText}</span>`;
+    block.appendChild(titleEl);
     const g=document.createElement('div');g.className='stage-grid';
     for(let n=tier.from;n<=tier.to;n++){
       const b=document.createElement('button');
-      b.className='stage-btn';b.textContent=n;
+      b.className='stage-btn';b.dataset.stage=n;
+      const rk=save.ranks[n];
+      b.innerHTML=`${n}`+(rk?`<span class="mini-rank rank-${rk}">${rk}</span>`:'');
       if(n<=save.clearedMax)b.classList.add('done');
       if(n===save.unlocked&&n>save.clearedMax)b.classList.add('current');
       if(n>save.unlocked){b.classList.add('locked');b.disabled=true;}
@@ -2312,6 +2904,18 @@ function renderStageSelect(){
     }
     block.appendChild(g);grid.appendChild(block);
   });
+}
+/* 続きから: 未クリア最前線のステージへスクロールしてハイライト */
+function jumpToFront(){
+  const target=Math.min(save.unlocked,TOTAL_STAGES);
+  const btn=$('stageGrid').querySelector(`.stage-btn[data-stage="${target}"]`);
+  if(btn){
+    btn.scrollIntoView({behavior:'smooth',block:'center'});
+    btn.animate(
+      [{boxShadow:'0 0 0 rgba(255,184,77,0)'},{boxShadow:'0 0 16px rgba(255,184,77,.8)'},{boxShadow:'0 0 0 rgba(255,184,77,0)'}],
+      {duration:1400,iterations:2}
+    );
+  }
 }
 
 /* ================= free mode: patch I/O ================= */
@@ -2385,6 +2989,7 @@ $('btnPatchImport').addEventListener('click',()=>{
   if(r.err){setFreeMsg('patchMsg','✖ '+r.err,false);return;}
   releaseAllNotes();
   player=r.patch;
+  while(player.mods.length<3)player.mods.push({wave:'sine',r:1,I:0,env:'const',s:1});
   renderAlgo();renderOps();refresh();
   setFreeMsg('patchMsg','✔ パッチを読み込みました。',true);
   playWave(player);
@@ -2565,6 +3170,14 @@ document.addEventListener('keyup',e=>{
 });
 window.addEventListener('blur',releaseAllNotes);
 $('btnStopAll').addEventListener('click',stopAllVoices);
+$('btnFreeReset').addEventListener('click',()=>{
+  if(mode!=='free')return;
+  releaseAllNotes();
+  freePatch=defaultFreePatch();
+  player={algo:freePatch.algo, mods:freePatch.mods.map(m=>({...m}))};
+  renderAlgo();renderOps();refresh();
+  setFreeMsg('patchMsg','音色を初期状態にリセットしました。',true);
+});
 
 /* ---- ENV TIME (フリーモードの時間変化再生設定) ---- */
 function syncEnvTimeUI(){
@@ -2605,6 +3218,9 @@ function renderOptions(){
   const bg=$('optBgm');
   bg.textContent=save.bgm?'ON':'OFF';
   bg.classList.toggle('on',save.bgm);
+  const et=$('optEarTrain');
+  et.textContent=save.earTrain?'ON':'OFF';
+  et.classList.toggle('on',save.earTrain);
   resetDisarm();
 }
 function applyStickyScope(){
@@ -2635,6 +3251,13 @@ $('optBgm').addEventListener('click',()=>{
   userInteracted=true;
   updateBgm();
 });
+$('optEarTrain').addEventListener('click',()=>{
+  save.earTrain=!save.earTrain;renderOptions();persist();
+  /* ゲーム画面表示中なら即反映 */
+  if(!$('gameScreen').classList.contains('hidden') && (mode==='stage'||mode==='endless')){
+    applyModeUI();refresh();
+  }
+});
 $('optClose').addEventListener('click',()=>$('optOverlay').classList.add('hidden'));
 $('btnOptionsTitle').addEventListener('click',()=>{renderOptions();$('optOverlay').classList.remove('hidden');});
 $('btnOptionsGame').addEventListener('click',()=>{renderOptions();$('optOverlay').classList.remove('hidden');});
@@ -2658,6 +3281,8 @@ $('optReset').addEventListener('click',()=>{
   resetDisarm();
   save.unlocked=1;save.clearedMax=0;save.totalClears=0;save.endlessBest=0;
   save.tuts={...DEFAULT_TUTS};
+  save.ranks={};
+  save.daily={};save.dailyStreak=0;save.dailyLast='';save.dailyBestStreak=0;
   persist();
   renderTitleStats();
   b.textContent='✔ リセットしました';
@@ -2713,14 +3338,19 @@ function showToast(text){
 
 /* ================= screens ================= */
 function show(screen){
-  ['titleScreen','tutSelectScreen','selectScreen','gameScreen','infoScreen','changelogScreen'].forEach(id=>$(id).classList.add('hidden'));
-  $({title:'titleScreen',tutsel:'tutSelectScreen',select:'selectScreen',game:'gameScreen',info:'infoScreen',changelog:'changelogScreen'}[screen])
+  if(typeof hideHelp==='function')hideHelp();
+  if(screen!=='game'){releaseAllNotes();mode=null;} /* ゲーム画面を離れたらモード解除(キー入力の誤発火防止) */
+  if(presetSrc){try{presetSrc.stop();}catch(e){}presetSrc=null;} /* 図鑑の試聴音を止める */
+  ['titleScreen','tutSelectScreen','selectScreen','gameScreen','infoScreen','changelogScreen','presetScreen','reverseScreen'].forEach(id=>$(id).classList.add('hidden'));
+  $({title:'titleScreen',tutsel:'tutSelectScreen',select:'selectScreen',game:'gameScreen',info:'infoScreen',changelog:'changelogScreen',preset:'presetScreen',reverse:'reverseScreen'}[screen])
     .classList.remove('hidden');
   if(screen!=='game'){$('tutBox').classList.add('hidden');stopAllVoices();}
   if(screen==='title')renderTitleStats();
   if(screen==='select')renderStageSelect();
   if(screen==='tutsel')renderTutSelect();
   if(screen==='changelog')renderChangelog();
+  if(screen==='preset')renderPresets();
+  if(screen==='reverse')setRevTab('solve');
   updateBgm();
   window.scrollTo(0,0);
 }
@@ -2739,20 +3369,141 @@ function renderChangelog(){
     first=false;
   });
 }
+
+/* ================= preset gallery ================= */
+function presetFullPatch(p){
+  const mods=p.patch.mods.map(m=>({s:1,...m}));
+  while(mods.length<3)mods.push({wave:'sine',r:1,I:0,env:'const',s:1});
+  return {algo:p.patch.algo, mods};
+}
+function presetSpecText(p){
+  const algoLabel={single:'A',parallel:'B',serial:'C',par3:'D',ser3:'E',mix21:'F',ycross:'G'}[p.patch.algo];
+  const wn={sine:'SIN',triangle:'TRI',square:'SQR',saw:'SAW'};
+  const en={const:'',decay:' DEC',rise:' RISE',lfo:' LFO'};
+  const parts=p.patch.mods.map((m,i)=>{
+    const sp=(m.s&&m.s!==1&&m.env&&m.env!=='const')?` ×${m.s}`:'';
+    return `M${i+1}:${wn[m.wave]} ×${m.r%1===0?m.r:m.r} I${m.I}${en[m.env||'const']}${sp}`;
+  });
+  return `ALGO ${algoLabel}　${parts.join('　')}`;
+}
+/* カード用の小さな波形プレビューSVG */
+function presetWaveSVG(p){
+  const full=presetFullPatch(p);
+  const W=226,H=54,mid=H/2,amp=H*0.4,pts=200;
+  const u=0.12; /* エンベロープ序盤の状態を表示 */
+  let d='';
+  for(let i=0;i<=pts;i++){
+    const y=mid-calcWave(full,(i/pts)*VIEW_T,F0,u)*amp;
+    d+=(i===0?'M':'L')+(W*i/pts).toFixed(1)+' '+y.toFixed(1);
+  }
+  return `<svg class="preset-mini" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`+
+    `<line x1="0" y1="${mid}" x2="${W}" y2="${mid}" stroke="rgba(120,200,170,0.18)" stroke-width="1"/>`+
+    `<path d="${d}" fill="none" stroke="#3ee6c0" stroke-width="2"/></svg>`;
+}
+function previewPreset(p){
+  /* 図鑑専用の試聴(BGMと共存。ENVがあれば長めに鳴らす) */
+  const full=presetFullPatch(p);
+  if(presetSrc){try{presetSrc.stop();}catch(e){}presetSrc=null;}
+  const ctx=audio();
+  const dur=patchHasEnv(full)?2.0:1.0;
+  const src=ctx.createBufferSource();
+  src.buffer=buildBuffer(full,F0,dur,0.3);
+  src.connect(masterGain);src.start();presetSrc=src;
+}
+function openPresetInFree(p){
+  if(presetSrc){try{presetSrc.stop();}catch(e){}presetSrc=null;}
+  startFree(presetFullPatch(p));
+  showToast('🎹 「'+p.name+'」をフリーモードで開きました');
+}
+function renderPresets(){
+  const grid=$('presetGrid');grid.innerHTML='';
+  const algoLabel={single:'A',parallel:'B',serial:'C',par3:'D',ser3:'E',mix21:'F',ycross:'G'};
+  PRESETS.forEach((p,idx)=>{
+    const card=document.createElement('div');
+    card.className='preset-card';
+    card.innerHTML=
+      `<div class="pc-head"><span class="pc-name">${p.icon} ${p.name}</span>`+
+        `<span class="pc-algo">ALGO ${algoLabel[p.patch.algo]}</span></div>`+
+      presetWaveSVG(p)+
+      `<div class="pc-desc">${p.desc}</div>`+
+      `<div class="pc-spec">${presetSpecText(p)}</div>`+
+      `<div class="pc-btns">`+
+        `<button class="btn btn-teal btn-sm" data-act="play">♪ 試聴</button>`+
+        `<button class="btn btn-amber btn-sm" data-act="open">🎛 フリーモードで開く</button>`+
+      `</div>`;
+    card.querySelector('[data-act="play"]').addEventListener('click',()=>previewPreset(p));
+    card.querySelector('[data-act="open"]').addEventListener('click',()=>openPresetInFree(p));
+    grid.appendChild(card);
+  });
+}
+
+/* ================= reverse mode wiring ================= */
+function setRevTab(tab){
+  const solve=tab==='solve';
+  $('revTabSolve').classList.toggle('active',solve);
+  $('revTabMake').classList.toggle('active',!solve);
+  $('revSolvePanel').classList.toggle('hidden',!solve);
+  $('revMakePanel').classList.toggle('hidden',solve);
+}
+function revSolveStart(){
+  const r=importPatch($('revCodeInput').value);
+  if(r.err){
+    const el=$('revSolveMsg');el.textContent='✖ '+r.err;el.className='rev-msg err';return;
+  }
+  startReverseSolve(r.patch);
+}
+$('revTabSolve').addEventListener('click',()=>setRevTab('solve'));
+$('revTabMake').addEventListener('click',()=>setRevTab('make'));
+$('btnRevSolve').addEventListener('click',revSolveStart);
+$('revCodeInput').addEventListener('keydown',e=>{if(e.key==='Enter')revSolveStart();});
+$('btnRevPaste').addEventListener('click',async()=>{
+  const el=$('revSolveMsg');
+  try{
+    if(navigator.clipboard&&navigator.clipboard.readText){
+      const t=await navigator.clipboard.readText();
+      $('revCodeInput').value=t.trim();
+      el.textContent='クリップボードから貼り付けました。';el.className='rev-msg ok';
+    }else{
+      el.textContent='この環境では自動貼り付けに対応していません。手動で貼り付けてください。';el.className='rev-msg err';
+    }
+  }catch(e){
+    el.textContent='貼り付けできませんでした。手動で貼り付けてください。';el.className='rev-msg err';
+  }
+});
+$('btnRevToFree').addEventListener('click',()=>startFree());
+
 function renderTitleStats(){
   const tutDone=Object.values(save.tuts).filter(Boolean).length;
+  const ranks=Object.values(save.ranks||{});
+  const sCount=ranks.filter(r=>r==='S').length;
+  const aPlus=ranks.filter(r=>r==='S'||r==='A').length;
   $('titleStats').innerHTML=
     `進行状況: ステージ <b>${save.clearedMax}</b>/${TOTAL_STAGES}　|　チュートリアル <b>${tutDone}</b>/${TUTORIALS.length}<br>`+
-    `エンドレスベスト <b>${save.endlessBest}</b>　|　累計クリア <b>${save.totalClears}</b>`;
+    `Sランク <b>${sCount}</b>　|　A以上 <b>${aPlus}</b>　|　エンドレスベスト <b>${save.endlessBest}</b>　|　累計クリア <b>${save.totalClears}</b>`;
+  /* デイリーボタンに本日の状況を反映 */
+  const today=todayStr();
+  const todayRank=save.daily[today];
+  const eq=dailyStageEquiv(today);
+  const streak=save.dailyStreak>0?`　🔥${save.dailyStreak}日`:'';
+  $('btnDaily').innerHTML = todayRank
+    ? `📅 デイリーチャレンジ — 本日達成 ${todayRank}ランク（約${eq}ステージ相当）${streak}`
+    : `📅 デイリーチャレンジ — 今日の1問（約${eq}ステージ相当）${streak}`;
 }
 
 /* ================= UI wiring ================= */
 $('btnStageMode').addEventListener('click',()=>show('select'));
 $('btnSelBack').addEventListener('click',()=>show('title'));
+$('btnJumpFront').addEventListener('click',jumpToFront);
 $('btnTutMenu').addEventListener('click',()=>show('tutsel'));
 $('btnTutSelBack').addEventListener('click',()=>show('title'));
 $('btnEndlessMode').addEventListener('click',startEndless);
-$('btnFreeMode').addEventListener('click',startFree);
+$('btnDaily').addEventListener('click',startDaily);
+$('btnFreeMode').addEventListener('click',()=>startFree());
+$('btnPresets').addEventListener('click',()=>show('preset'));
+$('btnPresetBack').addEventListener('click',()=>show('title'));
+$('btnPresetBack2').addEventListener('click',()=>show('title'));
+$('btnReverse').addEventListener('click',()=>show('reverse'));
+$('btnReverseBack').addEventListener('click',()=>show('title'));
 $('btnInfo').addEventListener('click',()=>show('info'));
 $('btnInfoBack').addEventListener('click',()=>show('title'));
 $('btnInfoBack2').addEventListener('click',()=>show('title'));
@@ -2767,10 +3518,12 @@ $('btnBackFromGame').addEventListener('click',()=>{
   stopAllVoices();
   if(mode==='stage')show('select');
   else if(mode==='tutorial')show(pendingStage?'select':'tutsel');
+  else if(mode==='reverse')show('reverse');
+  else if(mode==='daily')show('title');
   else show('title');
 });
 $('btnRegen').addEventListener('click',()=>{
-  if(mode==='tutorial'||mode==='free')return;
+  if(mode==='tutorial'||mode==='free'||mode==='reverse'||mode==='daily')return;
   stopSound();
   if(mode==='stage')beginPuzzle(stageSpec(stageIdx+1));
   else beginPuzzle(endlessSpec(endlessCount));
@@ -2784,13 +3537,23 @@ $('btnNext').addEventListener('click',e=>{
   else if(a==='toEndless')startEndless();
   else if(a==='tutToPending'){const n=pendingStage;pendingStage=null;startStage(n);}
   else if(a==='tutToList')show('tutsel');
+  else if(a==='reverseAgain')show('reverse');
+  else if(a==='dailyAgain')startDaily();
 });
 $('btnClearBack').addEventListener('click',()=>{
   $('clearOverlay').classList.add('hidden');stopSound();
   if(mode==='stage')show('select');
   else if(mode==='tutorial')show(pendingStage?'select':'tutsel');
+  else if(mode==='reverse')show('reverse');
   else show('title');
   pendingStage=null;
+});
+$('btnClearToFree').addEventListener('click',()=>{
+  $('clearOverlay').classList.add('hidden');stopSound();
+  /* 逆引きで再現した波形をそのままフリーモードへ引き継ぐ */
+  const carry={algo:player.algo, mods:player.mods.map(m=>({...m}))};
+  startFree(carry);
+  showToast('🎛 再現した音色をフリーモードで開きました');
 });
 
 /* ================= boot ================= */

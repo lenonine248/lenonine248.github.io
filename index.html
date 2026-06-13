@@ -596,6 +596,46 @@ input[type=range]::-moz-range-thumb{
   animation:fadein .25s;
 }
 
+/* 実績トースト(右上にスタック) */
+#achToastWrap{position:fixed;top:14px;right:14px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.ach-toast{
+  display:flex;align-items:center;gap:12px;min-width:240px;max-width:330px;
+  background:linear-gradient(135deg,#2a2620,#1a1714);
+  border:1px solid var(--line);border-left:5px solid var(--lcd);
+  border-radius:10px;padding:11px 15px;
+  box-shadow:0 8px 28px rgba(0,0,0,.55);
+  animation:achIn .4s cubic-bezier(.2,1.2,.4,1);
+}
+.ach-toast .ico{font-size:26px;flex:none;line-height:1}
+.ach-toast .tx{min-width:0}
+.ach-toast .lead{font-size:10px;letter-spacing:.18em;font-weight:800;opacity:.85}
+.ach-toast .nm{font-size:14px;font-weight:800;color:var(--text);margin:2px 0 1px}
+.ach-toast .ds{font-size:11px;color:var(--dim);line-height:1.5}
+@keyframes achIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+.ach-toast.out{animation:achOut .35s forwards}
+@keyframes achOut{to{opacity:0;transform:translateX(40px)}}
+
+/* 実績画面 */
+.ach-summary{font-size:13px;color:var(--text);margin-bottom:16px;line-height:1.8}
+.ach-summary b{color:var(--lcd)}
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.ach-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;
+}
+.ach-card.locked{opacity:.62}
+.ach-card .ico{font-size:26px;flex:none;line-height:1;width:30px;text-align:center}
+.ach-card .nm{font-size:13.5px;font-weight:800;color:var(--text)}
+.ach-card .ds{font-size:11px;color:var(--dim);line-height:1.55;margin-top:2px}
+.ach-card.locked .nm,.ach-card.locked .ds{color:var(--dim)}
+.ach-card .tier-tag{font-size:9px;font-weight:800;letter-spacing:.1em;margin-top:3px;display:inline-block}
+.ach-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ach-filter button{
+  background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+  padding:7px 14px;font-size:12px;font-weight:700;color:var(--dim);
+}
+.ach-filter button.active{color:var(--trace);border-color:var(--trace)}
+
 .hidden{display:none !important}
 
 @media (max-width:480px){
@@ -631,6 +671,7 @@ input[type=range]::-moz-range-thumb{
         <button class="btn" id="btnTutMenu">📖 チュートリアル</button>
         <button class="btn" id="btnPresets">🎹 プリセット図鑑 — 定番FM音色を聴く</button>
         <button class="btn" id="btnInfo">📜 FM音源とは？ — しくみと歴史</button>
+        <button class="btn" id="btnAchievements">🏆 実績</button>
         <button class="btn" id="btnOptionsTitle">⚙ オプション</button>
       </div>
       <div class="title-stats" id="titleStats"></div>
@@ -774,12 +815,14 @@ input[type=range]::-moz-range-thumb{
         <textarea id="patchText" maxlength="200" rows="2" placeholder="例: FM1:F|sqr,2.5,3.40,dec,2|sin,3,1.20,-,1|tri,1,0.80,-,1"></textarea>
         <div class="free-btns">
           <button class="btn btn-amber btn-sm" id="btnPatchExport">⬆ 書き出し</button>
+          <button class="btn btn-pink btn-sm" id="btnPatchExportObf">🔒 出題コード書き出し</button>
           <button class="btn btn-teal btn-sm" id="btnPatchImport">⬇ 読み込み</button>
           <button class="btn btn-sm" id="btnPatchCopy">📋 コピー</button>
         </div>
         <div class="free-msg" id="patchMsg"></div>
         <div class="free-hint">
-          書式: FM1:アルゴリズム(A〜G)|波形,RATIO,INDEX,ENV,速度|…（最大3基）　波形=sin/tri/sqr/saw、ENV=-/dec/rise/lfo、速度=0.5/1/2/4
+          <b>書き出し</b>＝中身が読める通常コード（FM1:…）。<b>出題コード書き出し</b>＝答えが見えない逆引き用コード（FMX:…）。<br>
+          書式(通常): FM1:アルゴリズム(A〜G)|波形,RATIO,INDEX,ENV,速度|…（最大3基）　波形=sin/tri/sqr/saw、ENV=-/dec/rise/lfo、速度=0.5/1/2/4　／　読み込みは両形式に対応。
         </div>
       </div>
     </div>
@@ -880,6 +923,28 @@ input[type=range]::-moz-range-thumb{
     </div>
   </div>
 
+  <!-- ============ ACHIEVEMENTS ============ -->
+  <div id="achScreen" class="hidden">
+    <header>
+      <div class="logo"><span>FM</span> WAVE <em>PUZZLE</em></div>
+      <div class="hud"><button class="gear" id="btnAchBack">◀ タイトル</button></div>
+    </header>
+    <div class="sel-head">
+      <h2>ACHIEVEMENTS — 実績</h2>
+      <span class="sub">遊んでいるうちに自然と解除されていきます</span>
+    </div>
+    <div class="ach-summary" id="achSummary"></div>
+    <div class="ach-filter" id="achFilter">
+      <button data-f="all" class="active">すべて</button>
+      <button data-f="unlocked">解除済み</button>
+      <button data-f="locked">未解除</button>
+    </div>
+    <div class="ach-grid" id="achGrid"></div>
+    <div style="text-align:center;margin:26px 0 10px">
+      <button class="btn btn-teal" id="btnAchBack2">◀ タイトルにもどる</button>
+    </div>
+  </div>
+
   <!-- ============ PRESET GALLERY ============ -->
   <div id="presetScreen" class="hidden">
     <header>
@@ -924,9 +989,10 @@ input[type=range]::-moz-range-thumb{
     <!-- 挑戦タブ -->
     <div class="rev-panel" id="revSolvePanel">
       <h3>出題コードに挑戦</h3>
-      <p>受け取った<b style="color:var(--lcd)">出題コード</b>（<span class="dim">FM1:… で始まる文字列</span>）を貼り付けて「挑戦開始」を押すと、
-      その音色が<b>お手本</b>になります。お手本は<b style="color:var(--trace)">音だけ</b>聴けます——波形を見ずに、耳で同じ音を作り出しましょう。</p>
-      <input type="text" id="revCodeInput" maxlength="200" placeholder="例: FM1:C|sin,1,3.00,dec,1|sin,3,2.00,-,1">
+      <p>受け取った<b style="color:var(--lcd)">出題コード</b>（<span class="dim">FMX:… で始まる文字列</span>）を貼り付けて「挑戦開始」を押すと、
+      その音色が<b>お手本</b>になります。お手本は<b style="color:var(--trace)">音だけ</b>聴けます——波形を見ずに、耳で同じ音を作り出しましょう。<br>
+      <span class="dim">※ 出題コード(FMX:)は中身が見えないので答えが分かりません。中身の読める FM1: 形式も読み込めます。</span></p>
+      <input type="text" id="revCodeInput" maxlength="200" placeholder="例: FMX:k3f9p2x7…">
       <div class="rev-btns">
         <button class="btn btn-teal btn-sm" id="btnRevSolve">▶ 挑戦開始</button>
         <button class="btn btn-sm" id="btnRevPaste">📋 クリップボードから貼り付け</button>
@@ -938,9 +1004,9 @@ input[type=range]::-moz-range-thumb{
     <div class="rev-panel hidden" id="revMakePanel">
       <h3>問題を作って出題</h3>
       <div class="rev-step"><span class="n">1</span><span class="tx"><b>フリーモード</b>で好きな音色を作ります（鍵盤で試したり、プリセット図鑑から改造してもOK）。</span></div>
-      <div class="rev-step"><span class="n">2</span><span class="tx">フリーモード内の <b>PATCH I/O</b> で「⬆ 書き出し」を押し、表示された <b>FM1:…</b> のコードを「📋 コピー」します。</span></div>
+      <div class="rev-step"><span class="n">2</span><span class="tx">フリーモード内の <b>PATCH I/O</b> で「🔒 出題コード書き出し」を押し、表示された <b>FMX:…</b> のコードを「📋 コピー」します。</span></div>
       <div class="rev-step"><span class="n">3</span><span class="tx">そのコードを友達やSNSに貼って出題！ 相手はこの逆引きモードの「挑戦」タブにコードを入れて再現します。</span></div>
-      <p class="dim">※ 出題コードは音色そのものなので、共有された人は同じ音をゲーム上で完全に再現できます。</p>
+      <p class="dim">※ 出題コード（FMX:）はパラメータが見えない形に変換されているので、<b style="color:var(--text)">コードを読んでも答えは分かりません</b>。耳だけが頼りの出題になります。</p>
       <div class="rev-btns">
         <button class="btn btn-amber btn-sm" id="btnRevToFree">🎛 フリーモードで音色を作る</button>
       </div>
@@ -1056,8 +1122,12 @@ input[type=range]::-moz-range-thumb{
 /* ================= version & changelog =================
    バージョンを更新するときは VERSION を進め、CHANGELOG の
    先頭に新しいエントリを追加すること(新しい順に表示される) */
-const VERSION = 'Beta7';
+const VERSION = 'Beta8';
 const CHANGELOG = [
+  {v:'Beta8', items:[
+    '逆引きモードに「出題コード（FMX:…）」を追加: パラメータが見えない形に変換され、コードを読んでも答えが分からないように。従来の FM1: 形式も引き続き読み込み可能',
+    '実績システムを追加: 全50種類の実績を銅・銀・金の3段階で用意。解除時にトースト通知が出て、専用の実績画面で確認できる。一部は隠し実績で、解除するまで内容が分からない',
+  ]},
   {v:'Beta7', items:[
     'スコア＆ランク機能を追加: クリア時に操作の少なさ・速さからS/A/B/Cを判定し、ステージごとに最高ランクを記録。ステージセレクトとタイトルに表示',
     'フリーモードを出てもキーボードが反応し続ける不具合を修正',
@@ -1280,8 +1350,116 @@ const PRESETS=[
    patch:{algo:'serial',mods:[{wave:'sine',r:1,I:5,env:'decay',s:1},{wave:'sine',r:4,I:3,env:'decay',s:2}]}},
 ];
 
-/* ================= help tooltips ================= */
-/* 各パラメータの「なぜそうなるか」豆知識。FM音源の原理と操作を結びつける */
+/* ================= achievements ================= */
+/* tier: 'bronze'|'silver'|'gold' / hidden: 解除まで内容を隠す
+   check(s): save を見て解除条件を満たすか返す(遡及判定にも使う) */
+function ranksArr(){return Object.values(save.ranks||{});}
+function clearedStagesAllRanked(minRank){
+  /* 全ステージが minRank 以上か(全クリア前提) */
+  if(save.clearedMax<TOTAL_STAGES)return false;
+  for(let n=1;n<=TOTAL_STAGES;n++){
+    const r=save.ranks[n];
+    if(!r||RANK_ORDER[r]<RANK_ORDER[minRank])return false;
+  }
+  return true;
+}
+function tierAllS(){
+  /* いずれかのティアが丸ごと全S */
+  return TIERS.some(t=>{
+    for(let n=t.from;n<=t.to;n++){ if(save.ranks[n]!=='S')return false; }
+    return true;
+  });
+}
+function finalMasterAllS(){
+  for(let n=195;n<=200;n++){ if(save.ranks[n]!=='S')return false; }
+  return true;
+}
+const ACHIEVEMENTS=[
+  /* --- 進行・網羅 --- */
+  {id:'firstClear', tier:'bronze', name:'はじめの一歩', desc:'初めてステージをクリアした', check:s=>s.clearedMax>=1},
+  {id:'stage10',  tier:'bronze', name:'入り口を抜けて', desc:'ステージ10に到達した', check:s=>s.clearedMax>=10},
+  {id:'stage50',  tier:'silver', name:'波形使いの卵', desc:'ステージ50に到達した', check:s=>s.clearedMax>=50},
+  {id:'stage100', tier:'silver', name:'折り返し地点', desc:'ステージ100に到達した', check:s=>s.clearedMax>=100},
+  {id:'stage200', tier:'gold',   name:'全ステージ走破', desc:'ステージ200をクリアした', check:s=>s.clearedMax>=200},
+  {id:'tryEndless',tier:'bronze',name:'果てなき波', desc:'エンドレスモードを遊んだ', check:s=>!!s.flags.endless},
+  {id:'tryFree',  tier:'bronze', name:'音作りの第一歩', desc:'フリーモードを遊んだ', check:s=>!!s.flags.free},
+  {id:'tryReverse',tier:'bronze',name:'逆さまの耳', desc:'逆引きモードを遊んだ', check:s=>!!s.flags.reverse},
+  {id:'tryDaily', tier:'bronze', name:'今日の一問', desc:'デイリーチャレンジを遊んだ', check:s=>!!s.flags.daily},
+  {id:'allTuts',  tier:'silver', name:'よき生徒', desc:'チュートリアルを全て完了した', check:s=>Object.keys(DEFAULT_TUTS).every(k=>s.tuts[k])},
+  {id:'allPresets',tier:'silver',name:'音色コレクター', desc:'プリセット図鑑を全種類試聴した', check:s=>(s.flags.presetHeard||[]).length>=PRESETS.length},
+  {id:'exportPatch',tier:'bronze',name:'設計図を手に', desc:'パッチを書き出した', check:s=>!!s.flags.exported},
+  {id:'allModes', tier:'gold',   name:'全モード制覇', desc:'全てのモードを一度ずつ遊んだ', check:s=>['endless','free','reverse','daily'].every(f=>s.flags[f])&&s.clearedMax>=1},
+
+  /* --- 熟達・ランク --- */
+  {id:'clearAll', tier:'gold',   name:'完全走破', desc:'全200ステージをクリアした', check:s=>s.clearedMax>=TOTAL_STAGES},
+  {id:'allA',     tier:'gold',   name:'熟練の極み', desc:'全ステージをAランク以上でクリアした', check:s=>clearedStagesAllRanked('A')},
+  {id:'allS',     tier:'gold',   name:'波形の達人', desc:'全ステージをSランクでクリアした', check:s=>clearedStagesAllRanked('S')},
+  {id:'s10',  tier:'bronze', name:'Sの輝き', desc:'Sランクを10個獲得した', check:s=>ranksArr().filter(r=>r==='S').length>=10},
+  {id:'s50',  tier:'silver', name:'Sの常連', desc:'Sランクを50個獲得した', check:s=>ranksArr().filter(r=>r==='S').length>=50},
+  {id:'s100', tier:'gold',   name:'Sの帝王', desc:'Sランクを100個獲得した', check:s=>ranksArr().filter(r=>r==='S').length>=100},
+  {id:'a50',  tier:'silver', name:'安定の腕前', desc:'Aランク以上を50個獲得した', check:s=>ranksArr().filter(r=>r==='S'||r==='A').length>=50},
+  {id:'finalS',tier:'gold',  name:'最終試練の覇者', desc:'ファイナルマスター(195〜200)を全てSにした', check:s=>finalMasterAllS()},
+  {id:'tierS', tier:'silver', name:'一帯の支配者', desc:'いずれかのティアを丸ごと全Sにした', check:s=>tierAllS()},
+  {id:'endless10',tier:'bronze',name:'波乗り', desc:'エンドレスでLv.10に到達した', check:s=>s.endlessBest>=10},
+  {id:'endless25',tier:'silver',name:'波の支配者', desc:'エンドレスでLv.25に到達した', check:s=>s.endlessBest>=25},
+
+  /* --- 継続 --- */
+  {id:'dailyFirst',tier:'bronze',name:'日課のはじまり', desc:'デイリーチャレンジを初めて達成した', check:s=>s.dailyClears>=1},
+  {id:'streak3', tier:'silver', name:'三日坊主返上', desc:'デイリーを3日連続で達成した', check:s=>s.dailyBestStreak>=3},
+  {id:'streak7', tier:'gold',   name:'一週間の習慣', desc:'デイリーを7日連続で達成した', check:s=>s.dailyBestStreak>=7},
+  {id:'dailyHard',tier:'silver',name:'手強い日', desc:'難易度150以上のデイリーをクリアした', check:s=>!!s.flags.dailyHard},
+  {id:'daily5',  tier:'bronze', name:'常連の予感', desc:'デイリーを通算5回クリアした', check:s=>s.dailyClears>=5},
+  {id:'daily15', tier:'silver', name:'通い慣れて', desc:'デイリーを通算15回クリアした', check:s=>s.dailyClears>=15},
+  {id:'daily30', tier:'gold', hidden:true, name:'皆勤の境地', desc:'デイリーを通算30回クリアした', check:s=>s.dailyClears>=30},
+  {id:'total100',tier:'silver', name:'積み重ね', desc:'累計100回クリアした', check:s=>s.totalClears>=100},
+  {id:'total300',tier:'gold',   name:'波形と共に', desc:'累計300回クリアした', check:s=>s.totalClears>=300},
+  {id:'total500',tier:'gold', hidden:true, name:'波形の伝道師', desc:'累計500回クリアした', check:s=>s.totalClears>=500},
+
+  /* --- スキル・縛り(全て隠し) --- */
+  {id:'earClear', tier:'silver', hidden:true, name:'耳が頼り', desc:'耳トレモードでステージをクリアした', check:s=>!!s.flags.earClear},
+  {id:'earS',     tier:'gold',   hidden:true, name:'絶対音感', desc:'耳トレモードでSランクを獲得した', check:s=>!!s.flags.earS},
+  {id:'perfectMove',tier:'gold', hidden:true, name:'無駄なき手', desc:'最小操作数でステージをクリアした', check:s=>!!s.flags.perfectMove},
+  {id:'speed5',   tier:'gold',   hidden:true, name:'電光石火', desc:'5秒以内にステージをクリアした', check:s=>!!s.flags.speed5},
+  {id:'revPerfect',tier:'gold',  hidden:true, name:'一発正解', desc:'逆引きを最小操作数で解いた', check:s=>!!s.flags.revPerfect},
+  {id:'hardAlgoS',tier:'silver', hidden:true, name:'難所突破', desc:'直列3連かY字を含むステージをSにした', check:s=>!!s.flags.hardAlgoS},
+  {id:'osc3Perfect',tier:'gold', hidden:true, name:'三基の妙', desc:'3基ステージ(141以降)を最小操作でクリアした', check:s=>!!s.flags.osc3Perfect},
+  {id:'allAlgoClear',tier:'silver',hidden:true,name:'七つの形', desc:'全7アルゴリズムのステージをそれぞれクリアした', check:s=>['single','parallel','serial','par3','ser3','mix21','ycross'].every(a=>(s.flags.algoCleared||{})[a])},
+  {id:'envS',     tier:'silver', hidden:true, name:'時を操る', desc:'時間変化のあるステージをSにした', check:s=>!!s.flags.envS},
+
+  /* --- 探究・お遊び(全て隠し) --- */
+  {id:'allWaves', tier:'bronze', hidden:true, name:'波形コンプ', desc:'4種類の波形を全て使った', check:s=>['sine','triangle','square','saw'].every(w=>(s.flags.wavesUsed||{})[w])},
+  {id:'allEnvs',  tier:'bronze', hidden:true, name:'包絡線マスター', desc:'4種類のENVを全て使った', check:s=>['const','decay','rise','lfo'].every(e=>(s.flags.envsUsed||{})[e])},
+  {id:'allAlgoUse',tier:'silver',hidden:true, name:'接続の探究者', desc:'全7アルゴリズムを使った', check:s=>['single','parallel','serial','par3','ser3','mix21','ycross'].every(a=>(s.flags.algoUsed||{})[a])},
+  {id:'presetMod',tier:'silver', hidden:true, name:'魔改造', desc:'プリセットをフリーで改造して書き出した', check:s=>!!s.flags.presetMod},
+  {id:'revExport',tier:'silver', hidden:true, name:'出題者', desc:'逆引きの出題コードを書き出した', check:s=>!!s.flags.revExport},
+  {id:'playKbd',  tier:'bronze', hidden:true, name:'演奏家', desc:'フリーモードで鍵盤を弾いた', check:s=>!!s.flags.playedKbd},
+  {id:'maxIndex', tier:'silver', hidden:true, name:'振り切れ', desc:'INDEXを最大(10.0)にした', check:s=>!!s.flags.maxIndex},
+];
+const ACH_TIER={bronze:{label:'銅',color:'#cd7f3f',icon:'🥉'},silver:{label:'銀',color:'#b8c4d0',icon:'🥈'},gold:{label:'金',color:'#ffd24a',icon:'🥇'}};
+
+/* 実績解除チェック: 全実績をcheckし、新規解除をトースト表示。1か所で呼ぶ */
+function checkAchievements(){
+  if(!save.ach)save.ach={};
+  let newly=[];
+  ACHIEVEMENTS.forEach(a=>{
+    if(!save.ach[a.id]){
+      let met=false;
+      try{ met=a.check(save); }catch(e){ met=false; }
+      if(met){ save.ach[a.id]=true; newly.push(a); }
+    }
+  });
+  if(newly.length){ persist(); newly.forEach(a=>queueAchToast(a)); }
+  return newly;
+}
+/* 行動フラグを立ててから実績チェック(ショートカット) */
+function setFlag(path, value){
+  /* path: 'free' / 'wavesUsed.sine' / 'algoCleared.par3' のようなドット表記 */
+  const parts=path.split('.');
+  let o=save.flags;
+  for(let i=0;i<parts.length-1;i++){ if(typeof o[parts[i]]!=='object'||!o[parts[i]])o[parts[i]]={}; o=o[parts[i]]; }
+  o[parts[parts.length-1]] = value===undefined?true:value;
+}
+
 const HELP={
   wave:{t:'WAVE（モジュレータの波形）', b:
     'キャリアを揺らす波の<b>形</b>です。サイン波は倍音を含まないので加わる倍音が穏やか、'+
@@ -1368,6 +1546,9 @@ const save = {
   dailyStreak: 0, /* 連続達成日数 */
   dailyLast: '',  /* 最後に達成した日付(ストリーク判定用) */
   dailyBestStreak: 0,
+  dailyClears: 0, /* デイリー累計クリア回数 */
+  ach: {},        /* {achId: true} 解除済み実績 */
+  flags: {},      /* 実績判定用の行動フラグ(使った波形/ENV/アルゴリズム等) */
   tuts: {...DEFAULT_TUTS},
 };
 function loadSave(){
@@ -1382,6 +1563,9 @@ function loadSave(){
       save.dailyStreak = d.dailyStreak||0;
       save.dailyLast = d.dailyLast||'';
       save.dailyBestStreak = d.dailyBestStreak||0;
+      save.dailyClears = d.dailyClears||0;
+      save.ach = (d.ach && typeof d.ach==='object') ? d.ach : {};
+      save.flags = (d.flags && typeof d.flags==='object') ? d.flags : {};
     }
   }catch(e){/* 初回 or storage 非対応 */}
   /* ステージ数が変わった版からの引き継ぎに備えてクランプ */
@@ -1808,6 +1992,7 @@ let scrubOn=false, scrubU=0;
 /* スコア計測 */
 let moveCount=0, puzzleStart=0;
 let presetSrc=null; /* プリセット図鑑の試聴音 */
+let freeFromPreset=false; /* フリーモードにプリセット由来で入ったか(改造実績用) */
 let lockedMods=new Set(); /* お手本の値で固定されたモジュレータ番号 */
 /* フリーモードの時間変化再生設定 */
 let envLoopOn=true, envLoopTime=2.0, envAnimStart=0;
@@ -2336,6 +2521,7 @@ function renderAlgo(){
         if(cleared)return;
         if(player.algo===b.dataset.algo)return;
         player.algo=b.dataset.algo;
+        setFlag('algoUsed.'+player.algo);checkAchievements();
         renderAlgo();renderOps();
         registerMove();
         tutorialEvent('algo');
@@ -2468,11 +2654,12 @@ function onSliderInput(e){
   }else{
     player.mods[i].I=+e.target.value;
     $('valI'+i).textContent=fmtIdx(player.mods[i].I);
+    if(player.mods[i].I>=10){setFlag('maxIndex');checkAchievements();}
     tutorialEvent('index');
   }
   refresh();
 }
-function registerMove(){ if(mode==='stage'||mode==='endless'||mode==='daily')moveCount++; }
+function registerMove(){ if(mode==='stage'||mode==='endless'||mode==='daily'||mode==='reverse')moveCount++; }
 function onSliderRelease(){
   if(cleared)return;
   registerMove();
@@ -2486,6 +2673,7 @@ function onWaveSelect(i,w){
     b.classList.toggle('active',b.dataset.wave===w);
   });
   const v=$('valW'+i);if(v)v.textContent=WAVE_INFO[w].label;
+  setFlag('wavesUsed.'+w);checkAchievements();
   registerMove();
   tutorialEvent('wave');
   refresh();
@@ -2499,6 +2687,7 @@ function onEnvSelect(i,e){
     b.classList.toggle('active',b.dataset.env===e);
   });
   const v=$('valE'+i);if(v)v.textContent=ENV_INFO[e].label;
+  setFlag('envsUsed.'+e);checkAchievements();
   registerMove();
   tutorialEvent('env');
   refresh();
@@ -2597,6 +2786,7 @@ function startStage(n){
 }
 function startEndless(){
   mode='endless';endlessCount=0;curTut=null;
+  setFlag('endless');checkAchievements();
   $('tutBox').classList.add('hidden');
   show('game');
   beginPuzzle(endlessSpec(0));
@@ -2605,6 +2795,7 @@ function startEndless(){
 function startDaily(){
   dailyDate=todayStr();
   mode='daily';curTut=null;
+  setFlag('daily');checkAchievements();
   $('tutBox').classList.add('hidden');
   show('game');
   /* 日付をシードに固定問題を生成(全プレイヤー・何度挑戦しても同一) */
@@ -2634,6 +2825,8 @@ const FREE_SPEC={algoMode:'choice',algoPool:ALL_ALGOS,
   waves:W4, envs:E4, envSpeeds:FREE_SPEEDS, ratios:FREE_RATIOS, idxMax:10, idxStep:0.05};
 function startFree(presetPatch){
   mode='free';curTut=null;pendingStage=null;
+  freeFromPreset=!!presetPatch;
+  setFlag('free');checkAchievements();
   $('tutBox').classList.add('hidden');
   cleared=false;
   lockedMods=new Set();
@@ -2653,6 +2846,7 @@ function startFree(presetPatch){
 /* ---- reverse mode: 出題コードに挑戦 ---- */
 function startReverseSolve(patch){
   mode='reverse';curTut=null;pendingStage=null;
+  setFlag('reverse');checkAchievements();
   $('tutBox').classList.add('hidden');
   envLoopOn=true;envLoopTime=2.0;envAnimStart=performance.now();
   show('game');
@@ -2734,16 +2928,42 @@ function doClear(){
     if(endlessCount+1>save.endlessBest)save.endlessBest=endlessCount+1;
   }else if(mode==='daily'){
     save.totalClears++;
+    save.dailyClears++;
     dailyFirst = !save.daily[dailyDate];
     /* その日の最高ランクを記録 */
     const prev=save.daily[dailyDate];
     if(!prev||RANK_ORDER[rank]>RANK_ORDER[prev]){save.daily[dailyDate]=rank;rankUp=true;}
+    if(dailyStageEquiv(dailyDate)>=150)setFlag('dailyHard');
     updateDailyStreak(dailyDate);
     dailyStreakNow=save.dailyStreak;
   }else if(mode==='tutorial'&&curTut){
     save.tuts[curTut.id]=true;
   }
+  /* --- 実績用フラグ(ステージ/エンドレス/デイリーのスキル系) --- */
+  if(mode==='stage'||mode==='endless'||mode==='daily'){
+    const par=parScore();
+    const sec=(performance.now()-puzzleStart)/1000;
+    const minMove = moveCount<=par;        /* 理論最小操作以下 */
+    if(target){
+      /* アルゴリズム別クリア記録 */
+      setFlag('algoCleared.'+target.algo);
+      /* 難接続(ser3/ycross)をS */
+      if(rank==='S'&&(target.algo==='ser3'||target.algo==='ycross'))setFlag('hardAlgoS');
+      /* 時間変化(ENV)を含むステージをS */
+      if(rank==='S'&&patchHasEnv(target))setFlag('envS');
+    }
+    if(minMove)setFlag('perfectMove');
+    if(sec<=5)setFlag('speed5');
+    if(save.earTrain){ setFlag('earClear'); if(rank==='S')setFlag('earS'); }
+    /* 3基ステージ(141以降)を最小操作 */
+    if(mode==='stage'&&stageIdx+1>=141&&minMove)setFlag('osc3Perfect');
+  }
+  if(mode==='reverse'){
+    const par=parScore();
+    if(moveCount<=par)setFlag('revPerfect');
+  }
   persist();
+  checkAchievements();
   updateHud();
   $('matchBanner').classList.add('hidden');
   $('btnPlayMine').classList.remove('attention');
@@ -2935,6 +3155,86 @@ function exportPatch(p){
   }
   return `FM1:${algo}|${ms.join('|')}`;
 }
+
+/* ---- 難読化コード(出題用): パラメータを直接読めない形にパック ----
+   後方互換のため平文 FM1: 形式も引き続き読み込める。
+   完全な秘匿ではなく「パッと見で答えが分からない」抑止が目的。 */
+const WAVE_IDX={sine:0,triangle:1,square:2,saw:3};
+const WAVE_IDX_R=['sine','triangle','square','saw'];
+const ENV_IDX={const:0,decay:1,rise:2,lfo:3};
+const ENV_IDX_R=['const','decay','rise','lfo'];
+const ALGO_IDX={single:0,parallel:1,serial:2,par3:3,ser3:4,mix21:5,ycross:6};
+const ALGO_IDX_R=['single','parallel','serial','par3','ser3','mix21','ycross'];
+const SPEED_IDX_R=[0.5,1,2,4];
+function speedIdx(s){const i=SPEED_IDX_R.indexOf(s);return i<0?1:i;}
+/* パッチ→数値列(各値は固定範囲の整数)。常に3モジュレータ分エンコード */
+function patchToNums(p){
+  const nums=[ALGO_IDX[p.algo]];
+  for(let i=0;i<3;i++){
+    const m=p.mods[i]||{wave:'sine',r:1,I:0,env:'const',s:1};
+    const wave=WAVE_IDX[m.wave]||0;
+    const rIdx=Math.min(31,Math.max(0,Math.round(m.r*4)-1));   /* 0.25..8 → 0..31 */
+    const iIdx=Math.min(200,Math.max(0,Math.round(m.I*20)));   /* 0..10 → 0..200 */
+    const env=ENV_IDX[m.env||'const']||0;
+    const sp=speedIdx(m.s||1);
+    nums.push(wave,rIdx,iIdx,env,sp);
+  }
+  return nums; /* 長さ16 (1 + 3*5) */
+}
+/* 数値列を1つの非負BigIntにパック(各値に基数を割り当て) */
+const OBF_BASES=[7, ...Array(3).fill([4,32,201,4,4]).flat()]; /* algo, (wave,ratio,index,env,speed)×3 */
+function numsToBig(nums){
+  let v=0n;
+  for(let i=0;i<nums.length;i++){ v=v*BigInt(OBF_BASES[i])+BigInt(nums[i]); }
+  return v;
+}
+function bigToNums(v){
+  const out=new Array(OBF_BASES.length);
+  for(let i=OBF_BASES.length-1;i>=0;i--){
+    const b=BigInt(OBF_BASES[i]);
+    out[i]=Number(v % b); v=v/b;
+  }
+  return out;
+}
+/* チェック文字(誤入力検知用): 数値列の簡易和を36進1桁に */
+function obfCheck(nums){return nums.reduce((a,b)=>a+b,0)%36;}
+const B36='0123456789abcdefghijklmnopqrstuvwxyz';
+function exportPatchObf(p){
+  const nums=patchToNums(p);
+  let v=numsToBig(nums);
+  let body='';
+  if(v===0n)body='0';
+  while(v>0n){ body=B36[Number(v%36n)]+body; v=v/36n; }
+  return `FMX:${B36[obfCheck(nums)]}${body}`;
+}
+function importPatchObf(text){
+  const m=text.match(/^FMX:([0-9a-z])([0-9a-z]+)$/i);
+  if(!m)return {err:'出題コードの形式が不正です。'};
+  const chk=B36.indexOf(m[1].toLowerCase());
+  let v=0n;
+  for(const c of m[2].toLowerCase()){
+    const d=B36.indexOf(c);
+    if(d<0)return {err:'出題コードに使えない文字が含まれています。'};
+    v=v*36n+BigInt(d);
+  }
+  const nums=bigToNums(v);
+  /* 範囲チェック */
+  for(let i=0;i<nums.length;i++){ if(nums[i]<0||nums[i]>=OBF_BASES[i])return {err:'出題コードが壊れているようです。'}; }
+  if(obfCheck(nums)!==chk)return {err:'出題コードが正しく読み取れません（入力ミスの可能性）。'};
+  const algo=ALGO_IDX_R[nums[0]];
+  const mods=[];
+  for(let i=0;i<3;i++){
+    const base=1+i*5;
+    mods.push({
+      wave: WAVE_IDX_R[nums[base]],
+      r: (nums[base+1]+1)/4,
+      I: nums[base+2]/20,
+      env: ENV_IDX_R[nums[base+3]],
+      s: SPEED_IDX_R[nums[base+4]],
+    });
+  }
+  return {patch:{algo,mods}};
+}
 function snapSpeed(x){
   let best=1,bd=1e9;
   FREE_SPEEDS.forEach(s=>{const d=Math.abs(s-x);if(d<bd){bd=d;best=s;}});
@@ -2942,8 +3242,9 @@ function snapSpeed(x){
 }
 function importPatch(text){
   const t=text.trim();
+  if(/^FMX:/i.test(t))return importPatchObf(t);   /* 難読化コード */
   const m=t.match(/^FM1:([A-G])\|(.+)$/i);
-  if(!m)return {err:'書式が不正です。「FM1:」から始まるパッチ文字列を入力してください。'};
+  if(!m)return {err:'書式が不正です。「FM1:」または「FMX:」から始まるコードを入力してください。'};
   const algo=ACODE_R[m[1].toUpperCase()];
   const parts=m[2].split('|');
   const need=ALGO_NMODS[algo];
@@ -2982,7 +3283,17 @@ function setFreeMsg(id,text,ok){
 }
 $('btnPatchExport').addEventListener('click',()=>{
   $('patchText').value=exportPatch(player);
+  setFlag('exported');
+  if(freeFromPreset)setFlag('presetMod');
+  checkAchievements();
   setFreeMsg('patchMsg','現在のパッチを書き出しました。',true);
+});
+$('btnPatchExportObf').addEventListener('click',()=>{
+  $('patchText').value=exportPatchObf(player);
+  setFlag('exported');setFlag('revExport');
+  if(freeFromPreset)setFlag('presetMod');
+  checkAchievements();
+  setFreeMsg('patchMsg','🔒 出題コードを書き出しました。中身が見えないので逆引きの出題に使えます。',true);
 });
 $('btnPatchImport').addEventListener('click',()=>{
   const r=importPatch($('patchText').value);
@@ -2994,17 +3305,33 @@ $('btnPatchImport').addEventListener('click',()=>{
   setFreeMsg('patchMsg','✔ パッチを読み込みました。',true);
   playWave(player);
 });
+function copyText(text, msgId){
+  /* execCommandフォールバック(同期) */
+  function legacy(){
+    const ta=$('patchText');
+    ta.value=text;ta.focus();ta.select();
+    try{ ta.setSelectionRange(0,text.length); }catch(e){}
+    let ok=false;
+    try{ ok=document.execCommand('copy'); }catch(e){ ok=false; }
+    return ok;
+  }
+  /* まず非同期Clipboard APIを試し、ダメなら同期フォールバック */
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      setFreeMsg(msgId,'クリップボードにコピーしました。',true);
+    }).catch(()=>{
+      const ok=legacy();
+      setFreeMsg(msgId, ok?'クリップボードにコピーしました。':'自動コピーできませんでした。テキストを選択して手動でコピーしてください。', ok);
+    });
+  }else{
+    const ok=legacy();
+    setFreeMsg(msgId, ok?'クリップボードにコピーしました。':'自動コピーできませんでした。テキストを選択して手動でコピーしてください。', ok);
+  }
+}
 $('btnPatchCopy').addEventListener('click',()=>{
   const ta=$('patchText');
   if(!ta.value)ta.value=exportPatch(player);
-  ta.select();
-  let ok=false;
-  try{
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(ta.value);ok=true;
-    }else{ok=document.execCommand('copy');}
-  }catch(e){}
-  setFreeMsg('patchMsg',ok?'クリップボードにコピーしました。':'コピーできませんでした。手動で選択してコピーしてください。',ok);
+  copyText(ta.value,'patchMsg');
 });
 
 /* ================= free mode: chords ================= */
@@ -3066,6 +3393,7 @@ function midiName(mi){return NOTE_NAMES[mi%12]+(Math.floor(mi/12)-1);}
 
 function noteOn(mi){
   if(activeNotes.has(mi))return;
+  if(mode==='free'){setFlag('playedKbd');checkAchievements();}
   const ctx=audio();
   const oneShot = patchHasEnv(player) && !envLoopOn;
   const src=ctx.createBufferSource();
@@ -3283,6 +3611,7 @@ $('optReset').addEventListener('click',()=>{
   save.tuts={...DEFAULT_TUTS};
   save.ranks={};
   save.daily={};save.dailyStreak=0;save.dailyLast='';save.dailyBestStreak=0;
+  save.dailyClears=0;save.ach={};save.flags={};
   persist();
   renderTitleStats();
   b.textContent='✔ リセットしました';
@@ -3314,6 +3643,29 @@ function showToast(text){
   if(toastTimer)clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>t.classList.add('hidden'),2600);
 }
+/* 実績トースト(複数同時解除に対応してキュー表示) */
+let achToastQueue=[], achToastBusy=false;
+function queueAchToast(a){ achToastQueue.push(a); if(!achToastBusy)nextAchToast(); }
+function nextAchToast(){
+  if(!achToastQueue.length){achToastBusy=false;return;}
+  achToastBusy=true;
+  const a=achToastQueue.shift();
+  let wrap=document.getElementById('achToastWrap');
+  if(!wrap){wrap=document.createElement('div');wrap.id='achToastWrap';document.body.appendChild(wrap);}
+  const ti=ACH_TIER[a.tier];
+  const el=document.createElement('div');
+  el.className='ach-toast';
+  el.style.borderLeftColor=ti.color;
+  el.innerHTML=`<div class="ico">${ti.icon}</div>`+
+    `<div class="tx"><div class="lead" style="color:${ti.color}">実績解除 · ${ti.label}</div>`+
+    `<div class="nm">${a.name}</div><div class="ds">${a.desc}</div></div>`;
+  wrap.appendChild(el);
+  if(typeof menuAudioAllowed==='function'&&menuAudioAllowed()&&typeof playSE==='function')try{playSE();}catch(e){}
+  setTimeout(()=>{
+    el.classList.add('out');
+    setTimeout(()=>{ el.remove(); nextAchToast(); }, 350);
+  }, 3200);
+}
 
 /* ================= title wave animation ================= */
 (function(){
@@ -3341,8 +3693,8 @@ function show(screen){
   if(typeof hideHelp==='function')hideHelp();
   if(screen!=='game'){releaseAllNotes();mode=null;} /* ゲーム画面を離れたらモード解除(キー入力の誤発火防止) */
   if(presetSrc){try{presetSrc.stop();}catch(e){}presetSrc=null;} /* 図鑑の試聴音を止める */
-  ['titleScreen','tutSelectScreen','selectScreen','gameScreen','infoScreen','changelogScreen','presetScreen','reverseScreen'].forEach(id=>$(id).classList.add('hidden'));
-  $({title:'titleScreen',tutsel:'tutSelectScreen',select:'selectScreen',game:'gameScreen',info:'infoScreen',changelog:'changelogScreen',preset:'presetScreen',reverse:'reverseScreen'}[screen])
+  ['titleScreen','tutSelectScreen','selectScreen','gameScreen','infoScreen','changelogScreen','presetScreen','reverseScreen','achScreen'].forEach(id=>$(id).classList.add('hidden'));
+  $({title:'titleScreen',tutsel:'tutSelectScreen',select:'selectScreen',game:'gameScreen',info:'infoScreen',changelog:'changelogScreen',preset:'presetScreen',reverse:'reverseScreen',ach:'achScreen'}[screen])
     .classList.remove('hidden');
   if(screen!=='game'){$('tutBox').classList.add('hidden');stopAllVoices();}
   if(screen==='title')renderTitleStats();
@@ -3350,6 +3702,7 @@ function show(screen){
   if(screen==='tutsel')renderTutSelect();
   if(screen==='changelog')renderChangelog();
   if(screen==='preset')renderPresets();
+  if(screen==='ach')renderAchievements();
   if(screen==='reverse')setRevTab('solve');
   updateBgm();
   window.scrollTo(0,0);
@@ -3403,6 +3756,9 @@ function presetWaveSVG(p){
 function previewPreset(p){
   /* 図鑑専用の試聴(BGMと共存。ENVがあれば長めに鳴らす) */
   const full=presetFullPatch(p);
+  /* 試聴したプリセットを記録(全種試聴の実績用) */
+  if(!Array.isArray(save.flags.presetHeard))save.flags.presetHeard=[];
+  if(!save.flags.presetHeard.includes(p.name)){save.flags.presetHeard.push(p.name);checkAchievements();}
   if(presetSrc){try{presetSrc.stop();}catch(e){}presetSrc=null;}
   const ctx=audio();
   const dur=patchHasEnv(full)?2.0:1.0;
@@ -3414,6 +3770,36 @@ function openPresetInFree(p){
   if(presetSrc){try{presetSrc.stop();}catch(e){}presetSrc=null;}
   startFree(presetFullPatch(p));
   showToast('🎹 「'+p.name+'」をフリーモードで開きました');
+}
+let achFilter='all';
+function renderAchievements(){
+  const total=ACHIEVEMENTS.length;
+  const got=ACHIEVEMENTS.filter(a=>save.ach[a.id]).length;
+  const byTier=t=>ACHIEVEMENTS.filter(a=>a.tier===t&&save.ach[a.id]).length;
+  const totTier=t=>ACHIEVEMENTS.filter(a=>a.tier===t).length;
+  $('achSummary').innerHTML=
+    `解除 <b>${got}</b> / ${total}　`+
+    `🥉 ${byTier('bronze')}/${totTier('bronze')}　`+
+    `🥈 ${byTier('silver')}/${totTier('silver')}　`+
+    `🥇 ${byTier('gold')}/${totTier('gold')}`;
+  const grid=$('achGrid');grid.innerHTML='';
+  ACHIEVEMENTS.forEach(a=>{
+    const unlocked=!!save.ach[a.id];
+    if(achFilter==='unlocked'&&!unlocked)return;
+    if(achFilter==='locked'&&unlocked)return;
+    const ti=ACH_TIER[a.tier];
+    const card=document.createElement('div');
+    card.className='ach-card'+(unlocked?'':' locked');
+    /* 隠し実績かつ未解除なら内容を伏せる */
+    const masked = a.hidden && !unlocked;
+    const icon = unlocked ? ti.icon : (masked?'❓':'🔒');
+    const name = masked ? '？？？' : a.name;
+    const desc = masked ? '隠し実績 — 解除すると内容が表示されます' : a.desc;
+    const tierTag = unlocked ? `<span class="tier-tag" style="color:${ti.color}">${ti.icon} ${ti.label}</span>` : '';
+    card.innerHTML=`<div class="ico">${icon}</div>`+
+      `<div><div class="nm">${name}</div><div class="ds">${desc}</div>${tierTag}</div>`;
+    grid.appendChild(card);
+  });
 }
 function renderPresets(){
   const grid=$('presetGrid');grid.innerHTML='';
@@ -3477,9 +3863,10 @@ function renderTitleStats(){
   const ranks=Object.values(save.ranks||{});
   const sCount=ranks.filter(r=>r==='S').length;
   const aPlus=ranks.filter(r=>r==='S'||r==='A').length;
+  const achGot=ACHIEVEMENTS.filter(a=>save.ach&&save.ach[a.id]).length;
   $('titleStats').innerHTML=
     `進行状況: ステージ <b>${save.clearedMax}</b>/${TOTAL_STAGES}　|　チュートリアル <b>${tutDone}</b>/${TUTORIALS.length}<br>`+
-    `Sランク <b>${sCount}</b>　|　A以上 <b>${aPlus}</b>　|　エンドレスベスト <b>${save.endlessBest}</b>　|　累計クリア <b>${save.totalClears}</b>`;
+    `Sランク <b>${sCount}</b>　|　A以上 <b>${aPlus}</b>　|　エンドレスベスト <b>${save.endlessBest}</b>　|　累計クリア <b>${save.totalClears}</b>　|　🏆 実績 <b>${achGot}</b>/${ACHIEVEMENTS.length}`;
   /* デイリーボタンに本日の状況を反映 */
   const today=todayStr();
   const todayRank=save.daily[today];
@@ -3504,6 +3891,16 @@ $('btnPresetBack').addEventListener('click',()=>show('title'));
 $('btnPresetBack2').addEventListener('click',()=>show('title'));
 $('btnReverse').addEventListener('click',()=>show('reverse'));
 $('btnReverseBack').addEventListener('click',()=>show('title'));
+$('btnAchievements').addEventListener('click',()=>show('ach'));
+$('btnAchBack').addEventListener('click',()=>show('title'));
+$('btnAchBack2').addEventListener('click',()=>show('title'));
+$('achFilter').querySelectorAll('button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    achFilter=b.dataset.f;
+    $('achFilter').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));
+    renderAchievements();
+  });
+});
 $('btnInfo').addEventListener('click',()=>show('info'));
 $('btnInfoBack').addEventListener('click',()=>show('title'));
 $('btnInfoBack2').addEventListener('click',()=>show('title'));
@@ -3558,6 +3955,15 @@ $('btnClearToFree').addEventListener('click',()=>{
 
 /* ================= boot ================= */
 loadSave();
+/* 既存セーブからの遡及解除(導入前のプレイ実績を反映)。起動時はトーストを出さず静かに付与 */
+(function backfillAchievements(){
+  if(!save.ach)save.ach={};
+  let changed=false;
+  ACHIEVEMENTS.forEach(a=>{
+    if(!save.ach[a.id]){ let met=false; try{met=a.check(save);}catch(e){} if(met){save.ach[a.id]=true;changed=true;} }
+  });
+  if(changed)persist();
+})();
 buildKeyboard();
 renderTitleStats();
 renderOptions();

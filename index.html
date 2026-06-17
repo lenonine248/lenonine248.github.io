@@ -365,6 +365,28 @@ input[type=range]::-moz-range-thumb{
 .free-msg.ok{color:var(--trace)}
 .free-msg.err{color:#ff9a9a}
 .free-hint{font-size:11px;color:var(--dim);margin-top:8px;line-height:1.8}
+.free-hint code{background:var(--lcd-bg);color:var(--lcd);border:1px solid var(--line);border-radius:3px;padding:0 4px;font-size:10.5px}
+
+/* MML sequencer */
+.mml-header{
+  display:flex;align-items:center;gap:9px;width:100%;
+  background:none;border:none;cursor:pointer;padding:0;
+  font-size:11.5px;letter-spacing:.2em;color:var(--dim);text-align:left;
+  font-family:inherit;
+}
+.mml-header:hover{color:var(--text)}
+.mml-header[aria-expanded="true"]{color:var(--trace)}
+.mml-caret{display:inline-block;transition:transform .15s;font-size:9px;flex:none}
+.mml-header[aria-expanded="true"] .mml-caret{transform:rotate(90deg)}
+.mml-body{margin-top:12px}
+.mml-body textarea{
+  width:100%;background:var(--lcd-bg);color:var(--lcd);
+  border:1px solid var(--line);border-radius:6px;padding:10px 12px;
+  font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;line-height:1.6;
+  resize:vertical;min-height:90px;
+}
+.mml-progress{height:5px;background:var(--lcd-bg);border:1px solid var(--line);border-radius:3px;margin-top:10px;overflow:hidden}
+.mml-progress-bar{height:100%;width:0;background:var(--trace);transition:width .08s linear}
 
 /* keyboard */
 .kbd{
@@ -775,19 +797,6 @@ input[type=range]::-moz-range-thumb{
         </div>
       </div>
       <div class="free-sec">
-        <div class="free-title" style="margin-bottom:10px">ENV TIME — 時間変化の再生設定</div>
-        <div class="envtime-row">
-          <button class="toggle on" id="btnEnvLoop">ループ ON</button>
-          <label>ループ時間</label>
-          <input type="range" id="envTimeSlider" min="0.5" max="4" step="0.1" value="2">
-          <div class="val" id="envTimeVal">2.0s</div>
-        </div>
-        <div class="free-hint">
-          ループ OFF にすると、時間変化は1回だけ進んで最後の状態で止まります（鍵盤の音もループせず1回分だけ鳴ります）。
-          SPEED を変えても、ここで指定したループ時間そのものは変わりません。
-        </div>
-      </div>
-      <div class="free-sec">
         <div class="free-head">
           <div class="free-title">KEYBOARD — 押している間だけ鳴ります</div>
           <div class="oct-ctrl">
@@ -800,14 +809,32 @@ input[type=range]::-moz-range-thumb{
         <div class="free-hint">PCキーボード: A W S E D F T G Y H U J K O L P ; （A = ド、押している間だけ発音）／ ← → キーでオクターブ切替</div>
       </div>
       <div class="free-sec">
-        <div class="free-title" style="margin-bottom:10px">CHORD PLAYER — コード式入力</div>
-        <input type="text" id="chordInput" maxlength="120" placeholder="例: C  Am7  F  G7　（スペース区切りで順に演奏）">
-        <div class="free-btns">
-          <button class="btn btn-teal btn-sm" id="btnPlayChords">♪ コードを演奏</button>
-        </div>
-        <div class="free-msg" id="chordMsg"></div>
-        <div class="free-hint">
-          対応コード: C / Cm / C7 / Cmaj7 / Cm7 / CmM7 / Cdim / Cdim7 / Cm7b5 / Caug / Csus2 / Csus4 / C6 / Cm6 / C9 / Cm9 / Cmaj9 / Cadd9（ルートは A〜G、#・b 可）
+        <button class="mml-header" id="mmlToggle" aria-expanded="false">
+          <span class="mml-caret">▶</span>
+          <span>MML SEQUENCER — 音色で曲を作る</span>
+        </button>
+        <div class="mml-body hidden" id="mmlBody">
+          <textarea id="mmlInput" maxlength="1000" rows="6" spellcheck="false" placeholder="例:
+t120
+@1 o5 l8 c d e f g f e d | c4 r4   ; メロディ(パッチ1=編集中の音色)
+@2 l2 C G Am F                      ; 伴奏(コード)
+@2=FMX:...                          ; トラック2に別パッチを割当(任意)"></textarea>
+          <div class="free-btns">
+            <button class="btn btn-teal btn-sm" id="btnMmlPlay">▶ 再生</button>
+            <button class="btn btn-sm" id="btnMmlStop">⏹ 停止</button>
+            <button class="btn btn-sm" id="btnMmlLoop">🔁 ループ OFF</button>
+            <button class="btn btn-sm" id="btnMmlCopy">📋 コピー</button>
+          </div>
+          <div class="mml-progress hidden" id="mmlProgress"><div class="mml-progress-bar" id="mmlProgressBar"></div></div>
+          <div class="free-msg" id="mmlMsg"></div>
+          <div class="free-hint">
+            <b>書き方</b>: <code>t120</code>=テンポ(途中変更可)。<code>@1</code>〜=トラック(番号=パッチ番号、@1は編集中の音色)。<code>@2=FM1:…</code> または <code>@2=FMX:…</code> でトラックに別パッチを割当(通常コード・出題コードのどちらも読み込めます)。<br>
+            <b>メロディ</b>: <code>c d e f g a b</code>=音名(ドレミファソラシ)、<code>#/+</code>=半音上・<code>b/-</code>=半音下、直後の数字=拍の長さ(1=全音符・4拍、2=2分・2拍、4=4分・1拍、8=8分・半拍、16=16分・1/4拍)、<code>r</code>=休符、<code>o4</code>=オクターブ(o4のcが中央ド)、<code>&gt;</code>/<code>&lt;</code>=オクターブ上下、<code>l4</code>=規定の拍の長さ、<code>.</code>=付点、<code>&amp;</code>=タイ、<code>{c d e}4</code>=三連符(4分音符1拍に詰める)。<br>
+            <span style="opacity:.85">※ オクターブは <code>c d e f g a b</code> の7音で1区切り。<code>b</code>(シ)の次の <code>c</code>(ド)で1つ上のオクターブに上がります(<code>&gt;</code> でも上げられます)。</span><br>
+            <b>伴奏</b>: 大文字でコード名(<code>C Am7 G7</code> など)、拍の長さは <code>C:2</code> 形式か <code>l</code> 値。ルート音は <code>A</code>〜<code>G</code>、<code>#/+</code>・<code>b/-</code> も付けられます(例 <code>F#m</code>・<code>Bbmaj7</code>)。<br>
+            <span style="opacity:.85">対応コード(Cを例に): <code>C</code>=メジャー、<code>Cm</code>=マイナー、<code>C7</code>=セブンス、<code>Cmaj7</code>(=<code>CM7</code>)=メジャーセブンス、<code>Cm7</code>=マイナーセブンス、<code>CmM7</code>=マイナーメジャーセブンス、<code>Cdim</code>=ディミニッシュ、<code>Cdim7</code>=ディミニッシュセブンス、<code>Cm7b5</code>=ハーフディミニッシュ、<code>Caug</code>(=<code>C+</code>)=オーギュメント、<code>Csus2</code>/<code>Csus4</code>=サスペンデッド、<code>C6</code>/<code>Cm6</code>=シックスス、<code>C9</code>/<code>Cmaj9</code>/<code>Cm9</code>=ナインス、<code>Cadd9</code>=アドナイン。</span><br>
+            <b>音色切替</b>: トラック内で <code>~2</code> と書くと以降パッチ2の音色に。 <code>;</code> 以降はコメント。
+          </div>
         </div>
       </div>
       <div class="free-sec">
@@ -1122,8 +1149,14 @@ input[type=range]::-moz-range-thumb{
 /* ================= version & changelog =================
    バージョンを更新するときは VERSION を進め、CHANGELOG の
    先頭に新しいエントリを追加すること(新しい順に表示される) */
-const VERSION = 'Beta8';
+const VERSION = 'Beta9';
 const CHANGELOG = [
+  {v:'Beta9', items:[
+    'フリーモードに「MML SEQUENCER」を追加（従来の CHORD PLAYER を拡張）: テキストで簡易作曲ができる（メロディ＋コード伴奏の2声）。テンポ・音の長さ・オクターブ・休符・付点・タイ・三連符に対応し、トラックごとに別の音色を割り当てたり、曲の途中で音色を切り替えたりできる。再生・停止・ループ・再生位置表示・コピー共有に対応。初期状態は折りたたみ',
+    '時間変化（ENV）の仕様を整理: ループの ON/OFF やループ時間の調整をなくし、常に「基準2秒のあいだ変化して最後の状態で安定する」挙動に統一（LFO は常にうねり続ける）。これに伴い ENV TIME の設定欄を撤去。鍵盤・プリセット図鑑・MML SEQUENCER すべてが同じ基準で時間変化するため、同じ音色が同じように鳴るようになった',
+    'DEC（減衰）・RISE（上昇）の SPEED の意味を変更: どの SPEED でも基準時間（2秒）いっぱい変化し続けるようにし、SPEED は変化カーブの急峻さを決めるものに（大きいほど序盤で急に、小さいほどゆるやかに変化）。DEC・RISE はどちらも序盤で大きく変化する、上下対称のカーブに統一',
+    'フリーモード上部の波形モニターを、ステージモードと同じループ進行表示に統一',
+  ]},
   {v:'Beta8', items:[
     '逆引きモードに「出題コード（FMX:…）」を追加: パラメータが見えない形に変換され、コードを読んでも答えが分からないように。従来の FM1: 形式も引き続き読み込み可能',
     '実績システムを追加: 全50種類の実績を銅・銀・金の3段階で用意。解除時にトースト通知が出て、専用の実績画面で確認できる。一部は隠し実績で、解除するまで内容が分からない',
@@ -1156,7 +1189,6 @@ const CHANGELOG = [
     'フリーモードの鍵盤を「押している間だけ鳴る」サステイン方式に変更(リリース付き)',
     'フリーモードにオクターブ切替を追加(OCT−/＋ボタン、キーボードの ← → キーでも変更可能)',
     'スコープ下に ⏱ 時間スライダーを追加: ONにすると時間変化を手動でコマ送り観察できる',
-    'フリーモードに ENV TIME 設定を追加: 時間変化のループON/OFF、ループ時間(0.5〜4.0秒)を指定可能。SPEEDを変えてもループ時間は変わらない',
     'オプションに「波形ウィンドウを上部に固定」を追加(スクロールしてもスコープが画面上部に追従)',
     'チュートリアルを改善: 操作の効果が必ず波形に現れるよう、各ステップで必要なINDEX/ENVを自動セット',
     'パッチ書式にENV速度フィールドを追加(旧形式も読み込み可)',
@@ -1233,8 +1265,11 @@ function waveGlyph(w){
 /* ================= index envelopes (時間変化) ================= */
 const ENV_FN = {
   const: u=>1,
-  decay: u=>Math.exp(-2.5*u),
-  rise:  u=>Math.exp(-2.5*(1-u)),
+  /* decay/rise は第2引数 k(=SPEED) でカーブの急峻さを変える。
+     k が大きいほど序盤で急激に変化し、小さいほどゆるやか。u は常に 0→1 を基準時間で一定進行。
+     decay: 1→0(序盤で急降下)、rise: 0→1(序盤で急上昇)。両者は上下対称の形。 */
+  decay: (u,k)=>Math.exp(-2.5*(k||1)*u),
+  rise:  (u,k)=>1-Math.exp(-2.5*(k||1)*u),
   lfo:   u=>0.5+0.5*Math.sin(2*Math.PI*2*u - Math.PI/2),
 };
 const ENV_INFO = {
@@ -1247,18 +1282,19 @@ function envGlyph(e){
   const paths={
     const:'M1 7 L17 7',
     decay:'M1 3 Q6 12 17 12',
-    rise:'M1 12 Q12 12 17 3',
+    rise:'M1 12 Q6 3 17 3',
     lfo:'M1 7 Q5 1 9 7 Q13 13 17 7',
   };
   return `<svg width="18" height="14" viewBox="0 0 18 14"><path d="${paths[e]}" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`;
 }
-/* エンベロープ値: 速度 s で位相を巻く
-   ループON: 位相は周回 / ループOFF(フリーモード): 1回進んで最終値で停止。
-   SPEED は位相の進む速さだけを変え、ループ時間そのものは変えない */
+/* エンベロープ値。仕様: 常にループOFF・基準2秒。
+   DEC/RISE は基準時間(2秒)いっぱい変化し続け(u:0→1を一定速度で進行)、
+   SPEED はカーブの急峻さを決める(大きいほど序盤で急変)。u=1(2秒)で最終状態に達し以後保持。
+   LFO だけは従来どおり SPEED でうねり速度が変わり、常に周期的にうねり続ける。 */
 function envVal(env,u,s){
   if(!env||env==='const')return 1;
-  const p = envLoopOn ? frac(u*(s||1)) : Math.min(u*(s||1),1);
-  return ENV_FN[env](p);
+  if(env==='lfo')return ENV_FN.lfo(frac(u*(s||1)));   /* LFOは常に周回(SPEED=うねり速度) */
+  return ENV_FN[env](Math.min(u,1), s||1);            /* DEC/RISEは2秒で一定進行、SPEED=カーブ係数 */
 }
 
 const W1=['sine'];
@@ -1913,8 +1949,8 @@ const TUTORIALS=[
    target:{algo:'single',mods:[{wave:'sine',r:2,I:3,env:'lfo',s:2},{wave:'sine',r:1,I:0,env:'const',s:1}]},
    steps:[
      {text:`最後の<b>新要素：変化速度（SPEED）</b>です。<br>
-       時間変化(ENV)に「進む速さ」が加わりました。<b>×2</b> なら2倍の速さで、<b>×4</b> なら4倍の速さで
-       エンベロープが繰り返されます。お手本の動きの「テンポ」まで読み取る必要があります。`, btn:'次へ ▶'},
+       時間変化(ENV)に「速さ」が加わりました。<b>×2</b>・<b>×4</b> と上げると、LFO はうねりが速くなり、
+       DEC / RISE は序盤の変化がより急になります。お手本の動きの「速さ」まで読み取る必要があります。`, btn:'次へ ▶'},
      {text:`MODULATOR パネルに <b>SPEED</b> ボタンが増えています。<br>
        INDEX 2 / ENV: LFO をセットしておいたので、SPEED を切り替えると
        波形のうねるテンポが変わるのが見えます。⏱ 時間スライダーでのコマ送り観察も有効です。<br>
@@ -1994,12 +2030,13 @@ let moveCount=0, puzzleStart=0;
 let presetSrc=null; /* プリセット図鑑の試聴音 */
 let freeFromPreset=false; /* フリーモードにプリセット由来で入ったか(改造実績用) */
 let lockedMods=new Set(); /* お手本の値で固定されたモジュレータ番号 */
-/* フリーモードの時間変化再生設定 */
-let envLoopOn=true, envLoopTime=2.0, envAnimStart=0;
-function envLoopSec(){return mode==='free'?envLoopTime:ENV_LOOP_MS/1000;}
+/* 時間変化の再生設定: 仕様をシンプル化し「常にループOFF・基準2秒固定」に統一。
+   DEC/RISEは2秒かけて1回進み最終状態で持続、LFOは常にうねり続ける。
+   ループON/OFFの切り替えやループ時間の調整UIは廃止。 */
+function envLoopSec(){ return ENV_LOOP_MS/1000; }   /* 常に2秒 */
 /* フリーモードで作った音色を保持(モードを出ても消えない) */
 function defaultFreePatch(){
-  return {algo:'single',mods:[
+  return {algo:'single', mods:[
     {wave:'sine',r:2,I:2,env:'const',s:1},
     {wave:'sine',r:1,I:0,env:'const',s:1},
     {wave:'sine',r:1,I:0,env:'const',s:1},
@@ -2188,45 +2225,69 @@ function stopAllVoices(){
   releaseAllNotes();
   while(voices.length){const v=voices.pop();try{v.stop();}catch(e){}}
 }
-/* ワンショット用バッファ: u は i/len（エンベロープが音の長さ全体にかかる） */
+/* ワンショット用バッファ: エンベロープの進行は基準2秒固定(envLoopSec)。
+   u=(経過秒/2.0) を渡すことで、鍵盤・MML・図鑑すべて同じ速度で時間変化する。
+   常にループOFF挙動: DEC/RISEは2秒で1回進み最終状態保持、LFOは常にうねる(envVal側)。 */
 function buildBuffer(p,f,dur,gain){
   const ctx=audio(),sr=ctx.sampleRate,len=Math.floor(sr*dur);
   const buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
-  const fi=Math.floor(sr*0.015),fo=Math.floor(sr*0.12);
+  const fi=Math.floor(sr*0.015), fo=Math.floor(sr*0.12);   /* フェードイン15ms / アウト120ms固定 */
   const g0=(gain===undefined?0.25:gain);
+  const envSec=envLoopSec();                                /* 2秒固定 */
   for(let i=0;i<len;i++){
     let g=g0;
-    if(i<fi)g*=i/fi;else if(i>len-fo)g*=(len-i)/fo;
-    d[i]=calcWave(p,i/sr,f,i/len)*g;
+    if(i<fi)g*=i/fi;
+    else if(i>len-fo)g*=(len-i)/fo;
+    d[i]=calcWave(p,i/sr,f,(i/sr)/envSec)*g;               /* u=実時間/2秒 */
   }
   return buf;
-}
-/* 押下中サステイン用のシームレスなループバッファ
+}/* 押下中サステイン用のシームレスなループバッファ
    - ENVなし: キャリア4周期ぶん(比率が0.25刻みなのでモジュレータも整数周期で繋がる)
-   - ENVあり: ループ時間ぶん(=表示と同じ)を丸ごとループ。周期数を4の倍数に量子化して
-     位相は連続(エンベロープのリセット感はループの仕様として残る)
-   - oneShot=true(ループOFF)のときは末尾に短いフェードを付ける */
+   - ENVあり(常にループOFF): 「進行部(env 0→1を1回, 基準2秒)」+「持続部(env=1で固定の数周期)」を作り、
+     持続部だけをループさせる。これで時間変化が1回進んだ後、最終状態で鳴り続ける。
+     ただし LFO は envVal 側で常に周回するので、ここでも自然にうねり続ける。
+   戻り値: {buf, loopStart, loopEnd}(秒)。loopStart<0 ならループ無し(=ENVなしの全体ループ) */
 function buildLoopBuffer(p,f,oneShot){
   const ctx=audio(),sr=ctx.sampleRate;
+  /* 仕様: 常にループOFF。ENVを持つ音色は必ず「進行部+持続部」のワンショット経路で作る */
+  oneShot = patchHasEnv(p);
   if(!patchHasEnv(p)){
     const len=Math.max(16,Math.round(sr*4/f));
     const f2=4*sr/len; /* ちょうど4周期収まる周波数(誤差は数セント) */
     const buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
     for(let i=0;i<len;i++)d[i]=calcWave(p,i/sr,f2,0);
-    return buf;
+    return {buf, loopStart:0, loopEnd:len/sr};
   }
   const dur=envLoopSec();
-  const len=Math.round(sr*dur);
-  let cycles=4*Math.max(1,Math.round(f*dur/4));
-  const f2=cycles/dur;
+  /* ループOFF: 進行部(u:0→1, 2秒) + 持続部
+     新仕様では DEC/RISE は u:0→1 で必ず完走する(SPEEDはカーブの急峻さで、進行時間は変えない)。
+     よって進行部は常に u:0→1 の2秒ぶん。LFO はこの間も frac(u*s) でうねる。 */
+  const progU = 1;                               /* 進行部で動かす u の幅(常に0→1で完走) */
+  const progDur = dur*progU;                     /* 進行部の実時間長(=2秒) */
+  const progLen=Math.round(sr*progDur);
+  /* 持続部: u を進行部の終端(=1)から連続して伸ばす。
+     - decay/rise は u>=1 で最終値固定(進行部で完走済みなので持続部は完全固定)
+     - LFO は frac(u*s) で周回し続ける(うねり継続)
+     継ぎ目をシームレスにするため、持続部の u 増分を全 SPEED で LFO が整数周回する幅にする。
+     s∈{0.5,1,2,4} なので u 増分=2 なら frac(u*s) は 1/2/4/8 周(すべて整数)で元に戻る。 */
+  const susU=2;
+  const susDur=dur*susU;
+  let susLen=Math.round(sr*susDur);
+  const susCycles=Math.max(1,Math.round(f*susDur));
+  const f2=susCycles/susDur;                     /* 持続部にキャリアが整数周期(継ぎ目の段差防止) */
+  const len=progLen+susLen;
   const buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
-  const fo=Math.floor(sr*0.04);
-  for(let i=0;i<len;i++){
-    let g=1;
-    if(oneShot && i>len-fo)g=(len-i)/fo;
-    d[i]=calcWave(p,i/sr,f2,i/len)*g;
+  for(let i=0;i<progLen;i++){
+    /* u: 0→1。decay/rise は u=1 で完走する(SPEEDはカーブの急峻さ) */
+    d[i]=calcWave(p,i/sr,f2,(i/progLen)*progU);
   }
-  return buf;
+  const uStart=progU;                            /* 進行部終端の u */
+  for(let i=0;i<susLen;i++){
+    /* u を uStart から susU ぶん伸ばす。decay/rise は固定、LFO はうねり続ける */
+    const u=uStart + (i/susLen)*susU;
+    d[progLen+i]=calcWave(p,(progLen+i)/sr,f2,u);
+  }
+  return {buf, loopStart:progLen/sr, loopEnd:len/sr};
 }
 function playWave(p,f,dur){
   stopSound();
@@ -2378,10 +2439,8 @@ function earTrainActive(){
 }
 function currentU(){
   if(scrubOn)return scrubU;
-  const T=envLoopSec()*1000;
-  if(mode==='free' && !envLoopOn){
-    return Math.min((performance.now()-envAnimStart)/T,1);
-  }
+  const T=envLoopSec()*1000;   /* 2秒 */
+  /* 波形モニターはステージ・フリー共通でループ進行表示(時間変化を周回アニメで見せる) */
   return (performance.now()%T)/T;
 }
 function drawScope(){
@@ -2709,7 +2768,6 @@ function onSpeedSelect(i,sv){
 
 /* ================= game flow ================= */
 function refresh(){
-  if(mode==='free' && !envLoopOn) envAnimStart=performance.now();
   if(mode==='free') saveFreePatch();
   drawScope();
   updateFormula();
@@ -2746,7 +2804,6 @@ function applyModeUI(){
 
 function beginPuzzle(rawSpec, fixedTarget){
   cleared=false;
-  envLoopOn=true; /* パズルの時間変化は常にループ */
   $('matchBanner').classList.add('hidden');
   $('btnPlayMine').classList.remove('attention');
   spec=resolveSpec(rawSpec);
@@ -2830,8 +2887,6 @@ function startFree(presetPatch){
   $('tutBox').classList.add('hidden');
   cleared=false;
   lockedMods=new Set();
-  envLoopOn=true;envLoopTime=2.0;envAnimStart=performance.now();
-  syncEnvTimeUI();
   spec=resolveSpec(FREE_SPEC);
   target=null;targetSets=null;
   if(presetPatch){
@@ -2848,7 +2903,6 @@ function startReverseSolve(patch){
   mode='reverse';curTut=null;pendingStage=null;
   setFlag('reverse');checkAchievements();
   $('tutBox').classList.add('hidden');
-  envLoopOn=true;envLoopTime=2.0;envAnimStart=performance.now();
   show('game');
   /* お手本=入力パッチ。プレイヤーは全要素を自由操作(初期は素のサイン) */
   beginPuzzle(FREE_SPEC, patch);
@@ -3334,7 +3388,7 @@ $('btnPatchCopy').addEventListener('click',()=>{
   copyText(ta.value,'patchMsg');
 });
 
-/* ================= free mode: chords ================= */
+/* ================= free mode: MML SEQUENCER ================= */
 const NOTE_SEMI={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 const CHORD_QUAL={
   '':[0,4,7],'maj':[0,4,7],'M':[0,4,7],
@@ -3348,38 +3402,234 @@ const CHORD_QUAL={
   '9':[0,4,7,10,14],'maj9':[0,4,7,11,14],'M9':[0,4,7,11,14],'m9':[0,3,7,10,14],
   'add9':[0,4,7,14],
 };
-function parseChord(tok){
-  const m=tok.match(/^([A-Ga-g])([#b]?)(.*)$/);
-  if(!m)return null;
-  const semi=NOTE_SEMI[m[1].toUpperCase()];
-  const acc=m[2]==='#'?1:m[2]==='b'?-1:0;
-  const ints=CHORD_QUAL[m[3]];
-  if(ints===undefined)return null;
-  const root=60+semi+acc;  /* C4 基準 */
-  return ints.map(i=>440*Math.pow(2,(root+i-69)/12));
+/* 音価(分母,付点)→拍数(4分=1拍) */
+function mmlBeats(denom, dots){
+  let b=4/denom, add=b, d=dots||0;
+  while(d-->0){ add/=2; b+=add; }
+  return b;
 }
-function playChordText(){
-  const text=$('chordInput').value.trim();
-  if(!text){setFreeMsg('chordMsg','コードを入力してください（例: C Am7 F G7）。',false);return;}
-  const toks=text.split(/\s+/);
-  const chords=[],bad=[];
-  toks.forEach(t=>{
-    const c=parseChord(t);
-    if(c)chords.push({name:t,freqs:c});else bad.push(t);
-  });
-  if(bad.length){setFreeMsg('chordMsg','✖ 解釈できないコード: '+bad.join(', '),false);return;}
-  stopAllVoices();
-  const hasEnv=patchHasEnv(player);
-  const dur=hasEnv?Math.max(0.8,envLoopSec()):1.0;
-  chords.forEach((c,i)=>{
-    const g=0.22/Math.sqrt(c.freqs.length);
-    c.freqs.forEach(f=>playVoice(player,f,i*dur,dur,g));
-  });
-  setFreeMsg('chordMsg','♪ '+chords.map(c=>c.name).join(' → '),true);
+/* MMLをパースして {tracks, trackPatch, tempoEvents, errors} を返す */
+function parseMML(text){
+  const lines=text.split('\n');
+  const tracks={};
+  const trackPatch={};
+  const tempoEvents=[];
+  const errors=[];
+  const TOKEN_RE=/^([A-Ga-gr])([#b+\-]*)((?:maj7|maj9|min7|mmaj7|mM7|m7b5|dim7|add9|sus2|sus4|maj|min|dim|aug|M7|M9|m7|m9|m6|7|9|6|m|M|\+|-)?)(\d+)?(\.*)(:\d+)?/;
+  function getTrack(slot){
+    if(!tracks[slot])tracks[slot]={events:[],cursorBeat:0,oct:4,defLen:4,curPatch:slot};
+    return tracks[slot];
+  }
+  function emit(tr,ev){ tr.events.push(ev); tr.cursorBeat+=ev.beats; }
+  function noteMidi(letter,accStr,oct){
+    const base=NOTE_SEMI[letter.toUpperCase()];
+    let a=0;
+    for(const c of accStr){ if(c==='#'||c==='+')a++; else if(c==='b'||c==='-')a--; }
+    return 12*(oct+1)+base+a;
+  }
+  for(let li=0;li<lines.length;li++){
+    let line=lines[li];
+    const sc=line.indexOf(';'); if(sc>=0)line=line.slice(0,sc);
+    line=line.trim(); if(!line)continue;
+    /* @n=CODE パッチ割当 */
+    let mA=line.match(/^@(\d+)\s*=\s*(\S+)$/);
+    if(mA){ trackPatch[+mA[1]]=mA[2]; continue; }
+    /* テンポ専用行 */
+    let mT=line.match(/^t(\d+(?:\.\d+)?)$/i);
+    if(mT){ tempoEvents.push({beat:0,bpm:+mT[1]}); continue; }
+    /* @n 本体 */
+    let mTrk=line.match(/^@(\d+)\s*(.*)$/);
+    if(!mTrk){ errors.push(`行${li+1}: トラック指定(@n)で始めてください`); continue; }
+    const slot=+mTrk[1], body=mTrk[2], tr=getTrack(slot);
+    let i=0;
+    while(i<body.length){
+      const ch=body[i];
+      if(ch===' '||ch==='\t'||ch==='|'){ i++; continue; }   /* | は小節線(無視) */
+      if(ch==='t'||ch==='T'){ const m=body.slice(i).match(/^t(\d+(?:\.\d+)?)/i); if(m){tempoEvents.push({beat:tr.cursorBeat,bpm:+m[1]});i+=m[0].length;continue;} }
+      if(ch==='l'||ch==='L'){ const m=body.slice(i).match(/^l(\d+)/i); if(m){tr.defLen=+m[1];i+=m[0].length;continue;} }
+      if(ch==='o'||ch==='O'){ const m=body.slice(i).match(/^o(\d+)/i); if(m){tr.oct=+m[1];i+=m[0].length;continue;} }
+      if(ch==='>'){ tr.oct++; i++; continue; }
+      if(ch==='<'){ tr.oct--; i++; continue; }
+      if(ch==='~'){ const m=body.slice(i).match(/^~(\d+)/); if(m){tr.curPatch=+m[1];i+=m[0].length;continue;} errors.push(`行${li+1}: ~の後に番号が必要です`); i++; continue; }
+      if(ch==='&'){ /* タイ: 直前の音を延長 */
+        const m=body.slice(i+1).match(/^([A-Ga-g])([#b+\-]*)(\d+)?(\.*)/);
+        const last=tr.events[tr.events.length-1];
+        if(m&&last&&last.type==='note'){
+          const denom=m[3]?+m[3]:tr.defLen;
+          const ext=mmlBeats(denom,m[4].length);
+          last.beats+=ext; tr.cursorBeat+=ext;
+          i+=1+m[0].length; continue;
+        }
+        i++; continue;
+      }
+      if(ch==='{'){ /* 三連符 {音名…}音価 */
+        const close=body.indexOf('}',i);
+        if(close<0){ errors.push(`行${li+1}: 三連符の } がありません`); break; }
+        const inner=body.slice(i+1,close).trim();
+        let j=close+1;
+        const m=body.slice(j).match(/^(\d+)(\.*)/);
+        const denom=m?+m[1]:tr.defLen, dots=m?m[2].length:0;
+        if(m)j+=m[0].length;
+        const notes=inner.split(/\s+/).filter(Boolean);
+        if(notes.length===0){ errors.push(`行${li+1}: 三連符が空です`); i=j; continue; }
+        const each=mmlBeats(denom,dots)/notes.length;
+        for(const nt of notes){
+          const nm=nt.match(/^([A-Ga-g])([#b+\-]*)$/);
+          if(!nm){ errors.push(`行${li+1}: 三連符内の "${nt}" が不正`); continue; }
+          emit(tr,{type:'note',midi:noteMidi(nm[1],nm[2],tr.oct),start:tr.cursorBeat,beats:each,patch:tr.curPatch});
+        }
+        i=j; continue;
+      }
+      const m=body.slice(i).match(TOKEN_RE);
+      if(!m){ errors.push(`行${li+1}: 解釈できない文字 "${body[i]}"`); i++; continue; }
+      i+=m[0].length;
+      const head=m[1],accS=m[2]||'',qual=m[3]||'',lenN=m[4],dots=(m[5]||'').length,colon=m[6];
+      if(head==='r'){ const denom=lenN?+lenN:tr.defLen; tr.cursorBeat+=mmlBeats(denom,dots); continue; }
+      if(head>='A'&&head<='G'){ /* コード */
+        const accSym=accS.replace(/\+/g,'#').replace(/-/g,'b');
+        let rootAcc=0; for(const c of accSym){ if(c==='#')rootAcc++; else if(c==='b')rootAcc--; }
+        const ints=CHORD_QUAL[qual];
+        if(ints===undefined){ errors.push(`行${li+1}: 不明なコード "${head}${accS}${qual}"`); continue; }
+        let denom=tr.defLen;
+        if(colon)denom=+colon.slice(1); else if(lenN)denom=+lenN;
+        const rootMidi=12*(tr.oct+1)+NOTE_SEMI[head]+rootAcc;
+        emit(tr,{type:'chord',midis:ints.map(iv=>rootMidi+iv),start:tr.cursorBeat,beats:mmlBeats(denom,dots),patch:tr.curPatch});
+        continue;
+      }
+      /* 小文字=単音 */
+      const denom=lenN?+lenN:tr.defLen;
+      emit(tr,{type:'note',midi:noteMidi(head,accS,tr.oct),start:tr.cursorBeat,beats:mmlBeats(denom,dots),patch:tr.curPatch});
+    }
+  }
+  if(tempoEvents.length===0)tempoEvents.push({beat:0,bpm:120});
+  tempoEvents.sort((a,b)=>a.beat-b.beat);
+  return {tracks,trackPatch,tempoEvents,errors};
 }
-$('btnPlayChords').addEventListener('click',playChordText);
-$('chordInput').addEventListener('keydown',e=>{
-  if(e.key==='Enter')playChordText();
+/* 拍→秒(テンポ途中変更を積分) */
+function beatToSec(beat,tempoEvents){
+  let sec=0,prevBeat=0,bpm=tempoEvents[0]?tempoEvents[0].bpm:120;
+  for(let k=0;k<tempoEvents.length;k++){
+    const te=tempoEvents[k];
+    if(te.beat>=beat)break;
+    if(te.beat>prevBeat){ sec+=(te.beat-prevBeat)*(60/bpm); prevBeat=te.beat; }
+    bpm=te.bpm;
+  }
+  sec+=(beat-prevBeat)*(60/bpm);
+  return sec;
+}
+/* トラックのパッチを解決(割当コード or 編集中パッチ) */
+function resolveTrackPatch(slot, trackPatch){
+  const code=trackPatch[slot];
+  if(!code)return {algo:player.algo, mods:player.mods.map(m=>({...m}))};
+  const r=importPatch(code);
+  if(r.err)return null;
+  const p=r.patch;
+  while(p.mods.length<3)p.mods.push({wave:'sine',r:1,I:0,env:'const',s:1});
+  return p;
+}
+
+let mmlPlaying=false, mmlLoop=false, mmlRaf=null, mmlEndTimer=null, mmlStartCtxTime=0, mmlTotalSec=0;
+let mmlVoices=[]; /* MML再生中の全AudioBufferSource(確実に停止するため専用管理) */
+function setMmlLoopBtn(){ const b=$('btnMmlLoop'); if(b){b.textContent=mmlLoop?'🔁 ループ ON':'🔁 ループ OFF'; b.classList.toggle('on',mmlLoop);} }
+function stopMml(){
+  mmlPlaying=false;
+  if(mmlRaf)cancelAnimationFrame(mmlRaf);mmlRaf=null;
+  if(mmlEndTimer)clearTimeout(mmlEndTimer);mmlEndTimer=null;
+  /* MMLのために予約した音を全て確実に止める(本数に関わらず) */
+  while(mmlVoices.length){ const v=mmlVoices.pop(); try{v.stop();}catch(e){} }
+  $('mmlProgress').classList.add('hidden');
+  $('mmlProgressBar').style.width='0%';
+}
+/* parsed を baseTime からスケジュール。総再生秒を返す。
+   ★最初の音のトラック間ずれ対策: 先に全ノートのバッファを生成し(時間のかかる処理)、
+   そのあとで一括して src.start を予約する。生成中に実時間が進んでも、
+   予約は baseTime 基準の絶対時刻なので、最初の音も含め全ノートがずれない。 */
+function playMmlOnce(parsed, baseTime){
+  const {tracks,trackPatch,tempoEvents}=parsed;
+  const ctx=audio();
+  let maxSec=0;
+  const scheduled=[];   /* {buf, when} のリスト(生成だけ先に済ませる) */
+  Object.keys(tracks).forEach(slotKey=>{
+    const slot=+slotKey, tr=tracks[slot];
+    tr.events.forEach(ev=>{
+      const startSec=beatToSec(ev.start,tempoEvents);
+      const durSec=beatToSec(ev.start+ev.beats,tempoEvents)-startSec;
+      maxSec=Math.max(maxSec,startSec+durSec);
+      const pp=resolveTrackPatch(ev.patch, trackPatch);
+      if(!pp)return;
+      const d=Math.max(0.05,durSec*0.98);
+      if(ev.type==='note'){
+        scheduled.push({buf:buildBuffer(pp, midiFreq(ev.midi), d, 0.2), when:baseTime+startSec});
+      }else{
+        const g=0.2/Math.sqrt(ev.midis.length);
+        ev.midis.forEach(mi=>scheduled.push({buf:buildBuffer(pp, midiFreq(mi), d, g), when:baseTime+startSec}));
+      }
+    });
+  });
+  /* 生成が終わってから一括予約(src.startは軽い処理なので全ノートが基準時刻どおりに鳴る) */
+  for(const s of scheduled){
+    const src=ctx.createBufferSource();
+    src.buffer=s.buf;
+    src.connect(masterGain);
+    src.start(s.when);
+    mmlVoices.push(src);
+  }
+  return maxSec;
+}
+function playMml(){
+  const text=$('mmlInput').value;
+  if(!text.trim()){ setFreeMsg('mmlMsg','MMLを入力してください。',false); return; }
+  const parsed=parseMML(text);
+  if(parsed.errors.length){ setFreeMsg('mmlMsg','✖ '+parsed.errors.slice(0,3).join(' / '),false); return; }
+  const trackCount=Object.keys(parsed.tracks).length;
+  if(trackCount===0){ setFreeMsg('mmlMsg','演奏できるトラックがありません。',false); return; }
+  /* パッチ割当の検証 */
+  for(const k of Object.keys(parsed.trackPatch)){
+    if(resolveTrackPatch(+k,parsed.trackPatch)===null){ setFreeMsg('mmlMsg',`✖ トラック${k}のパッチコードが不正です。`,false); return; }
+  }
+  stopMml();
+  setFlag('playedKbd'); /* 演奏系の実績 */
+  if(parsed.trackPatch && Object.keys(parsed.trackPatch).length) setFlag('exported'); /* 任意 */
+  checkAchievements();
+  mmlPlaying=true;
+  const ctx=audio();
+  /* 先読み: 全バッファ生成にかかる時間ぶんの余裕。事前生成方式と合わせ最初の音もずれない */
+  const baseTime=ctx.currentTime+0.12;
+  mmlStartCtxTime=baseTime;
+  mmlTotalSec=playMmlOnce(parsed, baseTime);   /* 1周目を baseTime からスケジュール */
+  let scheduledLoops=1;                         /* 何周ぶん予約済みか */
+  setFreeMsg('mmlMsg','♪ 再生中… ('+trackCount+'トラック)',true);
+  $('mmlProgress').classList.remove('hidden');
+  const tick=()=>{
+    if(!mmlPlaying)return;
+    const el=ctx.currentTime-baseTime;
+    if(mmlLoop && mmlTotalSec>0){
+      /* 現在位置が次周の予約境界に近づいたら、前周の終端ぴったりに次周を継ぎ目なく予約 */
+      const scheduledEnd=baseTime+scheduledLoops*mmlTotalSec;
+      if(ctx.currentTime > scheduledEnd-0.3){
+        playMmlOnce(parsed, scheduledEnd);       /* 隙間なく次周を追加 */
+        scheduledLoops++;
+      }
+      const pos=mmlTotalSec>0?((el%mmlTotalSec)/mmlTotalSec*100):0;
+      $('mmlProgressBar').style.width=pos+'%';
+    }else{
+      const pct=mmlTotalSec>0?Math.min(100,el/mmlTotalSec*100):100;
+      $('mmlProgressBar').style.width=pct+'%';
+      if(el>=mmlTotalSec){ stopMml(); setFreeMsg('mmlMsg','再生終了。',true); return; }
+    }
+    mmlRaf=requestAnimationFrame(tick);
+  };
+  mmlRaf=requestAnimationFrame(tick);
+}
+$('btnMmlPlay').addEventListener('click',playMml);
+$('btnMmlStop').addEventListener('click',()=>{ stopMml(); setFreeMsg('mmlMsg','停止しました。',true); });
+$('btnMmlLoop').addEventListener('click',()=>{ mmlLoop=!mmlLoop; setMmlLoopBtn(); });
+$('btnMmlCopy').addEventListener('click',()=>{ const t=$('mmlInput').value; if(!t.trim()){setFreeMsg('mmlMsg','コピーする内容がありません。',false);return;} copyText(t,'mmlMsg'); });
+/* 折りたたみ */
+$('mmlToggle').addEventListener('click',()=>{
+  const body=$('mmlBody'), open=body.classList.contains('hidden');
+  body.classList.toggle('hidden',!open);
+  $('mmlToggle').setAttribute('aria-expanded', open?'true':'false');
 });
 
 /* ================= free mode: keyboard (押下中サステイン) ================= */
@@ -3395,10 +3645,15 @@ function noteOn(mi){
   if(activeNotes.has(mi))return;
   if(mode==='free'){setFlag('playedKbd');checkAchievements();}
   const ctx=audio();
-  const oneShot = patchHasEnv(player) && !envLoopOn;
+  /* oneShotはパッチのENV設定から決まる(buildLoopBuffer内で判定)。undefinedを渡して委ねる */
+  const oneShot = patchHasEnv(player);   /* 常にループOFF: ENVありはワンショット */
   const src=ctx.createBufferSource();
-  src.buffer=buildLoopBuffer(player,midiFreq(mi),oneShot);
-  src.loop=!oneShot;
+  const lb=buildLoopBuffer(player,midiFreq(mi),oneShot);
+  src.buffer=lb.buf;
+  /* 常にループ。ループOFFのときは進行部を1回再生してから持続部(最終状態)をループし続ける */
+  src.loop=true;
+  src.loopStart=lb.loopStart;
+  src.loopEnd=lb.loopEnd;
   const g=ctx.createGain();
   const t=ctx.currentTime;
   g.gain.setValueAtTime(0.0001,t);
@@ -3505,29 +3760,6 @@ $('btnFreeReset').addEventListener('click',()=>{
   player={algo:freePatch.algo, mods:freePatch.mods.map(m=>({...m}))};
   renderAlgo();renderOps();refresh();
   setFreeMsg('patchMsg','音色を初期状態にリセットしました。',true);
-});
-
-/* ---- ENV TIME (フリーモードの時間変化再生設定) ---- */
-function syncEnvTimeUI(){
-  const b=$('btnEnvLoop');
-  b.textContent=envLoopOn?'ループ ON':'ループ OFF';
-  b.classList.toggle('on',envLoopOn);
-  $('envTimeSlider').value=envLoopTime;
-  $('envTimeVal').textContent=envLoopTime.toFixed(1)+'s';
-}
-$('btnEnvLoop').addEventListener('click',()=>{
-  envLoopOn=!envLoopOn;
-  envAnimStart=performance.now();
-  releaseAllNotes(); /* 既存の押下中ノートはループ設定が異なるため解放 */
-  syncEnvTimeUI();
-  drawScope();
-});
-$('envTimeSlider').addEventListener('input',e=>{
-  envLoopTime=+e.target.value;
-  envAnimStart=performance.now();
-  $('envTimeVal').textContent=envLoopTime.toFixed(1)+'s';
-  if(scrubOn)$('scrubVal').textContent='t='+(scrubU*envLoopSec()).toFixed(2)+'s';
-  drawScope();
 });
 
 /* ================= options ================= */
@@ -3693,6 +3925,7 @@ function show(screen){
   if(typeof hideHelp==='function')hideHelp();
   if(screen!=='game'){releaseAllNotes();mode=null;} /* ゲーム画面を離れたらモード解除(キー入力の誤発火防止) */
   if(presetSrc){try{presetSrc.stop();}catch(e){}presetSrc=null;} /* 図鑑の試聴音を止める */
+  if(typeof stopMml==='function')stopMml(); /* MML再生を止める */
   ['titleScreen','tutSelectScreen','selectScreen','gameScreen','infoScreen','changelogScreen','presetScreen','reverseScreen','achScreen'].forEach(id=>$(id).classList.add('hidden'));
   $({title:'titleScreen',tutsel:'tutSelectScreen',select:'selectScreen',game:'gameScreen',info:'infoScreen',changelog:'changelogScreen',preset:'presetScreen',reverse:'reverseScreen',ach:'achScreen'}[screen])
     .classList.remove('hidden');
@@ -3969,7 +4202,6 @@ renderTitleStats();
 renderOptions();
 applyVolume();
 applyStickyScope();
-syncEnvTimeUI();
 </script>
 </body>
 </html>

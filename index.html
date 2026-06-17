@@ -322,6 +322,13 @@ input[type=range]::-moz-range-thumb{
 /* ---------- bottom controls ---------- */
 .sound-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
 .sound-row .btn{flex:1;min-width:140px}
+.answer-row{margin-top:34px}
+.answer-row .btn{width:100%}
+.answer-row .btn.confirm{background:var(--target);color:#1a1a1a;border-color:var(--target)}
+.answer-panel{margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--lcd-bg)}
+.answer-note{font-size:12px;color:var(--target);line-height:1.7;margin-bottom:10px}
+.answer-params{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:var(--lcd);line-height:1.8;margin-bottom:12px;white-space:pre-wrap}
+.answer-panel .btn{width:100%}
 .nav-row{display:flex;gap:10px;margin-top:12px;justify-content:space-between;flex-wrap:wrap}
 
 /* ---------- free mode panel ---------- */
@@ -549,6 +556,8 @@ input[type=range]::-moz-range-thumb{
   font-family:inherit;font-size:14px;letter-spacing:.02em;
 }
 .rev-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.rev-earopt{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--text);line-height:1.6;cursor:pointer}
+.rev-earopt input{flex:none;width:16px;height:16px;cursor:pointer}
 .rev-msg{font-size:12px;margin-top:12px;line-height:1.8}
 .rev-msg.ok{color:var(--trace)}
 .rev-msg.err{color:#ff9a9a}
@@ -766,7 +775,7 @@ input[type=range]::-moz-range-thumb{
       <div class="meter" id="meter"></div>
       <div class="readout" id="readout">0.0%</div>
     </div>
-    <div class="meter-note" id="meterNote">一致度 96% 以上で波形ロック ▲</div>
+    <div class="meter-note" id="meterNote">一致度 98% 以上で波形ロック ▲</div>
     </div>
 
     <div id="matchBanner" class="match-banner hidden">
@@ -782,6 +791,16 @@ input[type=range]::-moz-range-thumb{
       <button class="btn btn-amber btn-sm" id="btnPlayTarget">♪ お手本を聴く</button>
       <button class="btn btn-teal btn-sm" id="btnPlayMine">♪ 自分の波を聴く</button>
       <button class="btn btn-sm hidden" id="btnStopAll">■ 停止</button>
+    </div>
+
+    <!-- ===== 答え合わせ(ステージモードのみ) ===== -->
+    <div class="answer-row" id="answerRow">
+      <button class="btn btn-sm" id="btnReveal">🔑 答え合わせ</button>
+    </div>
+    <div class="answer-panel hidden" id="answerPanel">
+      <div class="answer-note">🔑 答え合わせ中 — この問題ではクリアになりません。<b>「別の波形でやり直す」</b>を押すと、新しいお手本で改めて挑戦できます。</div>
+      <div class="answer-params" id="answerParams"></div>
+      <button class="btn btn-teal btn-sm" id="btnAnswerRetry">⟳ 別の波形でやり直す</button>
     </div>
 
     <!-- ===== FREE MODE PANELS ===== -->
@@ -831,6 +850,7 @@ t120
             <b>書き方</b>: <code>t120</code>=テンポ(途中変更可)。<code>@1</code>〜=トラック(番号=パッチ番号、@1は編集中の音色)。<code>@2=FM1:…</code> または <code>@2=FMX:…</code> でトラックに別パッチを割当(通常コード・出題コードのどちらも読み込めます)。<br>
             <b>メロディ</b>: <code>c d e f g a b</code>=音名(ドレミファソラシ)、<code>#/+</code>=半音上・<code>b/-</code>=半音下、直後の数字=拍の長さ(1=全音符・4拍、2=2分・2拍、4=4分・1拍、8=8分・半拍、16=16分・1/4拍)、<code>r</code>=休符、<code>o4</code>=オクターブ(o4のcが中央ド)、<code>&gt;</code>/<code>&lt;</code>=オクターブ上下、<code>l4</code>=規定の拍の長さ、<code>.</code>=付点、<code>&amp;</code>=タイ、<code>{c d e}4</code>=三連符(4分音符1拍に詰める)。<br>
             <span style="opacity:.85">※ オクターブは <code>c d e f g a b</code> の7音で1区切り。<code>b</code>(シ)の次の <code>c</code>(ド)で1つ上のオクターブに上がります(<code>&gt;</code> でも上げられます)。</span><br>
+            <b>音量</b>: <code>v0</code>〜<code>v15</code> で以降の音の大きさを変えられます(<code>v15</code>=標準の大きさ・初期値、<code>v0</code>=無音)。<code>l</code> や <code>o</code> と同じく、次に変えるまで続き、トラックごとに別々に設定できます。<br>
             <b>伴奏</b>: 大文字でコード名(<code>C Am7 G7</code> など)、拍の長さは <code>C:2</code> 形式か <code>l</code> 値。ルート音は <code>A</code>〜<code>G</code>、<code>#/+</code>・<code>b/-</code> も付けられます(例 <code>F#m</code>・<code>Bbmaj7</code>)。<br>
             <span style="opacity:.85">対応コード(Cを例に): <code>C</code>=メジャー、<code>Cm</code>=マイナー、<code>C7</code>=セブンス、<code>Cmaj7</code>(=<code>CM7</code>)=メジャーセブンス、<code>Cm7</code>=マイナーセブンス、<code>CmM7</code>=マイナーメジャーセブンス、<code>Cdim</code>=ディミニッシュ、<code>Cdim7</code>=ディミニッシュセブンス、<code>Cm7b5</code>=ハーフディミニッシュ、<code>Caug</code>(=<code>C+</code>)=オーギュメント、<code>Csus2</code>/<code>Csus4</code>=サスペンデッド、<code>C6</code>/<code>Cm6</code>=シックスス、<code>C9</code>/<code>Cmaj9</code>/<code>Cm9</code>=ナインス、<code>Cadd9</code>=アドナイン。</span><br>
             <b>音色切替</b>: トラック内で <code>~2</code> と書くと以降パッチ2の音色に。 <code>;</code> 以降はコメント。
@@ -1017,9 +1037,10 @@ t120
     <div class="rev-panel" id="revSolvePanel">
       <h3>出題コードに挑戦</h3>
       <p>受け取った<b style="color:var(--lcd)">出題コード</b>（<span class="dim">FMX:… で始まる文字列</span>）を貼り付けて「挑戦開始」を押すと、
-      その音色が<b>お手本</b>になります。お手本は<b style="color:var(--trace)">音だけ</b>聴けます——波形を見ずに、耳で同じ音を作り出しましょう。<br>
+      その音色が<b>お手本</b>になります。<br>
       <span class="dim">※ 出題コード(FMX:)は中身が見えないので答えが分かりません。中身の読める FM1: 形式も読み込めます。</span></p>
       <input type="text" id="revCodeInput" maxlength="200" placeholder="例: FMX:k3f9p2x7…">
+      <label class="rev-earopt"><input type="checkbox" id="revEarChk"> 🎧 耳トレモードで挑戦（お手本の波形を見ずに、音だけで再現する上級者向け）</label>
       <div class="rev-btns">
         <button class="btn btn-teal btn-sm" id="btnRevSolve">▶ 挑戦開始</button>
         <button class="btn btn-sm" id="btnRevPaste">📋 クリップボードから貼り付け</button>
@@ -1149,8 +1170,14 @@ t120
 /* ================= version & changelog =================
    バージョンを更新するときは VERSION を進め、CHANGELOG の
    先頭に新しいエントリを追加すること(新しい順に表示される) */
-const VERSION = 'Beta9';
+const VERSION = 'Beta10';
 const CHANGELOG = [
+  {v:'Beta10', items:[
+    'クリア判定の一致度を 96% 以上から 98% 以上に変更。より正確に波形を合わせることが求められるようになった(全ステージで、正解どおりに合わせれば必ずクリアできることは確認済み)',
+    'MML SEQUENCER に音量指定 v0〜v15 を追加(v15=標準・初期値、v0=無音)。l や o と同じく以降の音に適用され、トラックごとに独立して途中変更できる',
+    '逆引きモードに「耳トレモードで挑戦」の選択を追加: 挑戦開始時にチェックすると、これまでどおり音だけで再現する上級者向けに。チェックしなければお手本の波形を見ながら挑戦できる。クリア時に、どちらで再現したかが表示される',
+    'ステージモードに「答え合わせ」を追加: ボタンを押すと正解の波形とパラメータ(アルゴリズム・各モジュレータの設定)を確認できる。誤操作防止のため2回連続で押すと表示される。答えを見た問題はクリア・ランク対象外になり、「別の波形でやり直す」を押すと新しいお手本で改めて挑戦できる。耳トレ中でも答え合わせで波形を確認できる',
+  ]},
   {v:'Beta9', items:[
     'フリーモードに「MML SEQUENCER」を追加（従来の CHORD PLAYER を拡張）: テキストで簡易作曲ができる（メロディ＋コード伴奏の2声）。テンポ・音の長さ・オクターブ・休符・付点・タイ・三連符に対応し、トラックごとに別の音色を割り当てたり、曲の途中で音色を切り替えたりできる。再生・停止・ループ・再生位置表示・コピー共有に対応。初期状態は折りたたみ',
     '時間変化（ENV）の仕様を整理: ループの ON/OFF やループ時間の調整をなくし、常に「基準2秒のあいだ変化して最後の状態で安定する」挙動に統一（LFO は常にうねり続ける）。これに伴い ENV TIME の設定欄を撤去。鍵盤・プリセット図鑑・MML SEQUENCER すべてが同じ基準で時間変化するため、同じ音色が同じように鳴るようになった',
@@ -1211,7 +1238,7 @@ const CHANGELOG = [
 const F0 = 220;
 const VIEW_T = 2 / 110;
 const N_SAMPLES = 600;
-const CLEAR_PCT = 96;
+const CLEAR_PCT = 98;
 const TOTAL_STAGES = 200;
 const ENV_LOOP_MS = 2000;                 /* 時間変化の1ループ(描画/判定の基準=2秒) */
 const ENV_PHASES = [0.06,0.25,0.45,0.65,0.88]; /* 一致度判定に使う時刻 */
@@ -1833,7 +1860,7 @@ const TUTORIALS=[
        （チュートリアル中は使えません）。`, btn:'次へ ▶'},
      {text:`それでは本番。お手本に重ねてみましょう。<br>
        ヒント：この問題の答えは <b>RATIO ×2 / INDEX 3.0</b> です。<br>
-       <span class="tut-wait">▼ スライダーを合わせて一致度 96% を超えよう</span>`, wait:'matched'},
+       <span class="tut-wait">▼ スライダーを合わせて一致度 98% を超えよう</span>`, wait:'matched'},
      {text:`波形が一致！ でもまだクリアではありません。<br>
        最後に<b>自分で作った音を鳴らして</b>確認できたらクリアです。<br>
        <span class="tut-wait">▼ 光っている「♪ 自分の波を聴く」を押そう</span>`, wait:'clear'},
@@ -1853,7 +1880,7 @@ const TUTORIALS=[
      {text:`カクカクした矩形波で揺らすと波形に段差が、のこぎり波だと非対称なうねりが生まれます。<br>
        ではこのお手本を再現してみましょう。<br>
        ヒント：答えは <b>WAVE: SQR / RATIO ×2 / INDEX 2.0</b> です。<br>
-       <span class="tut-wait">▼ 一致度 96% を超えよう</span>`, wait:'matched'},
+       <span class="tut-wait">▼ 一致度 98% を超えよう</span>`, wait:'matched'},
      {text:`一致！ あとはもう分かりますね。<br>
        <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
    ]},
@@ -1876,7 +1903,7 @@ const TUTORIALS=[
      {text:`コツ：まず <b>M2 の INDEX を 0</b> に戻して M1 だけで大まかな形を作り、
        あとから M2 で細かいうねりを足すと合わせやすいです。<br>
        ヒント：答えは <b>M1: ×2 / 2.0、M2: ×3 / 1.0</b>（どちらも SIN）。<br>
-       <span class="tut-wait">▼ 2基を調整して一致度 96% を超えよう</span>`, wait:'matched'},
+       <span class="tut-wait">▼ 2基を調整して一致度 98% を超えよう</span>`, wait:'matched'},
      {text:`お見事！ 2オシレータを攻略しました。<br>
        <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
    ]},
@@ -1896,7 +1923,7 @@ const TUTORIALS=[
      {text:`コツ：まず <b>M2 の INDEX を 0</b> に戻して M1 だけで土台を作り、
        M2 の INDEX を少しずつ上げて「揺れの揺れ」を加えていきましょう。<br>
        ヒント：答えは <b>M1: ×2 / 2.0、M2: ×3 / 1.0</b>。<br>
-       <span class="tut-wait">▼ 一致度 96% を超えよう</span>`, wait:'matched'},
+       <span class="tut-wait">▼ 一致度 98% を超えよう</span>`, wait:'matched'},
      {text:`完璧！ 直列チェインを攻略しました。<br>
        <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
    ]},
@@ -1917,7 +1944,7 @@ const TUTORIALS=[
        2種類のうねりが重なって見えるなら <b>B</b>、
        うねり自体が波打っているなら <b>C</b> が怪しいです。<br>
        この問題の答えは <b>ALGORITHM C / M1: ×2 / 2.0、M2: ×3 / 1.0</b>。<br>
-       <span class="tut-wait">▼ 正しいアルゴリズムを選んで一致度 96% を超えよう</span>`, wait:'matched'},
+       <span class="tut-wait">▼ 正しいアルゴリズムを選んで一致度 98% を超えよう</span>`, wait:'matched'},
      {text:`推理成功！<br>
        <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
    ]},
@@ -1939,7 +1966,7 @@ const TUTORIALS=[
        ON にすると時間を手動で進めたり戻したりして、波形の変化をコマ送りで確認できます。<br>
        自分の波もお手本と<b>同じタイミング</b>で動くので、常にピッタリ重なるように合わせましょう。<br>
        ヒント：答えは <b>RATIO ×2 / INDEX 3.0 / ENV: DEC</b>。<br>
-       <span class="tut-wait">▼ 動きごと一致させて 96% を超えよう</span>`, wait:'matched'},
+       <span class="tut-wait">▼ 動きごと一致させて 98% を超えよう</span>`, wait:'matched'},
      {text:`動く波形を捕まえました！ 音も再生して確かめましょう（時間変化中の音は少し長めに鳴ります）。<br>
        <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
    ]},
@@ -1958,7 +1985,7 @@ const TUTORIALS=[
        ensure:[{m:0,I:2,env:'lfo'}]},
      {text:`動きの「形」が同じでも「速さ」が違うと一致しません。じっくり観察して合わせましょう。<br>
        ヒント：答えは <b>RATIO ×2 / INDEX 3.0 / ENV: LFO / SPEED ×2</b>。<br>
-       <span class="tut-wait">▼ 速度まで一致させて 96% を超えよう</span>`, wait:'matched'},
+       <span class="tut-wait">▼ 速度まで一致させて 98% を超えよう</span>`, wait:'matched'},
      {text:`テンポまで完璧に捕まえました！ 時間変化を完全マスターです。<br>
        <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
    ]},
@@ -1981,7 +2008,7 @@ const TUTORIALS=[
        お手本のどの「成分」が埋まったかを観察するのがコツ。
        ちなみに <b>E（3連直列）</b> はこの逆の発想で、C（直列）をもう一段深くした入れ子です。<br>
        ヒント：この問題の答えは <b>M1: ×2 / 2.0、M2: ×3 / 1.0、M3: ×1 / 2.0</b>。<br>
-       <span class="tut-wait">▼ 3基すべてを合わせて一致度 96% を超えよう</span>`, wait:'matched'},
+       <span class="tut-wait">▼ 3基すべてを合わせて一致度 98% を超えよう</span>`, wait:'matched'},
      {text:`3基を自力で乗りこなしました！
        F と G の見分け方は、登場直前のチュートリアル⑨でじっくり扱います。<br>
        <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
@@ -2009,7 +2036,7 @@ const TUTORIALS=[
      {text:`それでは本番。この問題は <b>D か G の2択</b>です。形を見極めたうえで、
        パラメータも自分の手で合わせ切りましょう。<br>
        ヒント：答えは <b>ALGORITHM G / M1: ×2 / 2.0、M2: ×3 / 1.0、M3: ×1 / 1.0</b>。<br>
-       <span class="tut-wait">▼ 形とパラメータを一致させて 96% を超えよう</span>`, wait:'matched'},
+       <span class="tut-wait">▼ 形とパラメータを一致させて 98% を超えよう</span>`, wait:'matched'},
      {text:`形の推理から再現まで、すべて自力でやり切りました！
        音でも、Dは澄んだ重なり、Gは濁りのある複雑な響きと、性格の違いが聴き取れます。<br>
        <span class="tut-wait">▼「♪ 自分の波を聴く」でクリア！</span>`, wait:'clear'},
@@ -2022,7 +2049,9 @@ let stageIdx=0;
 let endlessCount=0;
 let dailyDate='';  /* 現在挑戦中のデイリーの日付 */
 let spec=null, target=null, player=null, targetSets=null;
+let reverseEarMode=false; /* 逆引きモードで耳トレ(音だけ)にするか。挑戦開始時に決定 */
 let lastPct=0, cleared=false;
+let answerRevealed=false; /* 答え合わせを見たか(ステージのみ)。trueの間はクリア不可 */
 let curTut=null, tutStep=0, pendingStage=null;
 let scrubOn=false, scrubU=0;
 /* スコア計測 */
@@ -2430,11 +2459,12 @@ document.addEventListener('click',e=>{
 
 /* ================= drawing ================= */
 const canvas=$('scope'),cx=canvas.getContext('2d');
-/* 耳トレモード: お手本波形と一致度メーターを隠す(stage/endlessのみ。クリア後は答え合わせで表示)
-   逆引きモードは常に音だけ(波形を見ると音色コードの答えが一目で分かるため) */
+/* 耳トレモード: お手本波形と一致度メーターを隠す(クリア後は答え合わせで表示)
+   ステージ/エンドレスはオプションの earTrain、逆引きは挑戦開始時に選んだ reverseEarMode に従う。 */
 function earTrainActive(){
   if(cleared)return false;
-  if(mode==='reverse')return true;
+  if(answerRevealed)return false;   /* 答え合わせ中は波形・メーターを見せる */
+  if(mode==='reverse')return reverseEarMode;
   return save.earTrain && (mode==='stage'||mode==='endless');
 }
 function currentU(){
@@ -2775,7 +2805,8 @@ function refresh(){
   lastPct=matchScoreSets(targetSets,makeSampleSets(player));
   const ear=earTrainActive();
   updateMeter(ear?0:lastPct);            /* 耳トレ中はメーターを動かさない */
-  const matched=!cleared&&lastPct>=CLEAR_PCT;
+  /* 答え合わせを見た回は一致してもクリアにならないので、合図(バナー/点滅)を出さない */
+  const matched=!cleared&&!answerRevealed&&lastPct>=CLEAR_PCT;
   /* 耳トレ中は「合っている」ことを視覚的に教えない */
   $('matchBanner').classList.toggle('hidden',!matched||ear);
   $('btnPlayMine').classList.toggle('attention',matched&&!ear);
@@ -2789,9 +2820,10 @@ function applyModeUI(){
   $('meterRow').classList.toggle('hidden',free||ear);
   $('meterNote').classList.toggle('hidden',free);
   $('meterNote').innerHTML = rev
-    ? '🔍 逆引き — 音だけで同じ音色を作り「♪ 自分の波を聴く」'
+    ? (ear ? '🔍🎧 逆引き(耳トレ) — 音だけで同じ音色を作り「♪ 自分の波を聴く」'
+           : '🔍 逆引き — お手本に波形を合わせ「♪ 自分の波を聴く」')
     : (ear ? '🎧 耳トレモード — 音だけで合わせて「♪ 自分の波を聴く」'
-           : '一致度 96% 以上で波形ロック ▲');
+           : '一致度 98% 以上で波形ロック ▲');
   $('btnPlayTarget').classList.toggle('hidden',free);
   $('btnStopAll').classList.toggle('hidden',!free);
   $('btnRegen').classList.toggle('hidden',free||mode==='tutorial'||rev);
@@ -2799,11 +2831,19 @@ function applyModeUI(){
   $('labTarget').style.visibility=(free||ear)?'hidden':'visible';
   $('hudClearWrap').classList.toggle('hidden',free);
   if(free)$('matchBanner').classList.add('hidden');
+  /* 答え合わせUI: ステージモードのみ。表示中はボタンを隠してパネルを出す */
+  const stage = mode==='stage';
+  $('answerRow').classList.toggle('hidden', !stage || answerRevealed);
+  $('answerPanel').classList.toggle('hidden', !(stage && answerRevealed));
   updateScrubRow();
 }
 
 function beginPuzzle(rawSpec, fixedTarget){
   cleared=false;
+  answerRevealed=false;   /* 新しい問題では答え合わせ状態を解除 */
+  $('answerPanel').classList.add('hidden');
+  $('answerRow').classList.toggle('hidden', mode!=='stage');   /* ステージなら答え合わせボタンを再表示 */
+  if(typeof resetRevealBtn==='function')resetRevealBtn();
   $('matchBanner').classList.add('hidden');
   $('btnPlayMine').classList.remove('attention');
   spec=resolveSpec(rawSpec);
@@ -2899,8 +2939,9 @@ function startFree(presetPatch){
 }
 
 /* ---- reverse mode: 出題コードに挑戦 ---- */
-function startReverseSolve(patch){
+function startReverseSolve(patch, earMode){
   mode='reverse';curTut=null;pendingStage=null;
+  reverseEarMode=!!earMode;   /* 挑戦開始時に耳トレ(音だけ)か波形ありかを確定 */
   setFlag('reverse');checkAchievements();
   $('tutBox').classList.add('hidden');
   show('game');
@@ -2928,9 +2969,37 @@ function updateHud(){
 }
 
 function playMine(){
-  if(mode!=='free' && !cleared && lastPct>=CLEAR_PCT){doClear();return;}
+  /* 答え合わせを見た回(answerRevealed)はクリア不可。やり直すまで一致してもクリアにならない */
+  if(mode!=='free' && !cleared && !answerRevealed && lastPct>=CLEAR_PCT){doClear();return;}
   playWave(player);
   tutorialEvent('listen');
+}
+
+/* ---- 答え合わせ(ステージモードのみ) ---- */
+function fmtAnswerParams(p){
+  if(!p)return '';
+  const algo=ALGO_DEF.find(a=>a.key===p.algo);
+  const n=ALGO_NMODS[p.algo];
+  let lines=[`ALGORITHM: ${algo?algo.label:'?'}（${algo?algo.sub:''}）`];
+  for(let i=0;i<n;i++){
+    const m=p.mods[i];
+    const parts=[`WAVE ${WAVE_INFO[m.wave].label}`, `RATIO ×${m.r}`, `INDEX ${(+m.I).toFixed(2)}`, `ENV ${ENV_INFO[m.env||'const'].label}`];
+    if((m.env||'const')!=='const')parts.push(`SPEED ×${m.s||1}`);
+    lines.push(`M${i+1}: ${parts.join(' / ')}`);
+  }
+  return lines.join('\n');
+}
+function revealAnswer(){
+  if(mode!=='stage'||!target)return;
+  answerRevealed=true;
+  $('answerParams').textContent=fmtAnswerParams(target);
+  $('answerPanel').classList.remove('hidden');
+  $('answerRow').classList.add('hidden');
+  applyModeUI();    /* お手本波形・メーターを表示(耳トレ中でも解除) */
+  updateMeter(lastPct);
+  drawScope();
+  $('matchBanner').classList.add('hidden');
+  $('btnPlayMine').classList.remove('attention');
 }
 
 /* ================= score / rank ================= */
@@ -3067,7 +3136,10 @@ function doClear(){
     btnNext.textContent='もう一度挑戦 ▶';btnNext.dataset.action='dailyAgain';
   }else if(mode==='reverse'){
     word.textContent='SOLVED!';
-    msg.innerHTML=`出題コードの音色を再現しました！<br>波形を表示したので、お手本（点線）と見比べてみましょう。<br>この音色をフリーモードに持ち込んで、さらにいじることもできます。`;
+    const earTag = reverseEarMode
+      ? '<br><span style="color:var(--pink)">🎧 耳トレモード（音だけ）で再現しました！</span>'
+      : '<br><span style="opacity:.7;font-size:11px">🖥 波形を見ながら再現しました</span>';
+    msg.innerHTML=`出題コードの音色を再現しました！${earTag}<br>波形を表示したので、お手本（点線）と見比べてみましょう。<br>この音色をフリーモードに持ち込んで、さらにいじることもできます。`;
     btnNext.textContent='別のコードに挑戦 ▶';btnNext.dataset.action='reverseAgain';
     $('btnClearToFree').classList.remove('hidden');
   }else{
@@ -3417,7 +3489,7 @@ function parseMML(text){
   const errors=[];
   const TOKEN_RE=/^([A-Ga-gr])([#b+\-]*)((?:maj7|maj9|min7|mmaj7|mM7|m7b5|dim7|add9|sus2|sus4|maj|min|dim|aug|M7|M9|m7|m9|m6|7|9|6|m|M|\+|-)?)(\d+)?(\.*)(:\d+)?/;
   function getTrack(slot){
-    if(!tracks[slot])tracks[slot]={events:[],cursorBeat:0,oct:4,defLen:4,curPatch:slot};
+    if(!tracks[slot])tracks[slot]={events:[],cursorBeat:0,oct:4,defLen:4,curPatch:slot,vol:15};
     return tracks[slot];
   }
   function emit(tr,ev){ tr.events.push(ev); tr.cursorBeat+=ev.beats; }
@@ -3448,6 +3520,7 @@ function parseMML(text){
       if(ch==='t'||ch==='T'){ const m=body.slice(i).match(/^t(\d+(?:\.\d+)?)/i); if(m){tempoEvents.push({beat:tr.cursorBeat,bpm:+m[1]});i+=m[0].length;continue;} }
       if(ch==='l'||ch==='L'){ const m=body.slice(i).match(/^l(\d+)/i); if(m){tr.defLen=+m[1];i+=m[0].length;continue;} }
       if(ch==='o'||ch==='O'){ const m=body.slice(i).match(/^o(\d+)/i); if(m){tr.oct=+m[1];i+=m[0].length;continue;} }
+      if(ch==='v'||ch==='V'){ const m=body.slice(i).match(/^v(\d+)/i); if(m){ const vv=+m[1]; if(vv<0||vv>15){errors.push(`行${li+1}: 音量は0〜15で指定してください(v${m[1]})`);} else {tr.vol=vv;} i+=m[0].length; continue; } }
       if(ch==='>'){ tr.oct++; i++; continue; }
       if(ch==='<'){ tr.oct--; i++; continue; }
       if(ch==='~'){ const m=body.slice(i).match(/^~(\d+)/); if(m){tr.curPatch=+m[1];i+=m[0].length;continue;} errors.push(`行${li+1}: ~の後に番号が必要です`); i++; continue; }
@@ -3476,7 +3549,7 @@ function parseMML(text){
         for(const nt of notes){
           const nm=nt.match(/^([A-Ga-g])([#b+\-]*)$/);
           if(!nm){ errors.push(`行${li+1}: 三連符内の "${nt}" が不正`); continue; }
-          emit(tr,{type:'note',midi:noteMidi(nm[1],nm[2],tr.oct),start:tr.cursorBeat,beats:each,patch:tr.curPatch});
+          emit(tr,{type:'note',midi:noteMidi(nm[1],nm[2],tr.oct),start:tr.cursorBeat,beats:each,patch:tr.curPatch,vol:tr.vol});
         }
         i=j; continue;
       }
@@ -3493,12 +3566,12 @@ function parseMML(text){
         let denom=tr.defLen;
         if(colon)denom=+colon.slice(1); else if(lenN)denom=+lenN;
         const rootMidi=12*(tr.oct+1)+NOTE_SEMI[head]+rootAcc;
-        emit(tr,{type:'chord',midis:ints.map(iv=>rootMidi+iv),start:tr.cursorBeat,beats:mmlBeats(denom,dots),patch:tr.curPatch});
+        emit(tr,{type:'chord',midis:ints.map(iv=>rootMidi+iv),start:tr.cursorBeat,beats:mmlBeats(denom,dots),patch:tr.curPatch,vol:tr.vol});
         continue;
       }
       /* 小文字=単音 */
       const denom=lenN?+lenN:tr.defLen;
-      emit(tr,{type:'note',midi:noteMidi(head,accS,tr.oct),start:tr.cursorBeat,beats:mmlBeats(denom,dots),patch:tr.curPatch});
+      emit(tr,{type:'note',midi:noteMidi(head,accS,tr.oct),start:tr.cursorBeat,beats:mmlBeats(denom,dots),patch:tr.curPatch,vol:tr.vol});
     }
   }
   if(tempoEvents.length===0)tempoEvents.push({beat:0,bpm:120});
@@ -3558,10 +3631,12 @@ function playMmlOnce(parsed, baseTime){
       const pp=resolveTrackPatch(ev.patch, trackPatch);
       if(!pp)return;
       const d=Math.max(0.05,durSec*0.98);
+      const vscale=(ev.vol==null?15:ev.vol)/15;   /* 音量: 0〜15を倍率0〜1に(15=従来音量) */
+      if(vscale<=0)return;                         /* v0は無音なので発音しない */
       if(ev.type==='note'){
-        scheduled.push({buf:buildBuffer(pp, midiFreq(ev.midi), d, 0.2), when:baseTime+startSec});
+        scheduled.push({buf:buildBuffer(pp, midiFreq(ev.midi), d, 0.2*vscale), when:baseTime+startSec});
       }else{
-        const g=0.2/Math.sqrt(ev.midis.length);
+        const g=0.2*vscale/Math.sqrt(ev.midis.length);
         ev.midis.forEach(mi=>scheduled.push({buf:buildBuffer(pp, midiFreq(mi), d, g), when:baseTime+startSec}));
       }
     });
@@ -3926,6 +4001,7 @@ function show(screen){
   if(screen!=='game'){releaseAllNotes();mode=null;} /* ゲーム画面を離れたらモード解除(キー入力の誤発火防止) */
   if(presetSrc){try{presetSrc.stop();}catch(e){}presetSrc=null;} /* 図鑑の試聴音を止める */
   if(typeof stopMml==='function')stopMml(); /* MML再生を止める */
+  if(typeof resetRevealBtn==='function')resetRevealBtn(); /* 答え合わせの確認待ちを解除 */
   ['titleScreen','tutSelectScreen','selectScreen','gameScreen','infoScreen','changelogScreen','presetScreen','reverseScreen','achScreen'].forEach(id=>$(id).classList.add('hidden'));
   $({title:'titleScreen',tutsel:'tutSelectScreen',select:'selectScreen',game:'gameScreen',info:'infoScreen',changelog:'changelogScreen',preset:'presetScreen',reverse:'reverseScreen',ach:'achScreen'}[screen])
     .classList.remove('hidden');
@@ -4069,7 +4145,8 @@ function revSolveStart(){
   if(r.err){
     const el=$('revSolveMsg');el.textContent='✖ '+r.err;el.className='rev-msg err';return;
   }
-  startReverseSolve(r.patch);
+  const earMode=$('revEarChk').checked;
+  startReverseSolve(r.patch, earMode);
 }
 $('revTabSolve').addEventListener('click',()=>setRevTab('solve'));
 $('revTabMake').addEventListener('click',()=>setRevTab('make'));
@@ -4157,6 +4234,38 @@ $('btnRegen').addEventListener('click',()=>{
   stopSound();
   if(mode==='stage')beginPuzzle(stageSpec(stageIdx+1));
   else beginPuzzle(endlessSpec(endlessCount));
+});
+
+/* 答え合わせ: 自分の波を聴くボタンの近くにあるため、誤操作防止に2回連続押しで実行 */
+let revealArmed=false, revealArmTimer=null;
+function resetRevealBtn(){
+  revealArmed=false;
+  if(revealArmTimer){clearTimeout(revealArmTimer);revealArmTimer=null;}
+  const b=$('btnReveal');
+  b.textContent='🔑 答え合わせ';
+  b.classList.remove('confirm');
+}
+$('btnReveal').addEventListener('click',()=>{
+  if(mode!=='stage'||cleared)return;
+  if(!revealArmed){
+    /* 1回目: 確認待ち状態にする */
+    revealArmed=true;
+    const b=$('btnReveal');
+    b.textContent='⚠ もう一度押すと答えを表示（クリアできなくなります）';
+    b.classList.add('confirm');
+    if(revealArmTimer)clearTimeout(revealArmTimer);
+    revealArmTimer=setTimeout(resetRevealBtn,4000);   /* 4秒で確認解除 */
+    return;
+  }
+  /* 2回目: 実行 */
+  resetRevealBtn();
+  revealAnswer();
+});
+/* やり直す: 「別の波形に変える」と同じく、お手本ごと新しい問題にして答え合わせを解除 */
+$('btnAnswerRetry').addEventListener('click',()=>{
+  if(mode!=='stage')return;
+  stopSound();
+  beginPuzzle(stageSpec(stageIdx+1));   /* answerRevealed は beginPuzzle 冒頭でリセットされる */
 });
 
 $('btnNext').addEventListener('click',e=>{

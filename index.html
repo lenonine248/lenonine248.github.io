@@ -59,6 +59,35 @@ header{
 .title-sub{color:var(--dim);font-size:13px;letter-spacing:.25em;margin-bottom:28px;user-select:none;cursor:default}
 .title-wave{margin:0 auto 30px;display:block;max-width:520px;width:100%}
 .mode-btns{display:flex;flex-direction:column;gap:12px;max-width:360px;margin:0 auto}
+/* オンボーディング誘導 */
+.onboard-hint{
+  background:var(--lcd-bg);border:1px solid var(--target);border-radius:10px;
+  padding:11px 14px;font-size:12.5px;color:var(--target);line-height:1.7;text-align:left;
+  position:relative;margin-bottom:2px;
+}
+.onboard-hint b{color:var(--lcd)}
+.onboard-hint::after{
+  content:"";position:absolute;left:32px;bottom:-8px;width:14px;height:14px;
+  background:var(--lcd-bg);border-right:1px solid var(--target);border-bottom:1px solid var(--target);
+  transform:rotate(45deg);
+}
+@keyframes onboardPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,169,62,0.45)}50%{box-shadow:0 0 0 6px rgba(245,169,62,0)}}
+.onboard-glow{animation:onboardPulse 1.8s ease-in-out infinite}
+.stage-btn.onboard-glow{position:relative;z-index:2}
+.onboard-stage1-tip{
+  position:absolute;right:calc(100% + 10px);top:50%;transform:translateY(-50%);
+  white-space:nowrap;background:var(--lcd-bg);border:1px solid var(--target);border-radius:8px;
+  padding:6px 10px;font-size:12px;color:var(--target);font-weight:bold;pointer-events:none;
+}
+.onboard-stage1-tip::after{
+  content:"";position:absolute;left:100%;top:50%;transform:translateY(-50%);
+  border:6px solid transparent;border-left-color:var(--target);
+}
+/* 画面が狭い場合は吹き出しをステージ1の上に出す(左に収まらないため) */
+@media(max-width:520px){
+  .onboard-stage1-tip{right:auto;left:0;top:auto;bottom:calc(100% + 8px);transform:none}
+  .onboard-stage1-tip::after{left:16px;top:100%;transform:none;border-left-color:transparent;border-top-color:var(--target)}
+}
 .title-stats{margin-top:22px;font-size:12px;color:var(--dim);letter-spacing:.1em;line-height:2}
 .title-stats b{color:var(--lcd)}
 .ver-label{
@@ -374,6 +403,14 @@ input[type=range]::-moz-range-thumb{
 .free-hint{font-size:11px;color:var(--dim);margin-top:8px;line-height:1.8}
 .free-hint code{background:var(--lcd-bg);color:var(--lcd);border:1px solid var(--line);border-radius:3px;padding:0 4px;font-size:10.5px}
 
+/* my patches (マイ音色) */
+.mypatch-list{display:flex;flex-direction:column;gap:8px;margin:4px 0}
+.mypatch-empty{font-size:12px;color:var(--dim);padding:8px 2px}
+.mypatch-item{display:flex;align-items:center;gap:8px;background:var(--lcd-bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;flex-wrap:wrap}
+.mypatch-name{flex:1;min-width:90px;font-size:13px;color:var(--lcd);font-family:'SFMono-Regular',Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mypatch-btns{display:flex;gap:6px;flex-wrap:wrap}
+.mypatch-btns .btn{padding:5px 9px;font-size:11px}
+
 /* MML sequencer */
 .mml-header{
   display:flex;align-items:center;gap:9px;width:100%;
@@ -394,6 +431,13 @@ input[type=range]::-moz-range-thumb{
 }
 .mml-progress{height:5px;background:var(--lcd-bg);border:1px solid var(--line);border-radius:3px;margin-top:10px;overflow:hidden}
 .mml-progress-bar{height:100%;width:0;background:var(--trace);transition:width .08s linear}
+.wav-gain-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;font-size:11.5px;color:var(--dim)}
+.wav-gain-row label{flex:none;letter-spacing:.1em}
+.wav-gain-row input{
+  width:64px;background:var(--lcd-bg);color:var(--lcd);border:1px solid var(--line);
+  border-radius:6px;padding:5px 8px;font-family:inherit;font-size:12px;text-align:right;
+}
+.wav-gain-unit{flex:1;min-width:140px}
 
 /* keyboard */
 .kbd{
@@ -694,6 +738,7 @@ input[type=range]::-moz-range-thumb{
         <path id="titlePathP" fill="none" stroke="#3ee6c0" stroke-width="2.5" opacity=".9"/>
       </svg>
       <div class="mode-btns">
+        <div class="onboard-hint hidden" id="onboardHint">👋 はじめての方へ — まずは<b>ステージモード</b>から！<br>波形を合わせる遊び方を、やさしく学べます。</div>
         <button class="btn btn-teal" id="btnStageMode">▶ ステージモード（全200ステージ）</button>
         <button class="btn btn-pink" id="btnEndlessMode">∞ エンドレスモード</button>
         <button class="btn" id="btnDaily">📅 デイリーチャレンジ — 今日の1問</button>
@@ -795,10 +840,10 @@ input[type=range]::-moz-range-thumb{
 
     <!-- ===== 答え合わせ(ステージモードのみ) ===== -->
     <div class="answer-row" id="answerRow">
-      <button class="btn btn-sm" id="btnReveal">🔑 答え合わせ</button>
+      <button class="btn btn-sm" id="btnReveal">🏳 ギブアップして答えを見る</button>
     </div>
     <div class="answer-panel hidden" id="answerPanel">
-      <div class="answer-note">🔑 答え合わせ中 — この問題ではクリアになりません。<b>「別の波形でやり直す」</b>を押すと、新しいお手本で改めて挑戦できます。</div>
+      <div class="answer-note">🏳 答えを見ました — この問題ではクリアになりません。<b>「別の波形でやり直す」</b>を押すと、新しいお手本で改めて挑戦できます。</div>
       <div class="answer-params" id="answerParams"></div>
       <button class="btn btn-teal btn-sm" id="btnAnswerRetry">⟳ 別の波形でやり直す</button>
     </div>
@@ -843,6 +888,12 @@ t120
             <button class="btn btn-sm" id="btnMmlStop">⏹ 停止</button>
             <button class="btn btn-sm" id="btnMmlLoop">🔁 ループ OFF</button>
             <button class="btn btn-sm" id="btnMmlCopy">📋 コピー</button>
+            <button class="btn btn-sm" id="btnMmlExport">📥 WAVで保存</button>
+          </div>
+          <div class="wav-gain-row">
+            <label for="wavGainInput">WAV出力音量</label>
+            <input type="number" id="wavGainInput" min="-24" max="12" step="1" value="0">
+            <span class="wav-gain-unit">dB（0＝再生時と同じ、−24〜+12）</span>
           </div>
           <div class="mml-progress hidden" id="mmlProgress"><div class="mml-progress-bar" id="mmlProgressBar"></div></div>
           <div class="free-msg" id="mmlMsg"></div>
@@ -853,7 +904,25 @@ t120
             <b>音量</b>: <code>v0</code>〜<code>v15</code> で以降の音の大きさを変えられます(<code>v15</code>=標準の大きさ・初期値、<code>v0</code>=無音)。<code>l</code> や <code>o</code> と同じく、次に変えるまで続き、トラックごとに別々に設定できます。<br>
             <b>伴奏</b>: 大文字でコード名(<code>C Am7 G7</code> など)、拍の長さは <code>C:2</code> 形式か <code>l</code> 値。ルート音は <code>A</code>〜<code>G</code>、<code>#/+</code>・<code>b/-</code> も付けられます(例 <code>F#m</code>・<code>Bbmaj7</code>)。<br>
             <span style="opacity:.85">対応コード(Cを例に): <code>C</code>=メジャー、<code>Cm</code>=マイナー、<code>C7</code>=セブンス、<code>Cmaj7</code>(=<code>CM7</code>)=メジャーセブンス、<code>Cm7</code>=マイナーセブンス、<code>CmM7</code>=マイナーメジャーセブンス、<code>Cdim</code>=ディミニッシュ、<code>Cdim7</code>=ディミニッシュセブンス、<code>Cm7b5</code>=ハーフディミニッシュ、<code>Caug</code>(=<code>C+</code>)=オーギュメント、<code>Csus2</code>/<code>Csus4</code>=サスペンデッド、<code>C6</code>/<code>Cm6</code>=シックスス、<code>C9</code>/<code>Cmaj9</code>/<code>Cm9</code>=ナインス、<code>Cadd9</code>=アドナイン。</span><br>
-            <b>音色切替</b>: トラック内で <code>~2</code> と書くと以降パッチ2の音色に。 <code>;</code> 以降はコメント。
+            <b>音色切替</b>: トラック内で <code>~2</code> と書くと以降パッチ2の音色に。 <code>;</code> 以降はコメント。<br>
+            <b>保存</b>: 「📥 WAVで保存」で、作った曲を音声ファイル(WAV)として書き出せます。ほかのアプリでも再生・利用できます。書き出し時の音量は「WAV出力音量」(dB)で調整できます(0で再生時と同じ)。
+          </div>
+        </div>
+      </div>
+      <div class="free-sec">
+        <button class="mml-header" id="myPatchToggle" aria-expanded="false">
+          <span class="mml-caret">▶</span>
+          <span>マイ音色 — 作った音色を保存</span>
+        </button>
+        <div class="mml-body hidden" id="myPatchBody">
+          <div class="free-head" style="margin-bottom:10px">
+            <div class="free-title">保存した音色</div>
+            <button class="btn btn-teal btn-sm" id="btnPatchSave">＋ 今の音色を保存</button>
+          </div>
+          <div class="mypatch-list" id="myPatchList"></div>
+          <div class="free-msg" id="myPatchMsg"></div>
+          <div class="free-hint">
+            いま作っている音色に名前を付けて保存できます（最大16個）。保存した音色は、読み込み・名前変更・コードのコピー・削除ができます。図鑑のプリセットとは別に、自分だけの音色棚として使えます。
           </div>
         </div>
       </div>
@@ -1085,6 +1154,7 @@ t120
       <div class="clear-word" id="clearWord">CLEAR!</div>
       <div class="clear-rank hidden" id="clearRank"></div>
       <div class="clear-sub" id="clearMsg"></div>
+      <button class="btn btn-amber hidden" id="btnNextTier">次の難易度へ ▶▶</button>
       <button class="btn btn-teal" id="btnNext">次へ ▶</button>
       <button class="btn btn-amber hidden" id="btnClearToFree">🎛 この音色をフリーモードで開く</button>
       <button class="btn" id="btnClearBack">もどる</button>
@@ -1170,13 +1240,19 @@ t120
 /* ================= version & changelog =================
    バージョンを更新するときは VERSION を進め、CHANGELOG の
    先頭に新しいエントリを追加すること(新しい順に表示される) */
-const VERSION = 'Beta10';
+const VERSION = 'Beta11';
 const CHANGELOG = [
+  {v:'Beta11', items:[
+    'フリーモードに「マイ音色」を追加: 作った音色に名前を付けて保存できる(最大16個)。保存した音色は、読み込み・名前変更・コードのコピー・削除ができる。図鑑のプリセットとは別の、自分だけの音色棚として使える',
+    '初めて遊ぶ人向けの案内を追加: 最初の起動時だけ、タイトルでステージモードを目立たせて案内を表示し、ステージ選択でもステージ1を強調して案内を表示。ステージ1を選ぶか、ほかのモードを選ぶと案内は消える',
+    'MML SEQUENCER に「WAVで保存」を追加: 作った曲を音声ファイル(WAV形式)として書き出せる。書き出しは一瞬で完了し、ほかのアプリでも再生・利用できる。書き出し時の音量を dB 単位(−24〜+12dB、0で再生時と同じ)で調整できる',
+    'ステージの解放方法を追加: 各難易度(ティア)の中で4ステージをクリアすると、次のティアの最初のステージが解放されるように。苦手なステージがあっても、同じ難易度の他のステージを進めれば次の難易度に挑戦できる(飛ばしたステージは後から戻ってクリア可能)。次の難易度が解放されたときは、クリア画面に「次の難易度へ」ボタンが出る',
+  ]},
   {v:'Beta10', items:[
     'クリア判定の一致度を 96% 以上から 98% 以上に変更。より正確に波形を合わせることが求められるようになった(全ステージで、正解どおりに合わせれば必ずクリアできることは確認済み)',
     'MML SEQUENCER に音量指定 v0〜v15 を追加(v15=標準・初期値、v0=無音)。l や o と同じく以降の音に適用され、トラックごとに独立して途中変更できる',
     '逆引きモードに「耳トレモードで挑戦」の選択を追加: 挑戦開始時にチェックすると、これまでどおり音だけで再現する上級者向けに。チェックしなければお手本の波形を見ながら挑戦できる。クリア時に、どちらで再現したかが表示される',
-    'ステージモードに「答え合わせ」を追加: ボタンを押すと正解の波形とパラメータ(アルゴリズム・各モジュレータの設定)を確認できる。誤操作防止のため2回連続で押すと表示される。答えを見た問題はクリア・ランク対象外になり、「別の波形でやり直す」を押すと新しいお手本で改めて挑戦できる。耳トレ中でも答え合わせで波形を確認できる',
+    'ステージモードに「ギブアップして答えを見る」を追加: ボタンを押すと正解の波形とパラメータ(アルゴリズム・各モジュレータの設定)を確認できる。誤操作防止のため2回連続で押すと表示される。答えを見た問題はクリア・ランク対象外になり、「別の波形でやり直す」を押すと新しいお手本で改めて挑戦できる。耳トレ中でも答えを見て波形を確認できる',
   ]},
   {v:'Beta9', items:[
     'フリーモードに「MML SEQUENCER」を追加（従来の CHORD PLAYER を拡張）: テキストで簡易作曲ができる（メロディ＋コード伴奏の2声）。テンポ・音の長さ・オクターブ・休符・付点・タイ・三連符に対応し、トラックごとに別の音色を割り当てたり、曲の途中で音色を切り替えたりできる。再生・停止・ループ・再生位置表示・コピー共有に対応。初期状態は折りたたみ',
@@ -1593,6 +1669,7 @@ window.addEventListener('scroll',()=>{if(helpKey)hideHelp();},true);
 
 /* ================= help tooltips end ================= */
 const DEFAULT_TUTS = {basic:false, waves:false, parallel:false, serial:false, algo:false, env:false, speed:false, osc3:false, shapes:false};
+let isFirstLaunch=false;  /* 完全初回起動か(オンボーディング誘導用)。loadSaveで設定 */
 const save = {
   unlocked: 1,
   clearedMax: 0,
@@ -1612,11 +1689,13 @@ const save = {
   dailyClears: 0, /* デイリー累計クリア回数 */
   ach: {},        /* {achId: true} 解除済み実績 */
   flags: {},      /* 実績判定用の行動フラグ(使った波形/ENV/アルゴリズム等) */
+  myPatches: [],  /* マイ音色: [{name, code}] 最大16個。codeはFM1文字列 */
   tuts: {...DEFAULT_TUTS},
 };
 function loadSave(){
   try{
     const r = localStorage.getItem('fmwp-save');
+    isFirstLaunch = !r;   /* セーブが存在しない=完全初回。オンボーディング誘導の表示条件 */
     if(r){
       const d=JSON.parse(r);
       Object.assign(save, d);
@@ -1629,11 +1708,13 @@ function loadSave(){
       save.dailyClears = d.dailyClears||0;
       save.ach = (d.ach && typeof d.ach==='object') ? d.ach : {};
       save.flags = (d.flags && typeof d.flags==='object') ? d.flags : {};
+      save.myPatches = Array.isArray(d.myPatches) ? d.myPatches.slice(0,16) : [];
     }
   }catch(e){/* 初回 or storage 非対応 */}
   /* ステージ数が変わった版からの引き継ぎに備えてクランプ */
   save.unlocked=Math.min(Math.max(1,save.unlocked),TOTAL_STAGES);
   save.clearedMax=Math.min(Math.max(0,save.clearedMax),TOTAL_STAGES);
+  recomputeUnlocked();   /* ranksから連続解放を整合(先取り解放はstageUnlockedが判定) */
 }
 function persist(){
   try{ localStorage.setItem('fmwp-save', JSON.stringify(save)); }catch(e){}
@@ -1804,12 +1885,45 @@ function dailySpec(dateStr){
     bias: sys.bias,
   };
 }
+/* 連続解放(save.unlocked)の最前線を再計算。
+   ステージ1から連続してクリア済みのステージの「次」を解放最前線とする。
+   先取り解放(飛ばし)はここには含めず、stageUnlockedが別途ranksから判定する。 */
+function recomputeUnlocked(){
+  let n=1;
+  while(n<=TOTAL_STAGES && save.ranks[n])n++;   /* 連続クリアの先頭まで進む */
+  save.unlocked=Math.min(TOTAL_STAGES, Math.max(save.unlocked, n));
+}
 function stageSpec(n){
   const tier=TIERS.find(tr=>n>=tr.from&&n<=tr.to);
   const t=tier.to===tier.from?1:(n-tier.from)/(tier.to-tier.from);
   const s=tier.spec(t,n);
   s.tierName=tier.name;
   return s;
+}
+/* あるティア内でクリア済みのステージ数(save.ranksに記録があればクリア済み) */
+const TIER_UNLOCK_COUNT=4;   /* このステージ数を同一ティア内でクリアすると次ティア先頭が解放 */
+function tierClearedCount(tier){
+  let c=0;
+  for(let n=tier.from;n<=tier.to;n++)if(save.ranks[n])c++;
+  return c;
+}
+/* ステージnが解放済みか。
+   (1)従来どおり連続解放(n<=save.unlocked)、または
+   (2)先取り解放: nが属するティアの「1つ前のティア」で4ステージ以上クリア済みなら、
+      そのティアの先頭から解放(=次ティアの先頭が早めに開く)。 */
+function stageUnlocked(n){
+  if(n<=save.unlocked)return true;
+  const ti=TIERS.findIndex(tr=>n>=tr.from&&n<=tr.to);
+  if(ti<=0)return false;                       /* 最初のティアは先取り元がない */
+  const prev=TIERS[ti-1];
+  /* 先取りは「次ティアの先頭」を開く。nが現ティアの先頭で、前ティアを4つ以上クリア済みなら解放 */
+  if(tierClearedCount(prev)>=TIER_UNLOCK_COUNT){
+    /* 前ティアを4つクリアで、このティアは先頭から遊べる(連続解放と同様、以後は1つ前クリアで前進) */
+    if(n===TIERS[ti].from)return true;
+    /* 先頭以降は、このティア内で1つ前をクリアしていれば解放(ティア内一本道) */
+    if(save.ranks[n-1])return true;
+  }
+  return false;
 }
 
 /* ================= endless difficulty ================= */
@@ -1858,6 +1972,11 @@ const TUTORIALS=[
        <b>「⟳ 別の波形に変える」</b>を押すと、同じ難易度の別の問題に引き直せます。<br>
        ペナルティはないので、難しすぎると感じたら気軽に使ってください
        （チュートリアル中は使えません）。`, btn:'次へ ▶'},
+     {text:`進め方のコツ。ステージは<b>難易度ごとのまとまり</b>に分かれています。<br>
+       ひとつの難易度の中で <b style="color:var(--target)">4ステージ</b> クリアすると、
+       <b>次の難易度の最初のステージ</b>が解放されます。<br>
+       苦手なステージがあっても、同じ難易度の他のステージを進めれば先へ行けます
+       （飛ばしたステージは後から戻ってクリアできます）。`, btn:'次へ ▶'},
      {text:`それでは本番。お手本に重ねてみましょう。<br>
        ヒント：この問題の答えは <b>RATIO ×2 / INDEX 3.0</b> です。<br>
        <span class="tut-wait">▼ スライダーを合わせて一致度 98% を超えよう</span>`, wait:'matched'},
@@ -2874,6 +2993,7 @@ function beginPuzzle(rawSpec, fixedTarget){
 }
 
 function startStage(n){
+  dismissOnboard();   /* ステージを選んだら誘導を消す(以後出さない) */
   const tut=TUTORIALS.find(t=>t.unlockStage===n && !save.tuts[t.id]);
   if(tut){runTutorial(tut,n);return;}
   mode='stage';stageIdx=n-1;curTut=null;
@@ -3041,11 +3161,22 @@ function doClear(){
   const rank=(mode==='stage'||mode==='endless'||mode==='daily')?computeRank():null;
   let rankUp=false;
   let dailyFirst=false, dailyStreakNow=0;
+  let tierJustUnlocked=null;   /* このクリアで新たに先取り解放された次ティアの先頭ステージ番号(なければnull) */
   if(mode==='stage'){
     save.totalClears++;
     if(stageIdx+1>save.clearedMax)save.clearedMax=stageIdx+1;
-    if(stageIdx+2>save.unlocked)save.unlocked=Math.min(TOTAL_STAGES,stageIdx+2);
-    rankUp=recordRank(stageIdx+1,rank);
+    /* 先取り解放の判定: クリア記録の前後でティアのクリア数を比べ、ちょうど4に達したか */
+    const curN=stageIdx+1;
+    const ti=TIERS.findIndex(tr=>curN>=tr.from&&curN<=tr.to);
+    const beforeCnt=tierClearedCount(TIERS[ti]);
+    rankUp=recordRank(curN,rank);
+    recomputeUnlocked();   /* 連続解放の最前線を再計算(先取り解放はstageUnlockedが別途判定) */
+    const afterCnt=tierClearedCount(TIERS[ti]);
+    if(beforeCnt<TIER_UNLOCK_COUNT && afterCnt>=TIER_UNLOCK_COUNT && ti<TIERS.length-1){
+      const nextTierFirst=TIERS[ti+1].from;
+      /* 「次のステージへ」(curN+1=stageIdx+2)が次ティア先頭と重複しない場合だけ別ボタンを出す */
+      if(curN+1!==nextTierFirst)tierJustUnlocked=nextTierFirst;
+    }
   }else if(mode==='endless'){
     save.totalClears++;
     if(endlessCount+1>save.endlessBest)save.endlessBest=endlessCount+1;
@@ -3115,6 +3246,7 @@ function doClear(){
   const msg=$('clearMsg'),btnNext=$('btnNext'),word=$('clearWord');
   word.textContent='CLEAR!';
   $('btnClearToFree').classList.add('hidden');
+  $('btnNextTier').classList.add('hidden');   /* 既定は非表示。先取り解放時のみ下で表示 */
   if(mode==='stage'){
     if(stageIdx>=TOTAL_STAGES-1){
       word.textContent='ALL CLEAR!';
@@ -3123,6 +3255,13 @@ function doClear(){
     }else{
       msg.innerHTML=`STAGE ${stageIdx+1} クリア！<br>累計クリア数: <b>${save.totalClears}</b>`;
       btnNext.textContent='次のステージへ ▶';btnNext.dataset.action='nextStage';
+      if(tierJustUnlocked!=null){
+        msg.innerHTML+=`<br><span style="color:var(--target)">🎉 次の難易度が解放されました！</span>`;
+        const bt=$('btnNextTier');
+        bt.textContent='次の難易度へ ▶▶';
+        bt.dataset.tierStage=tierJustUnlocked;
+        bt.classList.remove('hidden');
+      }
     }
   }else if(mode==='endless'){
     msg.innerHTML=`Lv.${endlessCount+1} クリア！<br>連続クリア: <b>${endlessCount+1}</b>　ベスト: <b>${save.endlessBest}</b>`;
@@ -3222,8 +3361,8 @@ function renderStageSelect(){
     /* ティアの進捗(クリア数 / 総数)と状態 */
     const total=tier.to-tier.from+1;
     let cleared=0;
-    for(let n=tier.from;n<=tier.to;n++)if(n<=save.clearedMax)cleared++;
-    const locked = tier.from>save.unlocked;
+    for(let n=tier.from;n<=tier.to;n++)if(save.ranks[n])cleared++;   /* ranks基準(飛ばし解放に対応) */
+    const locked = !stageUnlocked(tier.from);
     let progClass='', progText;
     if(locked){progClass='locked';progText='🔒 未開放';}
     else if(cleared>=total){progClass='done';progText=`✓ ${cleared}/${total}`;}
@@ -3242,10 +3381,18 @@ function renderStageSelect(){
       b.className='stage-btn';b.dataset.stage=n;
       const rk=save.ranks[n];
       b.innerHTML=`${n}`+(rk?`<span class="mini-rank rank-${rk}">${rk}</span>`:'');
-      if(n<=save.clearedMax)b.classList.add('done');
-      if(n===save.unlocked&&n>save.clearedMax)b.classList.add('current');
-      if(n>save.unlocked){b.classList.add('locked');b.disabled=true;}
+      const unlocked=stageUnlocked(n);
+      if(rk)b.classList.add('done');                       /* クリア済み(ランク記録あり) */
+      if(unlocked && !rk)b.classList.add('current');       /* 解放済みで未クリア=挑戦可能 */
+      if(!unlocked){b.classList.add('locked');b.disabled=true;}
       else b.addEventListener('click',()=>startStage(n));
+      if(isFirstLaunch && n===1){
+        b.classList.add('onboard-glow','onboard-stage1');   /* 初回はステージ1を強調＋誘導ラベル */
+        const tip=document.createElement('span');
+        tip.className='onboard-stage1-tip';
+        tip.textContent='👉 まずはここから！';
+        b.appendChild(tip);
+      }
       g.appendChild(b);
     }
     block.appendChild(g);grid.appendChild(block);
@@ -3459,6 +3606,91 @@ $('btnPatchCopy').addEventListener('click',()=>{
   if(!ta.value)ta.value=exportPatch(player);
   copyText(ta.value,'patchMsg');
 });
+
+/* ---- マイ音色(フリーモードで作った音色を名前付きで保存) ---- */
+const MY_PATCH_MAX=16;
+function renderMyPatches(){
+  const list=$('myPatchList');
+  list.innerHTML='';
+  const arr=save.myPatches||[];
+  if(arr.length===0){
+    const e=document.createElement('div');
+    e.className='mypatch-empty';
+    e.textContent='まだ保存された音色はありません。「＋ 今の音色を保存」で追加できます。';
+    list.appendChild(e);
+    return;
+  }
+  arr.forEach((mp,idx)=>{
+    const row=document.createElement('div');
+    row.className='mypatch-item';
+    const nm=document.createElement('div');
+    nm.className='mypatch-name';
+    nm.textContent=mp.name;                 /* textContentでXSS安全 */
+    row.appendChild(nm);
+    const btns=document.createElement('div');
+    btns.className='mypatch-btns';
+    const mk=(label,cls,fn)=>{
+      const b=document.createElement('button');
+      b.className='btn btn-sm'+(cls?' '+cls:'');
+      b.textContent=label;
+      b.addEventListener('click',fn);
+      btns.appendChild(b);
+    };
+    mk('読込','btn-teal',()=>loadMyPatch(idx));
+    mk('改名',null,()=>renameMyPatch(idx));
+    mk('コピー',null,()=>copyText(mp.code,'myPatchMsg'));
+    mk('削除',null,()=>deleteMyPatch(idx));
+    row.appendChild(btns);
+    list.appendChild(row);
+  });
+}
+function saveMyPatch(){
+  if(mode!=='free'){return;}
+  const arr=save.myPatches||(save.myPatches=[]);
+  if(arr.length>=MY_PATCH_MAX){
+    setFreeMsg('myPatchMsg','✖ 保存できる音色は最大'+MY_PATCH_MAX+'個です。不要なものを削除してください。',false);
+    return;
+  }
+  const def='音色'+(arr.length+1);
+  let name=prompt('音色の名前を入力してください（空欄なら「'+def+'」）', def);
+  if(name===null)return;               /* キャンセル */
+  name=name.trim().slice(0,24)||def;   /* 空ならデフォルト名、長すぎは切る */
+  arr.push({name, code:exportPatch(player)});
+  persist();
+  renderMyPatches();
+  setFreeMsg('myPatchMsg','✔ 「'+name+'」を保存しました。',true);
+}
+function loadMyPatch(idx){
+  const mp=save.myPatches[idx]; if(!mp)return;
+  const r=importPatch(mp.code);
+  if(r.err){setFreeMsg('myPatchMsg','✖ 読み込めませんでした: '+r.err,false);return;}
+  releaseAllNotes();
+  player=r.patch;
+  while(player.mods.length<3)player.mods.push({wave:'sine',r:1,I:0,env:'const',s:1});
+  renderAlgo();renderOps();refresh();
+  setFreeMsg('myPatchMsg','✔ 「'+mp.name+'」を読み込みました。',true);
+  playWave(player);
+}
+function deleteMyPatch(idx){
+  const mp=save.myPatches[idx]; if(!mp)return;
+  if(!confirm('「'+mp.name+'」を削除しますか？'))return;
+  save.myPatches.splice(idx,1);
+  persist();
+  renderMyPatches();
+  setFreeMsg('myPatchMsg','「'+mp.name+'」を削除しました。',true);
+}
+function renameMyPatch(idx){
+  const mp=save.myPatches[idx]; if(!mp)return;
+  let name=prompt('新しい名前を入力してください', mp.name);
+  if(name===null)return;
+  name=name.trim().slice(0,24);
+  if(!name){setFreeMsg('myPatchMsg','名前が空のため変更しませんでした。',false);return;}
+  mp.name=name;
+  persist();
+  renderMyPatches();
+  setFreeMsg('myPatchMsg','✔ 名前を「'+name+'」に変更しました。',true);
+}
+$('btnPatchSave').addEventListener('click',saveMyPatch);
 
 /* ================= free mode: MML SEQUENCER ================= */
 const NOTE_SEMI={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
@@ -3700,11 +3932,99 @@ $('btnMmlPlay').addEventListener('click',playMml);
 $('btnMmlStop').addEventListener('click',()=>{ stopMml(); setFreeMsg('mmlMsg','停止しました。',true); });
 $('btnMmlLoop').addEventListener('click',()=>{ mmlLoop=!mmlLoop; setMmlLoopBtn(); });
 $('btnMmlCopy').addEventListener('click',()=>{ const t=$('mmlInput').value; if(!t.trim()){setFreeMsg('mmlMsg','コピーする内容がありません。',false);return;} copyText(t,'mmlMsg'); });
+
+/* ---- WAV書き出し(OfflineAudioContextで高速レンダリング → 16bit PCM WAV) ---- */
+function writeWavString(view,off,str){for(let i=0;i<str.length;i++)view.setUint8(off+i,str.charCodeAt(i));}
+function encodeWav(audioBuffer){
+  const ch=audioBuffer.numberOfChannels, sr=audioBuffer.sampleRate, len=audioBuffer.length;
+  const bps=16, bytesPer=bps/8, blockAlign=ch*bytesPer;
+  const dataSize=len*blockAlign, buf=new ArrayBuffer(44+dataSize), v=new DataView(buf);
+  writeWavString(v,0,'RIFF'); v.setUint32(4,36+dataSize,true); writeWavString(v,8,'WAVE');
+  writeWavString(v,12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true);
+  v.setUint16(22,ch,true); v.setUint32(24,sr,true); v.setUint32(28,sr*blockAlign,true);
+  v.setUint16(32,blockAlign,true); v.setUint16(34,bps,true);
+  writeWavString(v,36,'data'); v.setUint32(40,dataSize,true);
+  const d=audioBuffer.getChannelData(0);
+  let off=44;
+  for(let i=0;i<len;i++){
+    const s=Math.max(-1,Math.min(1,d[i]));
+    v.setInt16(off,s<0?s*0x8000:s*0x7FFF,true); off+=2;
+  }
+  return new Blob([buf],{type:'audio/wav'});
+}
+async function exportMmlWav(){
+  const text=$('mmlInput').value;
+  if(!text.trim()){setFreeMsg('mmlMsg','書き出す内容がありません。',false);return;}
+  const parsed=parseMML(text);
+  if(parsed.errors.length){setFreeMsg('mmlMsg','✖ '+parsed.errors[0],false);return;}
+  const {tracks,trackPatch,tempoEvents}=parsed;
+  /* WAV出力音量: 入力欄のdB値(-24〜+12)を振幅倍率に。0dB=再生時と同じ(振幅1.0倍) */
+  let gainDb=parseFloat($('wavGainInput').value);
+  if(!isFinite(gainDb))gainDb=0;
+  gainDb=Math.max(-24,Math.min(12,Math.round(gainDb)));
+  $('wavGainInput').value=gainDb;                /* 範囲内に正規化して表示も合わせる */
+  const wavGain=Math.pow(10, gainDb/20);
+  /* 全ノートのバッファを生成し、総再生時間を算出 */
+  const ctx=audio(), sr=ctx.sampleRate;
+  const scheduled=[];
+  let maxSec=0;
+  Object.keys(tracks).forEach(slotKey=>{
+    const tr=tracks[+slotKey];
+    tr.events.forEach(ev=>{
+      const startSec=beatToSec(ev.start,tempoEvents);
+      const durSec=beatToSec(ev.start+ev.beats,tempoEvents)-startSec;
+      maxSec=Math.max(maxSec,startSec+durSec);
+      const pp=resolveTrackPatch(ev.patch,trackPatch);
+      if(!pp)return;
+      const d=Math.max(0.05,durSec*0.98);
+      const vscale=(ev.vol==null?15:ev.vol)/15;
+      if(vscale<=0)return;
+      if(ev.type==='note'){
+        scheduled.push({buf:buildBuffer(pp,midiFreq(ev.midi),d,0.2*wavGain*vscale),when:startSec});
+      }else{
+        const g=0.2*wavGain*vscale/Math.sqrt(ev.midis.length);
+        ev.midis.forEach(mi=>scheduled.push({buf:buildBuffer(pp,midiFreq(mi),d,g),when:startSec}));
+      }
+    });
+  });
+  if(scheduled.length===0){setFreeMsg('mmlMsg','書き出す音がありません。',false);return;}
+  /* OfflineAudioContext でミックスダウン(瞬時にレンダリング) */
+  const totalLen=Math.ceil(sr*(maxSec+0.5));   /* 末尾の余韻のため0.5秒パディング */
+  const offCtx=new OfflineAudioContext(1,totalLen,sr);
+  for(const s of scheduled){
+    const src=offCtx.createBufferSource();
+    src.buffer=s.buf;
+    src.connect(offCtx.destination);
+    src.start(s.when);
+  }
+  const btn=$('btnMmlExport');
+  btn.textContent='⏳ 書き出し中…'; btn.disabled=true;
+  try{
+    const rendered=await offCtx.startRendering();
+    const blob=encodeWav(rendered);
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='fm-wave-puzzle-mml.wav';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setFreeMsg('mmlMsg','✔ WAVファイルを書き出しました（'+Math.round(blob.size/1024)+'KB / 音量 '+(gainDb>=0?'+':'')+gainDb+'dB）。',true);
+  }catch(e){
+    setFreeMsg('mmlMsg','✖ 書き出しに失敗しました: '+e.message,false);
+  }finally{
+    btn.textContent='📥 WAVで保存'; btn.disabled=false;
+  }
+}
+$('btnMmlExport').addEventListener('click',exportMmlWav);
 /* 折りたたみ */
 $('mmlToggle').addEventListener('click',()=>{
   const body=$('mmlBody'), open=body.classList.contains('hidden');
   body.classList.toggle('hidden',!open);
   $('mmlToggle').setAttribute('aria-expanded', open?'true':'false');
+});
+$('myPatchToggle').addEventListener('click',()=>{
+  const body=$('myPatchBody'), open=body.classList.contains('hidden');
+  body.classList.toggle('hidden',!open);
+  $('myPatchToggle').setAttribute('aria-expanded', open?'true':'false');
 });
 
 /* ================= free mode: keyboard (押下中サステイン) ================= */
@@ -4185,21 +4505,32 @@ function renderTitleStats(){
   $('btnDaily').innerHTML = todayRank
     ? `📅 デイリーチャレンジ — 本日達成 ${todayRank}ランク（約${eq}ステージ相当）${streak}`
     : `📅 デイリーチャレンジ — 今日の1問（約${eq}ステージ相当）${streak}`;
+  /* オンボーディング: 完全初回起動のときだけ、ステージモードへ誘導 */
+  $('onboardHint').classList.toggle('hidden', !isFirstLaunch);
+  $('btnStageMode').classList.toggle('onboard-glow', isFirstLaunch);
+}
+/* ゲームモードを選んだら誘導を消す(同一セッション中でも、以後二度と出さない)。
+   設定・情報系(オプション/実績/更新履歴)は対象外。 */
+function dismissOnboard(){
+  if(!isFirstLaunch)return;
+  isFirstLaunch=false;
+  $('onboardHint').classList.add('hidden');
+  $('btnStageMode').classList.remove('onboard-glow');
 }
 
 /* ================= UI wiring ================= */
 $('btnStageMode').addEventListener('click',()=>show('select'));
 $('btnSelBack').addEventListener('click',()=>show('title'));
 $('btnJumpFront').addEventListener('click',jumpToFront);
-$('btnTutMenu').addEventListener('click',()=>show('tutsel'));
+$('btnTutMenu').addEventListener('click',()=>{dismissOnboard();show('tutsel');});
 $('btnTutSelBack').addEventListener('click',()=>show('title'));
-$('btnEndlessMode').addEventListener('click',startEndless);
-$('btnDaily').addEventListener('click',startDaily);
-$('btnFreeMode').addEventListener('click',()=>startFree());
-$('btnPresets').addEventListener('click',()=>show('preset'));
+$('btnEndlessMode').addEventListener('click',()=>{dismissOnboard();startEndless();});
+$('btnDaily').addEventListener('click',()=>{dismissOnboard();startDaily();});
+$('btnFreeMode').addEventListener('click',()=>{dismissOnboard();startFree();});
+$('btnPresets').addEventListener('click',()=>{dismissOnboard();show('preset');});
 $('btnPresetBack').addEventListener('click',()=>show('title'));
 $('btnPresetBack2').addEventListener('click',()=>show('title'));
-$('btnReverse').addEventListener('click',()=>show('reverse'));
+$('btnReverse').addEventListener('click',()=>{dismissOnboard();show('reverse');});
 $('btnReverseBack').addEventListener('click',()=>show('title'));
 $('btnAchievements').addEventListener('click',()=>show('ach'));
 $('btnAchBack').addEventListener('click',()=>show('title'));
@@ -4242,7 +4573,7 @@ function resetRevealBtn(){
   revealArmed=false;
   if(revealArmTimer){clearTimeout(revealArmTimer);revealArmTimer=null;}
   const b=$('btnReveal');
-  b.textContent='🔑 答え合わせ';
+  b.textContent='🏳 ギブアップして答えを見る';
   b.classList.remove('confirm');
 }
 $('btnReveal').addEventListener('click',()=>{
@@ -4279,6 +4610,11 @@ $('btnNext').addEventListener('click',e=>{
   else if(a==='reverseAgain')show('reverse');
   else if(a==='dailyAgain')startDaily();
 });
+$('btnNextTier').addEventListener('click',e=>{
+  $('clearOverlay').classList.add('hidden');stopSound();
+  const n=parseInt(e.target.dataset.tierStage,10);
+  if(n>=1&&n<=TOTAL_STAGES)startStage(n);   /* 次ティア先頭へ(チュートリアルがあれば起動) */
+});
 $('btnClearBack').addEventListener('click',()=>{
   $('clearOverlay').classList.add('hidden');stopSound();
   if(mode==='stage')show('select');
@@ -4311,6 +4647,7 @@ renderTitleStats();
 renderOptions();
 applyVolume();
 applyStickyScope();
+renderMyPatches();
 </script>
 </body>
 </html>
